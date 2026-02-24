@@ -1,0 +1,72 @@
+/* Global Layout */
+body {
+    font-family: var(--font-family-primary);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: var(--line-height-body);
+}
+
+/* Sections: Full-screen containers */
+.section {
+    width: 100%;
+    height: var(--section-height);
+    height: var(--section-height-mobile);
+    position: relative;
+    overflow: hidden; /* Videos and content stay within bounds */
+}
+
+/* Section Grid: Base for all sections */
+.section-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    column-gap: var(--column-gap);
+}
+
+/* Grid Variations */
+.splash-grid {
+    grid-template-columns: var(--grid-splash);
+}
+
+.philosophy-grid,
+.what-we-do-grid,
+.contact-grid {
+    grid-template-columns: var(--grid-3-col);
+}
+
+/* Video Placeholders: Animated gradients */
+.video-placeholder {
+    width: 100%;
+    height: 100%;
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+}
+
+.gradient-1 {
+    background: var(--gradient-1);
+}
+
+.gradient-2 {
+    background: var(--gradient-2);
+}
+
+.gradient-3 {
+    background: var(--gradient-3);
+}
+
+.gradient-4 {
+    background: var(--gradient-4);
+}
+
+.gradient-5 {
+    background: var(--gradient-5);
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}

@@ -1,0 +1,30 @@
+/* Navigation Menu */
+.main-menu {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: var(--z-menu);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu-item {
+    color: var(--color-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+    text-align: right;
+    background-color: transparent;
+}
+
+.menu-item:hover {
+    color: var(--color-cta);
+}
+
+/* Ensure menu is always visible over any background */
+.main-menu {
+    mix-blend-mode: difference;
+}

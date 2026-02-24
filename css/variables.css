@@ -1,0 +1,45 @@
+:root {
+    /* Layout */
+    --section-height: 100vh;
+    --section-height-mobile: 100svh; /* Safari mobile fix */
+    --column-gap: 0; /* Columns are edge-to-edge */
+
+    /* Grid proportions */
+    --grid-3-col: 1fr 1fr 1fr; /* Three equal columns */
+    --grid-splash: 1fr 2fr; /* Splash: 1/3 and 2/3 */
+
+    /* Colors */
+    --color-bg: #000000;
+    --color-text: #ffffff;
+    --color-text-inverted: #ffffff;
+    --color-cta: #667eea;
+    --color-cta-hover: #5568d3;
+
+    /* Gradients for video placeholders */
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+
+    /* Typography */
+    --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-size-h1: clamp(2rem, 5vw, 4rem);
+    --font-size-h2: clamp(1.5rem, 4vw, 3rem);
+    --font-size-body: clamp(1rem, 2vw, 1.25rem);
+    --line-height-body: 1.6;
+
+    /* Animation timings */
+    --duration-text-reveal: 1s;
+    --duration-section-transition: 1.2s;
+    --ease-custom: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* Z-index layers */
+    --z-video: 1;
+    --z-content: 10;
+    --z-menu: 100;
+
+    /* Typing effect */
+    --typing-speed: 30; /* Characters per second */
+    --typing-box-height: 60vh;
+}

@@ -3,17 +3,23 @@
     background-color: #000;
 }
 
-.contact-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+.work-with-us-grid {
+    grid-template-columns: 2fr 1fr;
 }
 
-.contact-text-container {
-    grid-column: 2;
+.work-with-us-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.work-with-us-text-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
+    background-color: #fff;
+    padding: 4rem 2rem;
 }
 
 .contact-line {
@@ -24,12 +30,12 @@
 .contact-line[data-line="1"] {
     font-size: var(--font-size-h2);
     font-weight: 700;
-    color: var(--color-text);
+    color: #000;
 }
 
 .contact-line[data-line="2"] {
     font-size: var(--font-size-body);
-    color: var(--color-text);
+    color: #000;
 }
 
 .contact-cta {

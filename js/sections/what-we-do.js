@@ -16,6 +16,7 @@ Each project is an opportunity to discover something new—about our craft, our 
         ScrollController.registerSection('what-we-do', {
             onEnter: () => this.onEnter(),
             onLeave: () => this.onLeave(),
+            onAfterLeave: () => this.resetState(),
             onScrollAttempt: (direction) => this.onScrollAttempt(direction)
         });
     },
@@ -93,6 +94,16 @@ Each project is an opportunity to discover something new—about our craft, our 
     },
 
     onLeave() {
+        // Stop typing animation when leaving section
         this.stopTyping();
+    },
+
+    resetState() {
+        // Reset visual state after transition completes
+        const typingContainer = document.getElementById('typingContent');
+        if (typingContainer) {
+            typingContainer.textContent = '';
+            gsap.set(typingContainer, { opacity: 1 });
+        }
     }
 };

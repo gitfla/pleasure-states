@@ -20,9 +20,6 @@ const MenuController = {
                 }
             });
         });
-
-        // Track active section on scroll
-        this.trackActiveSection();
     },
 
     updateActiveMenuItem(sectionId) {
@@ -33,23 +30,6 @@ const MenuController = {
             } else {
                 item.classList.remove('active');
             }
-        });
-    },
-
-    trackActiveSection() {
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('.section');
-            const scrollPosition = window.scrollY + window.innerHeight / 2;
-
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionBottom = sectionTop + section.offsetHeight;
-
-                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-                    const sectionId = section.getAttribute('data-section');
-                    this.updateActiveMenuItem(sectionId);
-                }
-            });
         });
     }
 };

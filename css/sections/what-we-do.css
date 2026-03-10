@@ -5,7 +5,6 @@
 
 .what-we-do-grid {
     grid-template-columns: 1fr 2fr;
-    position: relative;
 }
 
 .what-we-do-video-container {
@@ -14,34 +13,18 @@
 }
 
 .what-we-do-text-wrapper {
-    position: relative;
+    background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4rem;
-}
-
-.what-we-do-bg-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: var(--z-video);
 }
 
 .what-we-do-text-box {
-    position: relative;
-    z-index: var(--z-content);
-    background-color: rgba(255, 255, 255, 0.95);
-    color: #000;
-    padding: 2rem;
-    height: var(--typing-box-height);
     width: 100%;
-    max-width: 800px;
+    height: 100%;
+    padding: 4rem;
+    color: #000;
     overflow-y: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .typing-content {

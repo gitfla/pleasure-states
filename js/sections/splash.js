@@ -8,6 +8,7 @@ const SplashSection = {
         ScrollController.registerSection('splash', {
             onEnter: () => this.playAnimation(),
             onLeave: () => this.cleanup(),
+            onAfterLeave: () => this.resetState(),
             onScrollAttempt: () => {
                 // Ignore scroll attempts during splash
                 // Scrolling is blocked by controller
@@ -63,8 +64,20 @@ const SplashSection = {
     },
 
     cleanup() {
+        // Stop animation when leaving section
         if (this.timeline) {
             this.timeline.kill();
+        }
+    },
+
+    resetState() {
+        // Reset visual state after transition completes
+        const texts = document.querySelectorAll('.splash-text');
+        const tagline = document.querySelector('.splash-tagline');
+
+        gsap.set(texts, { opacity: 0, y: 20 });
+        if (tagline) {
+            gsap.set(tagline, { opacity: 0, y: 20 });
         }
     }
 };

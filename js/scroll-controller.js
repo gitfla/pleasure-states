@@ -39,7 +39,8 @@ const ScrollController = {
             isScrollBlocking: el.dataset.scrollBlocking === 'true',
             autoAdvance: el.dataset.autoAdvance === 'true',
             onEnter: null, // Callback when section becomes active
-            onLeave: null, // Callback when leaving section
+            onLeave: null, // Callback when leaving section (before animation)
+            onAfterLeave: null, // Callback after leaving section (after animation completes)
             onScrollAttempt: null, // Callback when user tries to scroll
         }));
     },
@@ -139,10 +140,10 @@ const ScrollController = {
         // Calculate target section
         const targetIndex = this.currentSection + direction;
 
-        // Validate target
-        if (targetIndex < 0 || targetIndex >= this.sections.length) {
-            console.log('ScrollController: Cannot scroll beyond boundaries');
-            return; // Can't scroll beyond boundaries
+        // Validate target - prevent going back to splash (index 0)
+        if (targetIndex < 1 || targetIndex >= this.sections.length) {
+            console.log('ScrollController: Cannot scroll beyond boundaries (splash locked)');
+            return; // Can't scroll to splash or beyond end
         }
 
         // Notify current section of scroll attempt (for animation interruption)
@@ -167,8 +168,9 @@ const ScrollController = {
             console.log('ScrollController: Already at target section');
             return;
         }
-        if (targetIndex < 0 || targetIndex >= this.sections.length) {
-            console.log('ScrollController: Invalid target index');
+        // Prevent navigating to splash (index 0) or beyond boundaries
+        if (targetIndex < 1 || targetIndex >= this.sections.length) {
+            console.log('ScrollController: Invalid target index (splash locked)');
             return;
         }
 
@@ -221,6 +223,14 @@ const ScrollController = {
     // Called when transition animation completes
     onTransitionComplete(newIndex) {
         console.log('ScrollController: Transition complete, now at section', newIndex);
+
+        // Call onAfterLeave for the previous section (before updating currentSection)
+        const previousSectionData = this.sections[this.currentSection];
+        if (previousSectionData && previousSectionData.onAfterLeave) {
+            console.log('ScrollController: Calling onAfterLeave for section', previousSectionData.id);
+            previousSectionData.onAfterLeave();
+        }
+
         this.currentSection = newIndex;
         this.isTransitioning = false;
 
@@ -233,6 +243,16 @@ const ScrollController = {
 
         // Show/hide menu based on section
         this.updateMenuVisibility();
+
+        // Update logo visibility
+        if (typeof updateLogoVisibility === 'function') {
+            updateLogoVisibility(newIndex);
+        }
+
+        // Update active menu item
+        if (typeof MenuController !== 'undefined' && MenuController.updateActiveMenuItem) {
+            MenuController.updateActiveMenuItem(newSectionData.id);
+        }
 
         // Call onEnter for new section
         if (newSectionData.onEnter) {
@@ -261,6 +281,7 @@ const ScrollController = {
         if (section) {
             section.onEnter = callbacks.onEnter || null;
             section.onLeave = callbacks.onLeave || null;
+            section.onAfterLeave = callbacks.onAfterLeave || null;
             section.onScrollAttempt = callbacks.onScrollAttempt || null;
         }
     },

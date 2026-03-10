@@ -7,6 +7,7 @@ const WhatWeBelieveSection = {
         ScrollController.registerSection('what-we-believe', {
             onEnter: () => this.onEnter(),
             onLeave: () => this.onLeave(),
+            onAfterLeave: () => this.resetState(),
             onScrollAttempt: (direction) => this.onScrollAttempt(direction)
         });
     },
@@ -60,6 +61,13 @@ const WhatWeBelieveSection = {
     },
 
     onLeave() {
+        // Stop animation when leaving section
         this.stopAnimation();
+    },
+
+    resetState() {
+        // Reset visual state after transition completes
+        const paragraphs = document.querySelectorAll('.philosophy-paragraph');
+        gsap.set(paragraphs, { opacity: 0, y: 20 });
     }
 };

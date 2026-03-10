@@ -3,9 +3,11 @@
     position: fixed;
     top: 2rem;
     left: 2rem;
+    right: calc(66.66vw + 2rem); /* Takes left 1/3 of screen with padding */
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
+    mix-blend-mode: difference;
 }
 
 .site-logo.visible {
@@ -13,7 +15,8 @@
 }
 
 .site-logo img {
-    height: 1.5rem;
-    width: auto;
+    width: 100%;
+    height: auto;
     display: block;
+    filter: invert(1);
 }

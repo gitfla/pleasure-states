@@ -1,25 +1,14 @@
-// Logo visibility handler
-function initLogoVisibility() {
+// Logo visibility handler - updated to work with scroll controller
+function updateLogoVisibility(sectionIndex) {
     const logo = document.getElementById('siteLogo');
     if (!logo) return;
 
-    // Hide logo initially (on splash)
-    logo.classList.remove('visible');
-
-    // Show/hide logo based on scroll position
-    window.addEventListener('scroll', () => {
-        const splashSection = document.getElementById('splash');
-        if (!splashSection) return;
-
-        const splashBottom = splashSection.offsetTop + splashSection.offsetHeight;
-        const scrollPosition = window.scrollY;
-
-        if (scrollPosition > splashBottom - 100) {
-            logo.classList.add('visible');
-        } else {
-            logo.classList.remove('visible');
-        }
-    });
+    // Show logo on all sections except splash (index 0)
+    if (sectionIndex > 0) {
+        logo.classList.add('visible');
+    } else {
+        logo.classList.remove('visible');
+    }
 }
 
 // Main Entry Point - Initialize all modules when DOM is ready
@@ -37,9 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize menu
     MenuController.init();
-
-    // Initialize logo visibility
-    initLogoVisibility();
 
     // Start the experience (triggers splash animation)
     ScrollController.start();

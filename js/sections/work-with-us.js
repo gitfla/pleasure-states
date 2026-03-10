@@ -6,6 +6,7 @@ const WorkWithUsSection = {
         ScrollController.registerSection('work-with-us', {
             onEnter: () => this.onEnter(),
             onLeave: () => this.onLeave(),
+            onAfterLeave: () => this.resetState(),
             onScrollAttempt: (direction) => {
                 // Allow normal scroll behavior (no special handling)
                 // User can scroll up to previous section
@@ -32,8 +33,15 @@ const WorkWithUsSection = {
     },
 
     onLeave() {
+        // Stop animation when leaving section
         if (this.timeline) {
             this.timeline.kill();
         }
+    },
+
+    resetState() {
+        // Reset visual state after transition completes
+        const elements = document.querySelectorAll('.contact-line');
+        gsap.set(elements, { opacity: 0, y: 20 });
     }
 };

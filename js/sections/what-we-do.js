@@ -2,15 +2,30 @@
 const WhatWeDoSection = {
     typingTimeline: null,
     isTyping: false,
-    textContent: `We craft experiences that transform how people engage with the world around them.
+    textContent: `We name things.
 
-Our work spans digital and physical spaces, creating immersive environments that tell stories, evoke emotions, and inspire action.
+We write things.
 
-From interactive installations to web experiences, we blend creativity with technology to push boundaries and explore new possibilities.
+We design the strategy behind things.
 
-We believe that the best work emerges from collaboration, curiosity, and a willingness to experiment with the unexpected.
+We help good ideas become clear ideas.
 
-Each project is an opportunity to discover something new—about our craft, our clients, and ourselves.`,
+We give shape to the stuff people feel but can't explain.
+
+We turn research into direction, not decks.
+
+We build brand worlds people want to live in.
+
+We help tired things feel alive again.
+
+We think fast when we need to.
+
+We work slow when it matters.
+
+We plug into your team or bring our own.
+
+We're a practice.
+With a network. With taste. With teeth.`,
 
     init() {
         ScrollController.registerSection('what-we-do', {

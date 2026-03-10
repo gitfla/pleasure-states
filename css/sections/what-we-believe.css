@@ -10,16 +10,17 @@
 .philosophy-text-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 0 3rem;
+    justify-content: flex-start;
+    padding: 8rem 3rem 3rem 3rem;
     background-color: #fff;
 }
 
 .philosophy-paragraph {
-    font-size: var(--font-size-body);
-    margin-bottom: 2rem;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    margin-bottom: 1.8rem;
     opacity: 0; /* Hidden by default */
     color: #000;
+    line-height: 1.5;
 }
 
 .philosophy-video-container {

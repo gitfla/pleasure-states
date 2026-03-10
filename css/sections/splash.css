@@ -49,10 +49,11 @@
 .splash-tagline {
     position: relative;
     z-index: 2;
-    font-size: 1.5rem;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
     font-weight: 400;
     opacity: 0; /* Hidden by default, animated by JS */
     color: var(--color-text);
-    letter-spacing: 0.05em;
-    text-align: center;
+    letter-spacing: 0.1em;
+    text-align: right;
+    padding-right: 2rem;
 }

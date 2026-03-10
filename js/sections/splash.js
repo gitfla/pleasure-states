@@ -3,6 +3,7 @@ const SplashSection = {
     timeline: null,
 
     init() {
+        console.log('SplashSection: init() called');
         // Register with scroll controller
         ScrollController.registerSection('splash', {
             onEnter: () => this.playAnimation(),
@@ -15,9 +16,17 @@ const SplashSection = {
     },
 
     playAnimation() {
+        console.log('SplashSection: playAnimation() called');
         const lines = document.querySelectorAll('.splash-line');
+        console.log('SplashSection: Found', lines.length, 'text lines');
+
+        if (lines.length === 0) {
+            console.error('SplashSection: No .splash-line elements found!');
+            return;
+        }
 
         this.timeline = gsap.timeline({
+            onStart: () => console.log('SplashSection: Animation timeline started'),
             onComplete: () => this.onAnimationComplete()
         });
 

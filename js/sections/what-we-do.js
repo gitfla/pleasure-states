@@ -21,17 +21,23 @@ Each project is an opportunity to discover something new—about our craft, our 
     },
 
     onEnter() {
+        console.log('WhatWeDoSection: onEnter() called');
         // Start typing effect
         this.startTyping();
     },
 
     startTyping() {
+        console.log('WhatWeDoSection: startTyping() called');
         this.isTyping = true;
 
         const typingContainer = document.getElementById('typingContent');
         const textBox = document.getElementById('typingTextBox');
 
+        console.log('WhatWeDoSection: typingContainer:', typingContainer);
+        console.log('WhatWeDoSection: textBox:', textBox);
+
         typingContainer.textContent = ''; // Clear previous content
+        gsap.set(typingContainer, { opacity: 1 }); // Reset opacity in case it was faded out
 
         const chars = this.textContent.split('');
         const charsPerSecond = 30;

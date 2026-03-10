@@ -6,13 +6,34 @@ body {
     line-height: var(--line-height-body);
 }
 
-/* Sections: Full-screen containers */
+/* Sections: Full-screen containers with fixed positioning for mask-lifting effect */
 .section {
-    width: 100%;
-    height: var(--section-height);
-    height: var(--section-height-mobile);
-    position: relative;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
     overflow: hidden; /* Videos and content stay within bounds */
+}
+
+/* Z-index stacking: higher index = covers previous sections */
+#splash {
+    z-index: 10;
+}
+
+#philosophy {
+    z-index: 20;
+    transform: translateY(100%); /* Start off-screen below */
+}
+
+#what-we-do {
+    z-index: 30;
+    transform: translateY(100%); /* Start off-screen below */
+}
+
+#contact {
+    z-index: 40;
+    transform: translateY(100%); /* Start off-screen below */
 }
 
 /* Section Grid: Base for all sections */

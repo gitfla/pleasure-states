@@ -191,7 +191,7 @@ const ScrollController = {
         const duration = immediate ? 0 : this.config.transitionDuration;
 
         if (direction === 'down') {
-            // Scrolling forward: Next section slides up from bottom
+            // Scrolling forward: Next section slides up from bottom to cover current
             console.log('ScrollController: Sliding section', targetIndex, 'up from bottom');
 
             // Ensure target section starts at 100% (below viewport)
@@ -204,18 +204,29 @@ const ScrollController = {
                 onComplete: () => this.onTransitionComplete(targetIndex)
             });
         } else {
-            // Scrolling backward: Current section slides down to reveal previous
-            console.log('ScrollController: Sliding section', this.currentSection, 'down to reveal', targetIndex);
+            // Scrolling backward: Previous section slides down from top to cover current
+            console.log('ScrollController: Sliding section', targetIndex, 'down from top');
 
-            // Ensure target section (which is below current) is at 0%
-            gsap.set(targetSectionData.element, { y: '0%' });
+            // Ensure target section starts at -100% (above viewport)
+            gsap.set(targetSectionData.element, { y: '-100%' });
 
-            // Slide current section down to reveal it
-            gsap.to(currentSectionData.element, {
-                y: '100%',      // Slide down off-screen
+            // Temporarily boost z-index so previous section can cover current section
+            const currentZIndex = window.getComputedStyle(currentSectionData.element).zIndex;
+            const tempZIndex = parseInt(currentZIndex) + 1;
+            gsap.set(targetSectionData.element, { zIndex: tempZIndex });
+
+            // Slide previous section down to cover (current stays still)
+            gsap.to(targetSectionData.element, {
+                y: '0%',
                 duration: duration,
                 ease: 'power2.inOut',
-                onComplete: () => this.onTransitionComplete(targetIndex)
+                onComplete: () => {
+                    // Reset z-index after transition
+                    gsap.set(targetSectionData.element, { zIndex: '' });
+                    // Move the old section out of the way
+                    gsap.set(currentSectionData.element, { y: '100%' });
+                    this.onTransitionComplete(targetIndex);
+                }
             });
         }
     },

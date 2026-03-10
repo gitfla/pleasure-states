@@ -12,6 +12,15 @@
     overflow: hidden;
 }
 
+.what-we-do-video-container .background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .what-we-do-text-wrapper {
     background-color: #fff;
     display: flex;

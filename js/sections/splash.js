@@ -17,11 +17,12 @@ const SplashSection = {
 
     playAnimation() {
         console.log('SplashSection: playAnimation() called');
-        const lines = document.querySelectorAll('.splash-line');
-        console.log('SplashSection: Found', lines.length, 'text lines');
+        const texts = document.querySelectorAll('.splash-text');
+        const tagline = document.querySelector('.splash-tagline');
+        console.log('SplashSection: Found', texts.length, 'text elements');
 
-        if (lines.length === 0) {
-            console.error('SplashSection: No .splash-line elements found!');
+        if (texts.length === 0) {
+            console.error('SplashSection: No .splash-text elements found!');
             return;
         }
 
@@ -30,25 +31,27 @@ const SplashSection = {
             onComplete: () => this.onAnimationComplete()
         });
 
-        // Line 1 appears
-        this.timeline.fromTo(lines[0],
-            { opacity: 0, x: -50 },
-            { opacity: 1, x: 0, duration: 1, ease: 'power2.out' }
+        // "PLEASURE" appears
+        this.timeline.fromTo(texts[0],
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
         );
 
-        // Line 2 appears
-        this.timeline.fromTo(lines[1],
-            { opacity: 0, x: -50 },
-            { opacity: 1, x: 0, duration: 1, ease: 'power2.out' },
-            '+=0.5' // 0.5s after previous animation
-        );
-
-        // Line 3 appears
-        this.timeline.fromTo(lines[2],
-            { opacity: 0, x: -50 },
-            { opacity: 1, x: 0, duration: 1, ease: 'power2.out' },
+        // "STATES" appears
+        this.timeline.fromTo(texts[1],
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' },
             '+=0.5'
         );
+
+        // "PLEASURE IS SERIOUS BUSINESS" appears
+        if (tagline) {
+            this.timeline.fromTo(tagline,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+                '+=0.5'
+            );
+        }
     },
 
     onAnimationComplete() {

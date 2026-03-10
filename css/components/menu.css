@@ -24,13 +24,28 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     padding: 0.5rem 1rem;
+    padding-left: 2rem;
     transition: color 0.3s ease;
     text-align: right;
     background-color: transparent;
+    position: relative;
 }
 
 .menu-item:hover {
     color: var(--color-cta);
+}
+
+/* Active menu indicator */
+.menu-item::before {
+    content: '—';
+    position: absolute;
+    left: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.menu-item.active::before {
+    opacity: 1;
 }
 
 /* Ensure menu is always visible over any background */

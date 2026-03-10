@@ -1,10 +1,10 @@
-// Philosophy Section
-const PhilosophySection = {
+// What we believe Section
+const WhatWeBelieveSection = {
     timeline: null,
     isAnimating: false,
 
     init() {
-        ScrollController.registerSection('philosophy', {
+        ScrollController.registerSection('what-we-believe', {
             onEnter: () => this.onEnter(),
             onLeave: () => this.onLeave(),
             onScrollAttempt: (direction) => this.onScrollAttempt(direction)

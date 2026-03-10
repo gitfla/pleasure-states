@@ -21,7 +21,7 @@ body {
     z-index: 10;
 }
 
-#philosophy {
+#what-we-believe {
     z-index: 20;
     transform: translateY(100%); /* Start off-screen below */
 }
@@ -31,7 +31,7 @@ body {
     transform: translateY(100%); /* Start off-screen below */
 }
 
-#contact {
+#work-with-us {
     z-index: 40;
     transform: translateY(100%); /* Start off-screen below */
 }

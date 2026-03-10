@@ -1,9 +1,9 @@
-// Contact Section
-const ContactSection = {
+// Work with us Section
+const WorkWithUsSection = {
     timeline: null,
 
     init() {
-        ScrollController.registerSection('contact', {
+        ScrollController.registerSection('work-with-us', {
             onEnter: () => this.onEnter(),
             onLeave: () => this.onLeave(),
             onScrollAttempt: (direction) => {

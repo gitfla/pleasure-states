@@ -1,0 +1,19 @@
+/* Site Logo */
+.site-logo {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.site-logo.visible {
+    opacity: 1;
+}
+
+.site-logo img {
+    height: 1.5rem;
+    width: auto;
+    display: block;
+}

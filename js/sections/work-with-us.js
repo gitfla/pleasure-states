@@ -1,28 +1,35 @@
 // Work with us Section
 const WorkWithUsSection = {
     timeline: null,
+    isAnimating: false,
 
     init() {
         ScrollController.registerSection('work-with-us', {
-            onEnter: () => this.onEnter(),
+            onEnter: (hasAnimated) => this.onEnter(hasAnimated),
             onLeave: () => this.onLeave(),
-            onAfterLeave: () => this.resetState(),
-            onScrollAttempt: (direction) => {
-                // Allow normal scroll behavior (no special handling)
-                // User can scroll up to previous section
-            }
+            onScrollAttempt: (direction) => this.onScrollAttempt(direction)
         });
     },
 
-    onEnter() {
-        this.animateElements();
+    onEnter(hasAnimated) {
+        console.log('WorkWithUsSection: onEnter() called, hasAnimated:', hasAnimated);
+        if (hasAnimated) {
+            // Section was already animated - show final state immediately
+            this.showFinalState();
+        } else {
+            // First visit - play animation
+            this.animateElements();
+        }
     },
 
     animateElements() {
+        this.isAnimating = true;
         const headline = document.querySelector('.work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
 
-        this.timeline = gsap.timeline();
+        this.timeline = gsap.timeline({
+            onComplete: () => { this.isAnimating = false; }
+        });
 
         // First animate the headline on the left
         this.timeline.fromTo(headline,
@@ -40,19 +47,32 @@ const WorkWithUsSection = {
         });
     },
 
-    onLeave() {
-        // Stop animation when leaving section
-        if (this.timeline) {
-            this.timeline.kill();
+    onScrollAttempt(direction) {
+        if (this.isAnimating) {
+            // User scrolled during animation - stop and skip to final state
+            this.stopAnimation();
+            this.showFinalState();
         }
     },
 
-    resetState() {
-        // Reset visual state after transition completes
+    stopAnimation() {
+        if (this.timeline) {
+            this.timeline.kill();
+            this.isAnimating = false;
+        }
+    },
+
+    showFinalState() {
+        // Set all animated elements to their final state immediately
         const headline = document.querySelector('.work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
 
-        gsap.set(headline, { opacity: 0, y: 20 });
-        gsap.set(paragraphs, { opacity: 0, y: 20 });
+        gsap.set(headline, { opacity: 1, y: 0 });
+        gsap.set(paragraphs, { opacity: 1, y: 0 });
+    },
+
+    onLeave() {
+        // Stop animation when leaving section
+        this.stopAnimation();
     }
 };

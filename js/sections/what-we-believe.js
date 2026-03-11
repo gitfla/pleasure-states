@@ -2,19 +2,25 @@
 const WhatWeBelieveSection = {
     timeline: null,
     isAnimating: false,
+    hasAutoAdvanced: false,
 
     init() {
         ScrollController.registerSection('what-we-believe', {
-            onEnter: () => this.onEnter(),
+            onEnter: (hasAnimated) => this.onEnter(hasAnimated),
             onLeave: () => this.onLeave(),
-            onAfterLeave: () => this.resetState(),
             onScrollAttempt: (direction) => this.onScrollAttempt(direction)
         });
     },
 
-    onEnter() {
-        // Start paragraph animations
-        this.animateParagraphs();
+    onEnter(hasAnimated) {
+        console.log('WhatWeBelieveSection: onEnter() called, hasAnimated:', hasAnimated);
+        if (hasAnimated) {
+            // Section was already animated - show final state immediately
+            this.showFinalState();
+        } else {
+            // First visit - play animation
+            this.animateParagraphs();
+        }
     },
 
     animateParagraphs() {
@@ -39,17 +45,20 @@ const WhatWeBelieveSection = {
     onAnimationComplete() {
         this.isAnimating = false;
 
-        // Auto-advance after short delay
-        setTimeout(() => {
-            ScrollController.advanceToNext();
-        }, 800);
+        // Only auto-advance on first visit
+        if (!this.hasAutoAdvanced) {
+            this.hasAutoAdvanced = true;
+            setTimeout(() => {
+                ScrollController.advanceToNext();
+            }, 800);
+        }
     },
 
     onScrollAttempt(direction) {
         if (this.isAnimating) {
-            // User scrolled during animation - interrupt
+            // User scrolled during animation - stop and skip to final state
             this.stopAnimation();
-            // Let scroll controller handle the navigation
+            this.showFinalState();
         }
     },
 
@@ -60,14 +69,14 @@ const WhatWeBelieveSection = {
         }
     },
 
+    showFinalState() {
+        // Set all animated elements to their final state immediately
+        const paragraphs = document.querySelectorAll('.philosophy-paragraph');
+        gsap.set(paragraphs, { opacity: 1, y: 0 });
+    },
+
     onLeave() {
         // Stop animation when leaving section
         this.stopAnimation();
-    },
-
-    resetState() {
-        // Reset visual state after transition completes
-        const paragraphs = document.querySelectorAll('.philosophy-paragraph');
-        gsap.set(paragraphs, { opacity: 0, y: 20 });
     }
 };

@@ -21,7 +21,7 @@
 <body>
     <!-- Logo -->
     <a href="#splash" class="site-logo" id="siteLogo">
-        <img src="resources/PS_logotype-01.png" alt="Pleasure States">
+        <img src="resources/Fixed_WORMARK.png" alt="Pleasure States">
     </a>
 
     <!-- Navigation Menu -->
@@ -34,20 +34,25 @@
     <!-- Section 1: Splash Screen -->
     <section id="splash" class="section" data-section="splash" data-scroll-blocking="true">
         <div class="section-grid splash-grid">
-            <!-- Column 1: White background with PLEASURE (1/3 width) -->
+            <!-- Column 1: White background with PLEASURE image (1/3 width) -->
             <div class="splash-column splash-white-column">
-                <h1 class="splash-text" data-line="1">PLEASURE</h1>
+                <img src="resources/S1_PLEASURE .png" alt="PLEASURE" class="splash-image splash-pleasure-image" data-line="1">
             </div>
 
-            <!-- Column 2: Video background with STATES (1/3 width) -->
-            <div class="splash-column splash-video-column">
-                <div class="splash-video-container video-placeholder gradient-1"></div>
-                <h1 class="splash-text" data-line="2">STATES</h1>
+            <!-- Video background spanning columns 2-3 -->
+            <div class="splash-video-wrapper">
+                <video autoplay muted loop playsinline class="background-video">
+                    <source src="resources/splashscreen.mov" type="video/mp4">
+                </video>
             </div>
 
-            <!-- Column 3: Video background with tagline (1/3 width) -->
-            <div class="splash-column splash-video-column">
-                <div class="splash-video-container video-placeholder gradient-1"></div>
+            <!-- Column 2: STATES image overlay -->
+            <div class="splash-column splash-text-column">
+                <img src="resources/S1_STATES.png" alt="STATES" class="splash-image" data-line="2">
+            </div>
+
+            <!-- Column 3: Tagline text overlay -->
+            <div class="splash-column splash-text-column">
                 <h1 class="splash-tagline" data-line="3">PLEASURE IS SERIOUS BUSINESS</h1>
             </div>
         </div>

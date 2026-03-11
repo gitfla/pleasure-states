@@ -38,9 +38,9 @@ const ScrollController = {
             index: index,
             isScrollBlocking: el.dataset.scrollBlocking === 'true',
             autoAdvance: el.dataset.autoAdvance === 'true',
+            hasAnimated: false, // Track if section has been animated
             onEnter: null, // Callback when section becomes active
             onLeave: null, // Callback when leaving section (before animation)
-            onAfterLeave: null, // Callback after leaving section (after animation completes)
             onScrollAttempt: null, // Callback when user tries to scroll
         }));
     },
@@ -235,19 +235,13 @@ const ScrollController = {
     onTransitionComplete(newIndex) {
         console.log('ScrollController: Transition complete, now at section', newIndex);
 
-        // Call onAfterLeave for the previous section (before updating currentSection)
-        const previousSectionData = this.sections[this.currentSection];
-        if (previousSectionData && previousSectionData.onAfterLeave) {
-            console.log('ScrollController: Calling onAfterLeave for section', previousSectionData.id);
-            previousSectionData.onAfterLeave();
-        }
-
         this.currentSection = newIndex;
         this.isTransitioning = false;
 
         const newSectionData = this.sections[newIndex];
         console.log('ScrollController: New section data:', newSectionData ? newSectionData.id : 'NULL');
         console.log('ScrollController: Has onEnter callback?', !!newSectionData.onEnter);
+        console.log('ScrollController: Has been animated?', newSectionData.hasAnimated);
 
         // Update scroll blocking state
         this.isScrollBlocked = newSectionData.isScrollBlocking;
@@ -265,24 +259,30 @@ const ScrollController = {
             MenuController.updateActiveMenuItem(newSectionData.id);
         }
 
-        // Call onEnter for new section
+        // Call onEnter for new section, passing hasAnimated flag
         if (newSectionData.onEnter) {
             console.log('ScrollController: Calling onEnter for section', newSectionData.id);
-            newSectionData.onEnter();
+            newSectionData.onEnter(newSectionData.hasAnimated);
+            // Mark as animated after first visit
+            newSectionData.hasAnimated = true;
         } else {
             console.warn('ScrollController: No onEnter callback for section', newSectionData.id);
         }
     },
 
-    // Show menu from philosophy onwards, hide on splash
+    // Show menu and logo from philosophy onwards, hide on splash
     updateMenuVisibility() {
         const menu = document.getElementById('mainMenu');
+        const logo = document.getElementById('siteLogo');
+
         if (this.currentSection === 0) {
-            // Splash: hide menu
+            // Splash: hide menu and logo
             menu.classList.remove('visible');
+            if (logo) logo.classList.remove('visible');
         } else {
-            // All other sections: show menu
+            // All other sections: show menu and logo
             menu.classList.add('visible');
+            if (logo) logo.classList.add('visible');
         }
     },
 
@@ -292,7 +292,6 @@ const ScrollController = {
         if (section) {
             section.onEnter = callbacks.onEnter || null;
             section.onLeave = callbacks.onLeave || null;
-            section.onAfterLeave = callbacks.onAfterLeave || null;
             section.onScrollAttempt = callbacks.onScrollAttempt || null;
         }
     },

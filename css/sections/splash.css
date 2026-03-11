@@ -17,19 +17,29 @@
 
 .splash-white-column {
     background-color: #fff;
+    grid-column: 1;
+    grid-row: 1;
 }
 
-.splash-video-column {
+.splash-video-wrapper {
+    grid-column: 2 / 4; /* Span from column 2 to column 4 (i.e., columns 2 and 3) */
+    grid-row: 1;
+    position: relative;
     overflow: hidden;
 }
 
-.splash-video-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+.splash-text-column {
+    grid-row: 1;
+    background-color: transparent;
+    pointer-events: none; /* Allow clicks to pass through to video */
+}
+
+.splash-text-column:nth-of-type(3) {
+    grid-column: 2; /* STATES text in column 2 */
+}
+
+.splash-text-column:nth-of-type(4) {
+    grid-column: 3; /* Tagline in column 3 */
 }
 
 .splash-text {
@@ -46,14 +56,39 @@
     color: #000;
 }
 
+.splash-image {
+    position: relative;
+    z-index: 2;
+    max-width: 80%; /* Constrain to container width with some padding */
+    max-height: 20vh; /* Maximum height constraint, not fixed */
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Maintain aspect ratio */
+    opacity: 0; /* Hidden by default, animated by JS */
+}
+
+.splash-pleasure-image {
+    filter: brightness(0); /* Tint black */
+    max-width: 100%; /* Larger max-width since PLEASURE is wider - allows it to reach same height as STATES */
+}
+
 .splash-tagline {
     position: relative;
     z-index: 2;
     font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    font-weight: 400;
+    font-weight: 700;
     opacity: 0; /* Hidden by default, animated by JS */
     color: var(--color-text);
     letter-spacing: 0.1em;
     text-align: right;
-    padding-right: 2rem;
+    padding-right: 0.5rem; /* Reduced padding to fit on one line */
+}
+
+.splash-video-wrapper .background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }

@@ -8,6 +8,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     mix-blend-mode: difference;
+    pointer-events: none; /* Make logo non-clickable */
 }
 
 .site-logo.visible {
@@ -18,5 +19,5 @@
     width: 100%;
     height: auto;
     display: block;
-    filter: invert(1);
+    /* filter: invert(1); */ /* Removed - Fixed_WORMARK.png should work without inversion */
 }

@@ -1,14 +1,14 @@
 // Splash Section
 const SplashSection = {
     timeline: null,
+    hasAutoAdvanced: false,
 
     init() {
         console.log('SplashSection: init() called');
         // Register with scroll controller
         ScrollController.registerSection('splash', {
-            onEnter: () => this.playAnimation(),
+            onEnter: (hasAnimated) => this.onEnter(hasAnimated),
             onLeave: () => this.cleanup(),
-            onAfterLeave: () => this.resetState(),
             onScrollAttempt: () => {
                 // Ignore scroll attempts during splash
                 // Scrolling is blocked by controller
@@ -16,14 +16,25 @@ const SplashSection = {
         });
     },
 
+    onEnter(hasAnimated) {
+        console.log('SplashSection: onEnter() called, hasAnimated:', hasAnimated);
+        if (hasAnimated) {
+            // Section was already animated - show final state immediately
+            this.showFinalState();
+        } else {
+            // First visit - play animation
+            this.playAnimation();
+        }
+    },
+
     playAnimation() {
         console.log('SplashSection: playAnimation() called');
-        const texts = document.querySelectorAll('.splash-text');
+        const images = document.querySelectorAll('.splash-image');
         const tagline = document.querySelector('.splash-tagline');
-        console.log('SplashSection: Found', texts.length, 'text elements');
+        console.log('SplashSection: Found', images.length, 'image elements');
 
-        if (texts.length === 0) {
-            console.error('SplashSection: No .splash-text elements found!');
+        if (images.length === 0) {
+            console.error('SplashSection: No .splash-image elements found!');
             return;
         }
 
@@ -32,52 +43,55 @@ const SplashSection = {
             onComplete: () => this.onAnimationComplete()
         });
 
-        // "PLEASURE" appears
-        this.timeline.fromTo(texts[0],
+        // "PLEASURE" image appears
+        this.timeline.fromTo(images[0],
             { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
+            { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
         );
 
-        // "STATES" appears
-        this.timeline.fromTo(texts[1],
+        // "STATES" image appears
+        this.timeline.fromTo(images[1],
             { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' },
-            '+=0.5'
+            { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+            '+=0.25'
         );
 
         // "PLEASURE IS SERIOUS BUSINESS" appears
         if (tagline) {
             this.timeline.fromTo(tagline,
                 { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-                '+=0.5'
+                { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+                '+=0.25'
             );
         }
     },
 
     onAnimationComplete() {
-        // Wait 1 second, then scroll to next section
-        setTimeout(() => {
-            ScrollController.unlockScroll();
-            ScrollController.advanceToNext();
-        }, 1000);
+        // Only auto-advance on first visit
+        if (!this.hasAutoAdvanced) {
+            this.hasAutoAdvanced = true;
+            setTimeout(() => {
+                ScrollController.unlockScroll();
+                ScrollController.advanceToNext();
+            }, 1000);
+        }
+    },
+
+    showFinalState() {
+        // Set all animated elements to their final state immediately
+        const images = document.querySelectorAll('.splash-image');
+        const tagline = document.querySelector('.splash-tagline');
+
+        gsap.set(images, { opacity: 1, y: 0 });
+        if (tagline) {
+            gsap.set(tagline, { opacity: 1, y: 0 });
+        }
     },
 
     cleanup() {
         // Stop animation when leaving section
         if (this.timeline) {
             this.timeline.kill();
-        }
-    },
-
-    resetState() {
-        // Reset visual state after transition completes
-        const texts = document.querySelectorAll('.splash-text');
-        const tagline = document.querySelector('.splash-tagline');
-
-        gsap.set(texts, { opacity: 0, y: 20 });
-        if (tagline) {
-            gsap.set(tagline, { opacity: 0, y: 20 });
         }
     }
 };

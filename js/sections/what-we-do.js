@@ -2,6 +2,7 @@
 const WhatWeDoSection = {
     typingTimeline: null,
     isTyping: false,
+    hasAutoAdvanced: false,
     textContent: `We name things.
 
 We write things.
@@ -29,17 +30,21 @@ With a network. With taste. With teeth.`,
 
     init() {
         ScrollController.registerSection('what-we-do', {
-            onEnter: () => this.onEnter(),
+            onEnter: (hasAnimated) => this.onEnter(hasAnimated),
             onLeave: () => this.onLeave(),
-            onAfterLeave: () => this.resetState(),
             onScrollAttempt: (direction) => this.onScrollAttempt(direction)
         });
     },
 
-    onEnter() {
-        console.log('WhatWeDoSection: onEnter() called');
-        // Start typing effect
-        this.startTyping();
+    onEnter(hasAnimated) {
+        console.log('WhatWeDoSection: onEnter() called, hasAnimated:', hasAnimated);
+        if (hasAnimated) {
+            // Section was already animated - show final state immediately
+            this.showFinalState();
+        } else {
+            // First visit - play typing animation
+            this.startTyping();
+        }
     },
 
     startTyping() {
@@ -55,9 +60,10 @@ With a network. With taste. With teeth.`,
         typingContainer.textContent = ''; // Clear previous content
         gsap.set(typingContainer, { opacity: 1 }); // Reset opacity in case it was faded out
 
-        const chars = this.textContent.split('');
-        const charsPerSecond = 30;
-        const delayPerChar = 1 / charsPerSecond;
+        // Split by whitespace while preserving spaces and newlines
+        const parts = this.textContent.split(/(\s+)/);
+        const wordsPerSecond = 8; // Adjust speed for word-by-word
+        const delayPerWord = 1 / wordsPerSecond;
 
         this.typingTimeline = gsap.timeline({
             onComplete: () => this.onTypingComplete()
@@ -65,39 +71,36 @@ With a network. With taste. With teeth.`,
 
         let currentText = '';
 
-        chars.forEach((char, index) => {
+        parts.forEach((part, index) => {
             this.typingTimeline.call(() => {
-                currentText += char;
+                currentText += part;
                 typingContainer.textContent = currentText;
 
                 // Auto-scroll text box if content overflows
                 if (typingContainer.scrollHeight > textBox.clientHeight) {
                     textBox.scrollTop = typingContainer.scrollHeight - textBox.clientHeight;
                 }
-            }, [], delayPerChar * index);
+            }, [], delayPerWord * index);
         });
     },
 
     onTypingComplete() {
         this.isTyping = false;
 
-        // Auto-advance after brief delay
-        setTimeout(() => {
-            ScrollController.advanceToNext();
-        }, 1000);
+        // Only auto-advance on first visit
+        if (!this.hasAutoAdvanced) {
+            this.hasAutoAdvanced = true;
+            setTimeout(() => {
+                ScrollController.advanceToNext();
+            }, 1000);
+        }
     },
 
     onScrollAttempt(direction) {
         if (this.isTyping) {
-            // User scrolled during typing - interrupt
+            // User scrolled during typing - stop and skip to final state
             this.stopTyping();
-
-            // Fade out text
-            const typingContainer = document.getElementById('typingContent');
-            gsap.to(typingContainer, {
-                opacity: 0,
-                duration: 0.3
-            });
+            this.showFinalState();
         }
     },
 
@@ -108,17 +111,17 @@ With a network. With taste. With teeth.`,
         }
     },
 
+    showFinalState() {
+        // Set typing content to full text immediately
+        const typingContainer = document.getElementById('typingContent');
+        if (typingContainer) {
+            typingContainer.textContent = this.textContent;
+            gsap.set(typingContainer, { opacity: 1 });
+        }
+    },
+
     onLeave() {
         // Stop typing animation when leaving section
         this.stopTyping();
-    },
-
-    resetState() {
-        // Reset visual state after transition completes
-        const typingContainer = document.getElementById('typingContent');
-        if (typingContainer) {
-            typingContainer.textContent = '';
-            gsap.set(typingContainer, { opacity: 1 });
-        }
     }
 };

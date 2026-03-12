@@ -5,6 +5,7 @@ const ScrollController = {
     isTransitioning: false,
     isScrollBlocked: false,
     ctaButtonShown: false,
+    mouseX: 0,  // Track mouse X position for zone-based scrolling
     sections: [],
     sectionElements: [],
 
@@ -53,20 +54,34 @@ const ScrollController = {
         let lastWheelTime = 0;
 
         window.addEventListener('wheel', (e) => {
-            e.preventDefault(); // Always prevent default scroll
-
             const now = Date.now();
 
             // Block if scroll is locked (splash screen)
             if (this.isScrollBlocked) {
+                e.preventDefault();
                 return;
             }
 
             // Block if transition is in progress (prevents rapid scrolling through sections)
             if (this.isTransitioning) {
+                e.preventDefault();
                 console.log('ScrollController: Scroll ignored - transition in progress');
                 return;
             }
+
+            // Check if we're in what-we-do section
+            if (this.currentSection === 2) { // what-we-do is section index 2
+                const scrollZone = this.getScrollZone(e.target, this.mouseX);
+
+                if (scrollZone === 'typing-box') {
+                    // Allow default scroll behavior for typing box
+                    // Do NOT preventDefault
+                    return;
+                }
+            }
+
+            // For all other cases, prevent default and handle section transitions
+            e.preventDefault();
 
             // Debounce: ignore rapid wheel events
             if (now - lastWheelTime < this.config.wheelDebounceDelay) {
@@ -108,6 +123,11 @@ const ScrollController = {
                 this.handleScrollAttempt(direction);
             }
         }, { passive: false });
+
+        // Track mouse position for zone-based scrolling
+        window.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX;
+        }, { passive: true });
     },
 
     // Position viewport on splash screen
@@ -356,6 +376,27 @@ const ScrollController = {
         console.log('ScrollController: Setting scrollIndicator.style.top to:', topPosition + 'px');
         // Apply position (transition will animate smoothly)
         scrollIndicator.style.top = topPosition + 'px';
+    },
+
+    // Determine which scroll zone the mouse is in (for what-we-do section)
+    getScrollZone(target, mouseX) {
+        const viewportWidth = window.innerWidth;
+
+        // Calculate zone boundaries based on grid layout
+        const leftColumnEnd = viewportWidth * 0.327;  // 32.7%
+        const navStripStart = viewportWidth * 0.968;  // 96.8% (100% - 3.2%)
+
+        // Check if mouse is over the typing box element or its children
+        const typingBox = document.querySelector('.what-we-do-text-box');
+        if (typingBox && (typingBox === target || typingBox.contains(target))) {
+            // Mouse is over typing box area
+            if (mouseX > leftColumnEnd && mouseX < navStripStart) {
+                return 'typing-box';
+            }
+        }
+
+        // Default: section transition zones (left column or nav strip)
+        return 'section-transition';
     },
 
     // API: Register section callbacks

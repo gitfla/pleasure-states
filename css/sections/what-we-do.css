@@ -37,6 +37,7 @@
     overflow-y: auto;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
+    pointer-events: auto; /* Ensure it captures mouse events for zone-based scrolling */
 }
 
 .what-we-do-text-box::-webkit-scrollbar {

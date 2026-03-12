@@ -3,6 +3,7 @@ const WhatWeDoSection = {
     typingTimeline: null,
     isTyping: false,
     hasAutoAdvanced: false,
+    userHasScrolled: false, // Track if user manually scrolled away from bottom
     textContent: `We name things.
 
 We write things.
@@ -50,6 +51,7 @@ With a network. With taste. With teeth.`,
     startTyping() {
         console.log('WhatWeDoSection: startTyping() called');
         this.isTyping = true;
+        this.userHasScrolled = false; // Reset flag at start of typing
 
         const typingContainer = document.getElementById('typingContent');
         const textBox = document.getElementById('typingTextBox');
@@ -59,6 +61,24 @@ With a network. With taste. With teeth.`,
 
         typingContainer.textContent = ''; // Clear previous content
         gsap.set(typingContainer, { opacity: 1 }); // Reset opacity in case it was faded out
+
+        // Add scroll event listener to detect manual scrolling
+        const scrollHandler = () => {
+            // Check if user scrolled away from bottom
+            const isAtBottom = textBox.scrollTop >= (typingContainer.scrollHeight - textBox.clientHeight - 5);
+
+            if (!isAtBottom) {
+                this.userHasScrolled = true;
+            } else {
+                // User scrolled back to bottom, resume auto-scroll
+                this.userHasScrolled = false;
+            }
+        };
+
+        textBox.addEventListener('scroll', scrollHandler);
+
+        // Store reference to remove listener later
+        this.scrollHandler = scrollHandler;
 
         // Split by whitespace while preserving spaces and newlines
         const parts = this.textContent.split(/(\s+)/);
@@ -76,8 +96,8 @@ With a network. With taste. With teeth.`,
                 currentText += part;
                 typingContainer.textContent = currentText;
 
-                // Auto-scroll text box if content overflows
-                if (typingContainer.scrollHeight > textBox.clientHeight) {
+                // Auto-scroll text box if content overflows and user hasn't manually scrolled
+                if (typingContainer.scrollHeight > textBox.clientHeight && !this.userHasScrolled) {
                     textBox.scrollTop = typingContainer.scrollHeight - textBox.clientHeight;
                 }
             }, [], delayPerWord * index);
@@ -108,6 +128,15 @@ With a network. With taste. With teeth.`,
         if (this.typingTimeline) {
             this.typingTimeline.kill();
             this.isTyping = false;
+        }
+
+        // Remove scroll event listener
+        if (this.scrollHandler) {
+            const textBox = document.getElementById('typingTextBox');
+            if (textBox) {
+                textBox.removeEventListener('scroll', this.scrollHandler);
+            }
+            this.scrollHandler = null;
         }
     },
 

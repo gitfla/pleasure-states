@@ -44,6 +44,7 @@ const ScrollController = {
             onEnter: null, // Callback when section becomes active
             onLeave: null, // Callback when leaving section (before animation)
             onScrollAttempt: null, // Callback when user tries to scroll
+            isAtScrollBoundary: null, // Callback to check if at scroll boundary (for typing box transitions)
         }));
     },
 
@@ -72,10 +73,78 @@ const ScrollController = {
             // Check if we're in what-we-do section
             if (this.currentSection === 2) { // what-we-do is section index 2
                 const scrollZone = this.getScrollZone(e.target, this.mouseX);
+                console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'mouseX:', this.mouseX);
 
                 if (scrollZone === 'typing-box') {
-                    // Allow default scroll behavior for typing box
-                    // Do NOT preventDefault
+                    const direction = e.deltaY > 0 ? 1 : -1;
+
+                    // Access WhatWeDoSection directly for what-we-do section
+                    if (typeof WhatWeDoSection !== 'undefined') {
+                        // Detect if this is a new gesture
+                        if (WhatWeDoSection.isNewGesture()) {
+                            WhatWeDoSection.handleGestureStart();
+                        }
+
+                        // Update last wheel time for gesture tracking
+                        WhatWeDoSection.lastWheelTime = now;
+
+                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+
+                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping);
+
+                        // During typing: kill momentum once boundary is reached
+                        if (WhatWeDoSection.isTyping) {
+                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
+                                               (direction === -1 && currentBoundary.atTop);
+
+                            if (atBoundary) {
+                                // Mark that this gesture has hit the boundary
+                                if (!WhatWeDoSection.gestureHitBoundary) {
+                                    WhatWeDoSection.gestureHitBoundary = true;
+                                    console.log('ScrollController: Gesture hit boundary during typing, allowing this event');
+                                    // Allow this event to go through (reaches boundary naturally)
+                                    return;
+                                } else {
+                                    // Already hit boundary in this gesture - kill remaining momentum
+                                    e.preventDefault();
+                                    console.log('ScrollController: PREVENTED - Killing momentum after hitting boundary during typing');
+                                    return;
+                                }
+                            }
+
+                            // Not at boundary - allow scroll
+                            console.log('ScrollController: Allowing scroll during typing (not at boundary)');
+                            return;
+                        }
+
+                        // After typing: check if should transition
+                        if (this.canTransitionFromTypingBox(direction)) {
+                            e.preventDefault();
+                            console.log('ScrollController: Was at boundary when gesture started, transitioning');
+
+                            // Apply debouncing
+                            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
+                                console.log('ScrollController: Transition debounced');
+                                return;
+                            }
+
+                            lastWheelTime = now;
+                            this.handleScrollAttempt(direction);
+                            return;
+                        }
+
+                        // Check if currently at boundary (just arrived this gesture)
+                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                            e.preventDefault();
+                            console.log('ScrollController: Reached boundary, preventing scroll (wait for next gesture)');
+                            return;
+                        }
+
+                        // Not at boundary - allow scroll
+                        console.log('ScrollController: Not at boundary, allowing scroll');
+                        return;
+                    }
+
                     return;
                 }
             }
@@ -399,6 +468,32 @@ const ScrollController = {
         return 'section-transition';
     },
 
+    // Check if typing box allows section transition from boundary
+    canTransitionFromTypingBox(direction) {
+        console.log('ScrollController: canTransitionFromTypingBox() called, direction:', direction);
+        console.log('ScrollController: currentSection:', this.currentSection);
+
+        // Only applies to what-we-do section (index 2)
+        if (this.currentSection !== 2) {
+            console.log('ScrollController: Not in what-we-do section, returning false');
+            return false;
+        }
+
+        const currentSectionData = this.sections[this.currentSection];
+        console.log('ScrollController: currentSectionData:', currentSectionData ? currentSectionData.id : 'NULL');
+        console.log('ScrollController: Has isAtScrollBoundary callback?', typeof currentSectionData.isAtScrollBoundary === 'function');
+
+        // Delegate to section's boundary check method
+        if (typeof currentSectionData.isAtScrollBoundary === 'function') {
+            const result = currentSectionData.isAtScrollBoundary(direction);
+            console.log('ScrollController: isAtScrollBoundary returned:', result);
+            return result;
+        }
+
+        console.log('ScrollController: No isAtScrollBoundary callback, returning false');
+        return false;
+    },
+
     // API: Register section callbacks
     registerSection(sectionId, callbacks) {
         const section = this.sections.find(s => s.id === sectionId);
@@ -406,6 +501,7 @@ const ScrollController = {
             section.onEnter = callbacks.onEnter || null;
             section.onLeave = callbacks.onLeave || null;
             section.onScrollAttempt = callbacks.onScrollAttempt || null;
+            section.isAtScrollBoundary = callbacks.isAtScrollBoundary || null;
         }
     },
 

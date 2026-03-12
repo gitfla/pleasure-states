@@ -6,7 +6,7 @@
     z-index: var(--z-menu);
     display: flex;
     flex-direction: column;
-    gap: max(3px, 0.35vw); /* 6/1728 = 0.35%, very tight spacing between items */
+    gap: clamp(3px, 0.45vh, 5px); /* 5/1117 = 0.45vh, vertical spacing */
     opacity: 0;  /* Hidden by default */
     pointer-events: none;  /* Can't click when hidden */
     transition: opacity 0.5s ease;
@@ -21,9 +21,9 @@
 /* Moving menu indicator (like scroll bar) */
 .menu-indicator {
     position: absolute;
-    left: calc(var(--gutter) * -1.7); /* Move dash further to the left */
-    width: max(25px, 2.89vw);  /* 50/1728 = 2.89% - longer */
-    height: max(4px, 0.5vw); /* 10/1728 = 0.58% - thicker */
+    left: calc(var(--gutter) * -1.48); /* 37px to the left at 1728px (37/25 = 1.48) */
+    width: max(20px, 2.31vw);  /* 40/1728 = 2.31% */
+    height: max(3px, 0.627vh); /* 7/1117 = 0.627% */
     background-color: #fff;
     border-radius: max(4px, 0.463vw); /* 8/1728 = 0.463% */
     transition: top 1.2s ease; /* Match section transition duration */
@@ -62,7 +62,7 @@
     position: fixed;
     right: calc(3.2% - max(3px, 0.405vw) - var(--gutter)); /* Inside nav strip, left of menu items */
     width: max(3px, 0.405vw);  /* 7/1728 = 0.405% */
-    height: max(135px, 15.625vw); /* 270/1728 = 15.625% */
+    height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
     z-index: var(--z-menu);
     opacity: 0;
     transition: opacity 0.5s ease, top 1.2s ease;

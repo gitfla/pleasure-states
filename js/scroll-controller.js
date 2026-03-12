@@ -429,8 +429,8 @@ const ScrollController = {
         const gutterValue = parseFloat(getComputedStyle(temp).width);
         document.body.removeChild(temp);
 
-        // Calculate responsive scroll bar height: max(135px, 15.625vw)
-        const scrollBarHeight = Math.max(135, window.innerWidth * 0.15625);
+        // Calculate responsive scroll bar height: max(135px, 24.17vh)
+        const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
 
         console.log('ScrollController: gutterValue:', gutterValue, 'scrollBarHeight:', scrollBarHeight, 'window.innerHeight:', window.innerHeight);
 

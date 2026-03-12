@@ -56,17 +56,15 @@
 .splash-image {
     position: relative;
     z-index: 2;
-    max-width: 80%; /* Constrain to container width with some padding */
-    max-height: 20vh; /* Maximum height constraint, not fixed */
-    width: auto;
-    height: auto;
-    object-fit: contain; /* Maintain aspect ratio */
+    /* Remove max-width and max-height - JS will set explicit dimensions */
+    /* width and height will be set by JS */
+    object-fit: contain;
     opacity: 0; /* Hidden by default, animated by JS */
 }
 
 .splash-pleasure-image {
-    filter: brightness(0); /* Tint black */
-    max-width: 100%; /* Larger max-width since PLEASURE is wider - allows it to reach same height as STATES */
+    filter: brightness(0); /* Keep black tint */
+    /* JS will size this as the anchor */
 }
 
 .splash-tagline {
@@ -77,18 +75,47 @@
     opacity: 0;
     color: var(--color-text);
     letter-spacing: 0.05em;
-    text-align: right;
-    right: var(--gutter);
-    /* Position at same vertical center as images, then offset to align baselines */
+    text-align: left;
+    left: var(--gutter);
+    /* Initial position (JS will override with precise alignment) */
     top: 50%;
-    transform: translateY(calc(10vh - var(--font-splash-tagline) / 2)); /* Align bottom with bottom of 20vh images */
 }
 
-.splash-video-wrapper .background-video {
+/* Poster image - visible by default */
+.splash-video-poster {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 0;
+    opacity: 1;
+    /* No transition - just stay visible, video will fade on top */
+}
+
+.splash-video-poster.hidden {
+    /* Keep visible, video will cover it */
+    opacity: 1;
+    pointer-events: none;
+}
+
+/* Video - hidden by default, fades in on top of poster */
+.splash-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 250ms ease-out;
+    /* Force GPU compositing for smoother playback */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.splash-video.visible {
+    opacity: 1;
 }

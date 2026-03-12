@@ -24,15 +24,15 @@
     --frame-height: max(568px, 100vh);
 
     /* Grid units */
-    --cell-width: max(120px, 14.18vw);    /* 245/1728 = 14.18% */
-    --cell-height: max(80px, 11.73vh);     /* 131/1117 = 11.73% */
-    --gutter: max(12px, 1.45vw);            /* 25/1728 = 1.45% */
+    --cell-width: clamp(120px, 14.18vw, 245px);    /* 245/1728 = 14.18% */
+    --cell-height: clamp(80px, 11.73vh, 131px);     /* 131/1117 = 11.73% */
+    --gutter: clamp(12px, 1.45vw, 25px);            /* 25/1728 = 1.45% */
 
     /* Column bands (derived from cells + gutters) */
     --col-band-1: calc(var(--gutter) + var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
     --col-band-2: calc(var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
     --col-band-3-fg: calc(var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
-    --nav-strip: max(25px, 3.18vw);         /* 55/1728 = 3.18% */
+    --nav-strip: clamp(25px, 3.18vw, 55px);         /* 55/1728 = 3.18% */
     --col-band-3-media: calc(var(--col-band-3-fg) + var(--nav-strip));
 
     /* Inner widths */
@@ -44,30 +44,30 @@
     --font-family-primary: 'Alte Haas Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 
     /* Base typography (generic fallbacks) */
-    --font-size-body: max(15px, 1.68vw);                /* Default body text */
+    --font-size-body: clamp(15px, 1.68vw, 29px);                /* Default body text */
     --line-height-body: 1.5;
-    --font-size-h1: max(60px, 6.83vw);                 /* Large headlines */
-    --font-size-h2: max(16px, 1.79vw);                  /* Medium headlines */
+    --font-size-h1: clamp(60px, 6.83vw, 118px);                 /* Large headlines */
+    --font-size-h2: clamp(16px, 1.79vw, 31px);                  /* Medium headlines */
 
     /* Section-specific typography */
-    --font-splash-tagline: max(16px, 1.79vw);           /* 31/1728 = 1.79% */
-    --font-believe-body: max(15px, 1.68vw);             /* 29/1728 = 1.68% */
-    --font-believe-line-height: max(17px, 1.97vw);      /* 34/1728 = 1.97% - tight spacing */
-    --font-what-we-do: max(60px, 6.83vw);              /* 118/1728 = 6.83% */
+    --font-splash-tagline: clamp(16px, 1.79vw, 31px);           /* 31/1728 = 1.79% */
+    --font-believe-body: clamp(15px, 1.68vw, 29px);             /* 29/1728 = 1.68% */
+    --font-believe-line-height: clamp(28px, 3.13vh, 35px);      /* 35/1117 = 3.13vh - line spacing, vertical */
+    --font-what-we-do: clamp(60px, 6.83vw, 118px);              /* 118/1728 = 6.83% */
     --font-what-we-do-line-height: 0.87;                        /* 87% as specified */
     --font-what-we-do-letter-spacing: -2px;
-    --font-work-with-us-headline: max(60px, 6.83vw);
-    --font-work-with-us-body: max(15px, 1.68vw);
-    --font-button: max(16px, 1.79vw);
-    --font-menu: max(10px, 1.04vw);                     /* 18/1728 = 1.04% */
-    --font-menu-spacing: max(3px, 0.29vw);               /* 5/1728 = 0.29% */
+    --font-work-with-us-headline: clamp(60px, 6.83vw, 118px);
+    --font-work-with-us-body: clamp(15px, 1.68vw, 29px);
+    --font-button: clamp(16px, 1.79vw, 31px);
+    --font-menu: clamp(10px, 1.04vw, 18px);                     /* 18/1728 = 1.04% */
+    --font-menu-spacing: clamp(3px, 0.29vw, 5px);               /* 5/1728 = 0.29% */
 
     /* ========================================
        BUTTONS
        ======================================== */
     --button-width: var(--inner-width-2col);                    /* 515px reference */
-    --button-height: max(35px, 3.99vw);                 /* 69/1728 = 3.99% */
-    --button-radius: max(14px, 1.56vw);                 /* 27/1728 = 1.56% */
+    --button-height: clamp(52px, 6.18vh, 69px);                 /* 69/1117 = 6.18vh - vertical */
+    --button-radius: clamp(14px, 1.56vw, 27px);                 /* 27/1728 = 1.56% */
 
     /* ========================================
        COLORS

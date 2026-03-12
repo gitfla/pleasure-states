@@ -26,9 +26,21 @@ const WorkWithUsSection = {
         this.isAnimating = true;
         const headline = document.querySelector('.work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
+        const ctaButton = document.getElementById('ctaButton');
 
         this.timeline = gsap.timeline({
-            onComplete: () => { this.isAnimating = false; }
+            onComplete: () => {
+                console.log('WorkWithUsSection: Animation complete');
+                this.isAnimating = false;
+                // Enable pointer events on button
+                if (ctaButton) {
+                    ctaButton.style.pointerEvents = 'auto';
+                }
+                // Mark in ScrollController
+                if (typeof ScrollController !== 'undefined') {
+                    ScrollController.ctaButtonShown = true;
+                }
+            }
         });
 
         // First animate the headline on the left
@@ -45,6 +57,15 @@ const WorkWithUsSection = {
                 '+=0.4'
             );
         });
+
+        // Finally animate the CTA button
+        if (ctaButton) {
+            this.timeline.fromTo(ctaButton,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+                '+=0.4'
+            );
+        }
     },
 
     onScrollAttempt(direction) {
@@ -66,9 +87,22 @@ const WorkWithUsSection = {
         // Set all animated elements to their final state immediately
         const headline = document.querySelector('.work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
+        const ctaButton = document.getElementById('ctaButton');
 
         gsap.set(headline, { opacity: 1, y: 0 });
         gsap.set(paragraphs, { opacity: 1, y: 0 });
+
+        if (ctaButton) {
+            gsap.set(ctaButton, { opacity: 1, y: 0 });
+            ctaButton.style.pointerEvents = 'auto';
+        }
+
+        this.isAnimating = false;
+
+        // Mark in ScrollController
+        if (typeof ScrollController !== 'undefined') {
+            ScrollController.ctaButtonShown = true;
+        }
     },
 
     onLeave() {

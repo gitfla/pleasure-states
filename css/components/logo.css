@@ -1,14 +1,18 @@
 /* Site Logo */
 .site-logo {
     position: fixed;
-    top: 2rem;
-    left: 2rem;
-    right: calc(66.66vw + 2rem); /* Takes left 1/3 of screen with padding */
+    top: var(--gutter);
+    left: 0;
+    width: 32.7%; /* Column 1 width */
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
     mix-blend-mode: difference;
     pointer-events: none; /* Make logo non-clickable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--gutter);
 }
 
 .site-logo.visible {

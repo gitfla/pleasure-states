@@ -1,0 +1,47 @@
+/* Contact Section */
+#contact {
+    background-color: #000;
+}
+
+.contact-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.contact-text-container {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.contact-line {
+    opacity: 0; /* Hidden by default */
+    margin-bottom: 2rem;
+}
+
+.contact-line[data-line="1"] {
+    font-size: var(--font-size-h2);
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.contact-line[data-line="2"] {
+    font-size: var(--font-size-body);
+    color: var(--color-text);
+}
+
+.contact-cta {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--color-cta);
+    color: #fff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+}
+
+.contact-cta:hover {
+    background-color: var(--color-cta-hover);
+}

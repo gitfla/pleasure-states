@@ -1,45 +1,42 @@
 /* Splash Section */
 #splash {
-    background-color: #000;
-}
-
-.splash-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #fff;
 }
 
 .splash-column {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: center; /* Center the images vertically */
     justify-content: center;
-    padding: 2rem;
+    padding: calc(var(--gutter) * 2);
 }
 
 .splash-white-column {
     background-color: #fff;
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1 / -1;  /* Full height */
 }
 
 .splash-video-wrapper {
-    grid-column: 2 / 4; /* Span from column 2 to column 4 (i.e., columns 2 and 3) */
-    grid-row: 1;
+    grid-column: 2 / 4;  /* Spans columns 2 and 3 */
+    grid-row: 1 / -1;    /* Full height */
     position: relative;
     overflow: hidden;
 }
 
 .splash-text-column {
-    grid-row: 1;
+    grid-row: 1 / -1;    /* Full height */
     background-color: transparent;
-    pointer-events: none; /* Allow clicks to pass through to video */
+    pointer-events: none;
 }
 
 .splash-text-column:nth-of-type(3) {
-    grid-column: 2; /* STATES text in column 2 */
+    grid-column: 2;  /* STATES in column 2 */
 }
 
 .splash-text-column:nth-of-type(4) {
-    grid-column: 3; /* Tagline in column 3 */
+    grid-column: 3;  /* Tagline in column 3 */
+    padding: calc(var(--gutter) * 2) var(--gutter); /* Reduce horizontal padding for tagline */
 }
 
 .splash-text {
@@ -59,36 +56,66 @@
 .splash-image {
     position: relative;
     z-index: 2;
-    max-width: 80%; /* Constrain to container width with some padding */
-    max-height: 20vh; /* Maximum height constraint, not fixed */
-    width: auto;
-    height: auto;
-    object-fit: contain; /* Maintain aspect ratio */
+    /* Remove max-width and max-height - JS will set explicit dimensions */
+    /* width and height will be set by JS */
+    object-fit: contain;
     opacity: 0; /* Hidden by default, animated by JS */
 }
 
 .splash-pleasure-image {
-    filter: brightness(0); /* Tint black */
-    max-width: 100%; /* Larger max-width since PLEASURE is wider - allows it to reach same height as STATES */
+    filter: brightness(0); /* Keep black tint */
+    /* JS will size this as the anchor */
 }
 
 .splash-tagline {
-    position: relative;
+    position: absolute;
     z-index: 2;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    font-size: var(--font-splash-tagline);
     font-weight: 700;
-    opacity: 0; /* Hidden by default, animated by JS */
+    opacity: 0;
     color: var(--color-text);
-    letter-spacing: 0.1em;
-    text-align: right;
-    padding-right: 0.5rem; /* Reduced padding to fit on one line */
+    letter-spacing: 0.05em;
+    text-align: left;
+    left: var(--gutter);
+    /* Initial position (JS will override with precise alignment) */
+    top: 50%;
 }
 
-.splash-video-wrapper .background-video {
+/* Poster image - visible by default */
+.splash-video-poster {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 0;
+    opacity: 1;
+    /* No transition - just stay visible, video will fade on top */
+}
+
+.splash-video-poster.hidden {
+    /* Keep visible, video will cover it */
+    opacity: 1;
+    pointer-events: none;
+}
+
+/* Video - hidden by default, fades in on top of poster */
+.splash-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 250ms ease-out;
+    /* Force GPU compositing for smoother playback */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.splash-video.visible {
+    opacity: 1;
 }

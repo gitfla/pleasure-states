@@ -4,6 +4,8 @@ const ScrollController = {
     currentSection: 0,
     isTransitioning: false,
     isScrollBlocked: false,
+    ctaButtonShown: false,
+    mouseX: 0,  // Track mouse X position for zone-based scrolling
     sections: [],
     sectionElements: [],
 
@@ -42,6 +44,7 @@ const ScrollController = {
             onEnter: null, // Callback when section becomes active
             onLeave: null, // Callback when leaving section (before animation)
             onScrollAttempt: null, // Callback when user tries to scroll
+            isAtScrollBoundary: null, // Callback to check if at scroll boundary (for typing box transitions)
         }));
     },
 
@@ -52,20 +55,110 @@ const ScrollController = {
         let lastWheelTime = 0;
 
         window.addEventListener('wheel', (e) => {
-            e.preventDefault(); // Always prevent default scroll
-
             const now = Date.now();
 
             // Block if scroll is locked (splash screen)
             if (this.isScrollBlocked) {
+                e.preventDefault();
                 return;
             }
 
             // Block if transition is in progress (prevents rapid scrolling through sections)
             if (this.isTransitioning) {
+                e.preventDefault();
                 console.log('ScrollController: Scroll ignored - transition in progress');
                 return;
             }
+
+            // Check if we're in what-we-do section
+            if (this.currentSection === 2) { // what-we-do is section index 2
+                const scrollZone = this.getScrollZone(e.target, this.mouseX);
+                console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'mouseX:', this.mouseX);
+
+                if (scrollZone === 'typing-box') {
+                    const direction = e.deltaY > 0 ? 1 : -1;
+
+                    // Access WhatWeDoSection directly for what-we-do section
+                    if (typeof WhatWeDoSection !== 'undefined') {
+                        // Detect if this is a new gesture
+                        const timeSinceLastWheel = now - WhatWeDoSection.lastWheelTime;
+                        const isNewGesture = WhatWeDoSection.isNewGesture();
+                        console.log('ScrollController: Gesture check - timeSinceLastWheel:', timeSinceLastWheel, 'ms, isNewGesture:', isNewGesture, 'threshold:', WhatWeDoSection.GESTURE_TIMEOUT, 'ms');
+
+                        if (isNewGesture) {
+                            console.log('ScrollController: NEW GESTURE DETECTED - calling handleGestureStart()');
+                            WhatWeDoSection.handleGestureStart();
+                        }
+
+                        // Update last wheel time for gesture tracking
+                        WhatWeDoSection.lastWheelTime = now;
+
+                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+
+                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping, 'gestureHitBoundary:', WhatWeDoSection.gestureHitBoundary);
+
+                        // During typing: kill momentum once boundary is reached
+                        if (WhatWeDoSection.isTyping) {
+                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
+                                               (direction === -1 && currentBoundary.atTop);
+
+                            if (atBoundary) {
+                                // Mark that this gesture has hit the boundary
+                                if (!WhatWeDoSection.gestureHitBoundary) {
+                                    WhatWeDoSection.gestureHitBoundary = true;
+                                    console.log('ScrollController: Gesture hit boundary during typing, allowing this event');
+                                    // Allow this event to go through (reaches boundary naturally)
+                                    return;
+                                } else {
+                                    // Already hit boundary in this gesture - kill remaining momentum
+                                    e.preventDefault();
+                                    console.log('ScrollController: PREVENTED - Killing momentum after hitting boundary during typing');
+                                    return;
+                                }
+                            } else {
+                                // Not at boundary - reset flag (content may have grown, creating new bottom)
+                                WhatWeDoSection.gestureHitBoundary = false;
+                            }
+
+                            // Not at boundary - allow scroll
+                            console.log('ScrollController: Allowing scroll during typing (not at boundary)');
+                            return;
+                        }
+
+                        // After typing: check if should transition
+                        if (this.canTransitionFromTypingBox(direction)) {
+                            e.preventDefault();
+                            console.log('ScrollController: Was at boundary when gesture started, transitioning');
+
+                            // Apply debouncing
+                            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
+                                console.log('ScrollController: Transition debounced');
+                                return;
+                            }
+
+                            lastWheelTime = now;
+                            this.handleScrollAttempt(direction);
+                            return;
+                        }
+
+                        // Check if currently at boundary (just arrived this gesture)
+                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                            e.preventDefault();
+                            console.log('ScrollController: Reached boundary, preventing scroll (wait for next gesture)');
+                            return;
+                        }
+
+                        // Not at boundary - allow scroll
+                        console.log('ScrollController: Not at boundary, allowing scroll');
+                        return;
+                    }
+
+                    return;
+                }
+            }
+
+            // For all other cases, prevent default and handle section transitions
+            e.preventDefault();
 
             // Debounce: ignore rapid wheel events
             if (now - lastWheelTime < this.config.wheelDebounceDelay) {
@@ -107,6 +200,11 @@ const ScrollController = {
                 this.handleScrollAttempt(direction);
             }
         }, { passive: false });
+
+        // Track mouse position for zone-based scrolling
+        window.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX;
+        }, { passive: true });
     },
 
     // Position viewport on splash screen
@@ -137,6 +235,12 @@ const ScrollController = {
 
         const currentSectionData = this.sections[this.currentSection];
 
+        // Notify current section of scroll attempt FIRST (for animation interruption)
+        // This allows sections to skip to final state even if there's no next section
+        if (currentSectionData.onScrollAttempt) {
+            currentSectionData.onScrollAttempt(direction);
+        }
+
         // Calculate target section
         const targetIndex = this.currentSection + direction;
 
@@ -144,11 +248,6 @@ const ScrollController = {
         if (targetIndex < 1 || targetIndex >= this.sections.length) {
             console.log('ScrollController: Cannot scroll beyond boundaries (splash locked)');
             return; // Can't scroll to splash or beyond end
-        }
-
-        // Notify current section of scroll attempt (for animation interruption)
-        if (currentSectionData.onScrollAttempt) {
-            currentSectionData.onScrollAttempt(direction);
         }
 
         // Execute transition (goToSection will set isTransitioning flag)
@@ -183,6 +282,18 @@ const ScrollController = {
 
         console.log('ScrollController: Direction:', direction);
 
+        // Update current section index early so scroll indicator and menu animate with the transition
+        const previousSection = this.currentSection;
+        this.currentSection = targetIndex;
+
+        // Update scroll indicator BEFORE starting transition so it animates in sync
+        this.updateScrollIndicator();
+
+        // Update active menu item BEFORE starting transition so it animates in sync
+        if (typeof MenuController !== 'undefined' && MenuController.updateActiveMenuItem) {
+            MenuController.updateActiveMenuItem(targetSectionData.id);
+        }
+
         // Call onLeave for current section
         if (currentSectionData.onLeave) {
             currentSectionData.onLeave();
@@ -195,10 +306,10 @@ const ScrollController = {
             console.log('ScrollController: Sliding section', targetIndex, 'up from bottom');
 
             // Ensure target section starts at 100% (below viewport)
-            gsap.set(targetSectionData.element, { y: '100%' });
+            gsap.set(targetSectionData.element, { top: '100%' });
 
             gsap.to(targetSectionData.element, {
-                y: '0%',     // Slide up to cover current
+                top: '0%',     // Slide up to cover current
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: () => this.onTransitionComplete(targetIndex)
@@ -208,7 +319,7 @@ const ScrollController = {
             console.log('ScrollController: Sliding section', targetIndex, 'down from top');
 
             // Ensure target section starts at -100% (above viewport)
-            gsap.set(targetSectionData.element, { y: '-100%' });
+            gsap.set(targetSectionData.element, { top: '-100%' });
 
             // Temporarily boost z-index so previous section can cover current section
             const currentZIndex = window.getComputedStyle(currentSectionData.element).zIndex;
@@ -217,14 +328,14 @@ const ScrollController = {
 
             // Slide previous section down to cover (current stays still)
             gsap.to(targetSectionData.element, {
-                y: '0%',
+                top: '0%',
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: () => {
                     // Reset z-index after transition
                     gsap.set(targetSectionData.element, { zIndex: '' });
                     // Move the old section out of the way
-                    gsap.set(currentSectionData.element, { y: '100%' });
+                    gsap.set(currentSectionData.element, { top: '100%' });
                     this.onTransitionComplete(targetIndex);
                 }
             });
@@ -235,7 +346,7 @@ const ScrollController = {
     onTransitionComplete(newIndex) {
         console.log('ScrollController: Transition complete, now at section', newIndex);
 
-        this.currentSection = newIndex;
+        // Note: this.currentSection was already updated at the start of goToSection
         this.isTransitioning = false;
 
         const newSectionData = this.sections[newIndex];
@@ -246,17 +357,12 @@ const ScrollController = {
         // Update scroll blocking state
         this.isScrollBlocked = newSectionData.isScrollBlocking;
 
-        // Show/hide menu based on section
+        // Show/hide menu, logo, scroll bar after transition completes
         this.updateMenuVisibility();
 
         // Update logo visibility
         if (typeof updateLogoVisibility === 'function') {
             updateLogoVisibility(newIndex);
-        }
-
-        // Update active menu item
-        if (typeof MenuController !== 'undefined' && MenuController.updateActiveMenuItem) {
-            MenuController.updateActiveMenuItem(newSectionData.id);
         }
 
         // Call onEnter for new section, passing hasAnimated flag
@@ -274,16 +380,128 @@ const ScrollController = {
     updateMenuVisibility() {
         const menu = document.getElementById('mainMenu');
         const logo = document.getElementById('siteLogo');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const ctaButton = document.getElementById('ctaButton');
 
         if (this.currentSection === 0) {
-            // Splash: hide menu and logo
+            // Splash: hide menu, logo, scroll indicator, and CTA
             menu.classList.remove('visible');
             if (logo) logo.classList.remove('visible');
+            if (scrollIndicator) scrollIndicator.classList.remove('visible');
+            if (ctaButton && this.ctaButtonShown) {
+                ctaButton.classList.add('hidden');
+            }
         } else {
-            // All other sections: show menu and logo
+            // All other sections: show menu, logo, and scroll indicator
             menu.classList.add('visible');
             if (logo) logo.classList.add('visible');
+            if (scrollIndicator) scrollIndicator.classList.add('visible');
+            // Show CTA if it's been revealed
+            if (ctaButton && this.ctaButtonShown) {
+                ctaButton.classList.remove('hidden');
+            }
+            // Note: updateScrollIndicator() is now called at the start of goToSection for sync'd animation
         }
+    },
+
+    // Update scroll indicator bar position based on current section
+    updateScrollIndicator() {
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        if (!scrollIndicator) {
+            console.log('ScrollController: scrollIndicator element not found');
+            return;
+        }
+
+        const currentIndex = this.currentSection - 1; // 0-based index for non-splash sections
+        console.log('ScrollController: updateScrollIndicator() called, currentSection:', this.currentSection, 'currentIndex:', currentIndex);
+
+        if (currentIndex < 0) {
+            console.log('ScrollController: currentIndex < 0, not updating scroll indicator');
+            return;
+        }
+
+        // Compute actual gutter value in pixels (can't use parseFloat on CSS variables with max/clamp)
+        const temp = document.createElement('div');
+        temp.style.position = 'absolute';
+        temp.style.visibility = 'hidden';
+        temp.style.width = 'var(--gutter)';
+        document.body.appendChild(temp);
+        const gutterValue = parseFloat(getComputedStyle(temp).width);
+        document.body.removeChild(temp);
+
+        // Calculate responsive scroll bar height: max(135px, 24.17vh)
+        const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
+
+        console.log('ScrollController: gutterValue:', gutterValue, 'scrollBarHeight:', scrollBarHeight, 'window.innerHeight:', window.innerHeight);
+
+        // Calculate positions in pixels (always use top property for smooth transition)
+        let topPosition;
+
+        switch (currentIndex) {
+            case 0: // what-we-believe: align with top of first menu item (1 gutter from top)
+                topPosition = gutterValue;
+                console.log('ScrollController: Section 0 (what-we-believe), topPosition:', topPosition);
+                break;
+            case 1: // what-we-do: vertically centered
+                topPosition = (window.innerHeight - scrollBarHeight) / 2;
+                console.log('ScrollController: Section 1 (what-we-do), topPosition:', topPosition);
+                break;
+            case 2: // work-with-us: align with bottom of last menu item (1 gutter from bottom)
+                topPosition = window.innerHeight - scrollBarHeight - gutterValue;
+                console.log('ScrollController: Section 2 (work-with-us), topPosition:', topPosition);
+                break;
+        }
+
+        console.log('ScrollController: Setting scrollIndicator.style.top to:', topPosition + 'px');
+        // Apply position (transition will animate smoothly)
+        scrollIndicator.style.top = topPosition + 'px';
+    },
+
+    // Determine which scroll zone the mouse is in (for what-we-do section)
+    getScrollZone(target, mouseX) {
+        const viewportWidth = window.innerWidth;
+
+        // Calculate zone boundaries based on grid layout
+        const leftColumnEnd = viewportWidth * 0.327;  // 32.7%
+        const navStripStart = viewportWidth * 0.968;  // 96.8% (100% - 3.2%)
+
+        // Check if mouse is over the typing box element or its children
+        const typingBox = document.querySelector('.what-we-do-text-box');
+        if (typingBox && (typingBox === target || typingBox.contains(target))) {
+            // Mouse is over typing box area
+            if (mouseX > leftColumnEnd && mouseX < navStripStart) {
+                return 'typing-box';
+            }
+        }
+
+        // Default: section transition zones (left column or nav strip)
+        return 'section-transition';
+    },
+
+    // Check if typing box allows section transition from boundary
+    canTransitionFromTypingBox(direction) {
+        console.log('ScrollController: canTransitionFromTypingBox() called, direction:', direction);
+        console.log('ScrollController: currentSection:', this.currentSection);
+
+        // Only applies to what-we-do section (index 2)
+        if (this.currentSection !== 2) {
+            console.log('ScrollController: Not in what-we-do section, returning false');
+            return false;
+        }
+
+        const currentSectionData = this.sections[this.currentSection];
+        console.log('ScrollController: currentSectionData:', currentSectionData ? currentSectionData.id : 'NULL');
+        console.log('ScrollController: Has isAtScrollBoundary callback?', typeof currentSectionData.isAtScrollBoundary === 'function');
+
+        // Delegate to section's boundary check method
+        if (typeof currentSectionData.isAtScrollBoundary === 'function') {
+            const result = currentSectionData.isAtScrollBoundary(direction);
+            console.log('ScrollController: isAtScrollBoundary returned:', result);
+            return result;
+        }
+
+        console.log('ScrollController: No isAtScrollBoundary callback, returning false');
+        return false;
     },
 
     // API: Register section callbacks
@@ -293,6 +511,7 @@ const ScrollController = {
             section.onEnter = callbacks.onEnter || null;
             section.onLeave = callbacks.onLeave || null;
             section.onScrollAttempt = callbacks.onScrollAttempt || null;
+            section.isAtScrollBoundary = callbacks.isAtScrollBoundary || null;
         }
     },
 

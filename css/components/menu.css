@@ -1,12 +1,12 @@
 /* Navigation Menu */
 .main-menu {
     position: fixed;
-    top: 2rem;
-    right: 2rem;
+    top: var(--gutter);
+    right: 3.2%; /* Offset by nav strip width to sit in column 3 */
     z-index: var(--z-menu);
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: clamp(3px, 0.45vh, 5px); /* 5/1117 = 0.45vh, vertical spacing */
     opacity: 0;  /* Hidden by default */
     pointer-events: none;  /* Can't click when hidden */
     transition: opacity 0.5s ease;
@@ -18,42 +18,59 @@
     pointer-events: auto;
 }
 
+/* Moving menu indicator (like scroll bar) */
+.menu-indicator {
+    position: absolute;
+    left: calc(var(--gutter) * -1.48); /* 37px to the left at 1728px (37/25 = 1.48) */
+    width: max(20px, 2.31vw);  /* 40/1728 = 2.31% */
+    height: max(3px, 0.627vh); /* 7/1117 = 0.627% */
+    background-color: #fff;
+    border-radius: max(4px, 0.463vw); /* 8/1728 = 0.463% */
+    transition: top 1.2s ease; /* Match section transition duration */
+    opacity: 0;
+}
+
+.main-menu.visible .menu-indicator {
+    opacity: 1;
+}
+
 .menu-item {
     color: var(--color-text);
-    font-size: 0.85rem;
+    font-size: var(--font-menu);
     font-weight: 700;
     letter-spacing: 0.02em;
-    padding: 0.15rem 1rem;
-    padding-left: 2rem;
+    padding: 0;
+    padding-left: calc(var(--gutter) * 2);
     transition: color 0.3s ease;
     text-align: right;
     background-color: transparent;
     position: relative;
+    line-height: 1.2;
 }
 
 .menu-item:hover {
     color: var(--color-cta);
 }
 
-/* Active menu indicator */
-.menu-item::before {
-    content: '';
-    position: absolute;
-    left: -0.5rem;
-    width: 2rem;
-    height: 0.25rem;
-    background-color: currentColor;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.menu-item.active::before {
-    opacity: 1;
-}
-
 /* Ensure menu is always visible over any background */
 .main-menu {
     mix-blend-mode: difference;
+}
+
+/* Scroll indicator bar (no track, just the bar itself) */
+.scroll-indicator {
+    position: fixed;
+    right: calc(3.2% - max(3px, 0.405vw) - var(--gutter)); /* Inside nav strip, left of menu items */
+    width: max(3px, 0.405vw);  /* 7/1728 = 0.405% */
+    height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
+    z-index: var(--z-menu);
+    opacity: 0;
+    transition: opacity 0.5s ease, top 1.2s ease;
+    mix-blend-mode: difference;
+    background-color: #fff;
+    border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */
+}
+
+.scroll-indicator.visible {
+    opacity: 1;
 }

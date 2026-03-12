@@ -81,7 +81,12 @@ const ScrollController = {
                     // Access WhatWeDoSection directly for what-we-do section
                     if (typeof WhatWeDoSection !== 'undefined') {
                         // Detect if this is a new gesture
-                        if (WhatWeDoSection.isNewGesture()) {
+                        const timeSinceLastWheel = now - WhatWeDoSection.lastWheelTime;
+                        const isNewGesture = WhatWeDoSection.isNewGesture();
+                        console.log('ScrollController: Gesture check - timeSinceLastWheel:', timeSinceLastWheel, 'ms, isNewGesture:', isNewGesture, 'threshold:', WhatWeDoSection.GESTURE_TIMEOUT, 'ms');
+
+                        if (isNewGesture) {
+                            console.log('ScrollController: NEW GESTURE DETECTED - calling handleGestureStart()');
                             WhatWeDoSection.handleGestureStart();
                         }
 
@@ -90,7 +95,7 @@ const ScrollController = {
 
                         const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
 
-                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping);
+                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping, 'gestureHitBoundary:', WhatWeDoSection.gestureHitBoundary);
 
                         // During typing: kill momentum once boundary is reached
                         if (WhatWeDoSection.isTyping) {
@@ -110,6 +115,9 @@ const ScrollController = {
                                     console.log('ScrollController: PREVENTED - Killing momentum after hitting boundary during typing');
                                     return;
                                 }
+                            } else {
+                                // Not at boundary - reset flag (content may have grown, creating new bottom)
+                                WhatWeDoSection.gestureHitBoundary = false;
                             }
 
                             // Not at boundary - allow scroll
@@ -227,6 +235,12 @@ const ScrollController = {
 
         const currentSectionData = this.sections[this.currentSection];
 
+        // Notify current section of scroll attempt FIRST (for animation interruption)
+        // This allows sections to skip to final state even if there's no next section
+        if (currentSectionData.onScrollAttempt) {
+            currentSectionData.onScrollAttempt(direction);
+        }
+
         // Calculate target section
         const targetIndex = this.currentSection + direction;
 
@@ -234,11 +248,6 @@ const ScrollController = {
         if (targetIndex < 1 || targetIndex >= this.sections.length) {
             console.log('ScrollController: Cannot scroll beyond boundaries (splash locked)');
             return; // Can't scroll to splash or beyond end
-        }
-
-        // Notify current section of scroll attempt (for animation interruption)
-        if (currentSectionData.onScrollAttempt) {
-            currentSectionData.onScrollAttempt(direction);
         }
 
         // Execute transition (goToSection will set isTransitioning flag)
@@ -420,7 +429,8 @@ const ScrollController = {
         const gutterValue = parseFloat(getComputedStyle(temp).width);
         document.body.removeChild(temp);
 
-        const scrollBarHeight = 270; // Fixed height of scroll bar
+        // Calculate responsive scroll bar height: max(135px, 15.625vw)
+        const scrollBarHeight = Math.max(135, window.innerWidth * 0.15625);
 
         console.log('ScrollController: gutterValue:', gutterValue, 'scrollBarHeight:', scrollBarHeight, 'window.innerHeight:', window.innerHeight);
 
@@ -428,7 +438,7 @@ const ScrollController = {
         let topPosition;
 
         switch (currentIndex) {
-            case 0: // what-we-believe: 1 gutter from top
+            case 0: // what-we-believe: align with top of first menu item (1 gutter from top)
                 topPosition = gutterValue;
                 console.log('ScrollController: Section 0 (what-we-believe), topPosition:', topPosition);
                 break;
@@ -436,7 +446,7 @@ const ScrollController = {
                 topPosition = (window.innerHeight - scrollBarHeight) / 2;
                 console.log('ScrollController: Section 1 (what-we-do), topPosition:', topPosition);
                 break;
-            case 2: // work-with-us: 1 gutter from bottom
+            case 2: // work-with-us: align with bottom of last menu item (1 gutter from bottom)
                 topPosition = window.innerHeight - scrollBarHeight - gutterValue;
                 console.log('ScrollController: Section 2 (work-with-us), topPosition:', topPosition);
                 break;

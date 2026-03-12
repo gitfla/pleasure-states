@@ -17,7 +17,7 @@
 .philosophy-paragraph {
     font-size: var(--font-believe-body);
     line-height: var(--font-believe-line-height);
-    margin-bottom: calc(var(--font-believe-body) * 2);
+    margin-bottom: var(--font-believe-line-height); /* One line height spacing between paragraphs */
     opacity: 0;
     color: #000;
 }

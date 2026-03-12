@@ -6,7 +6,7 @@
     z-index: var(--z-menu);
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: max(3px, 0.35vw); /* 6/1728 = 0.35%, very tight spacing between items */
     opacity: 0;  /* Hidden by default */
     pointer-events: none;  /* Can't click when hidden */
     transition: opacity 0.5s ease;
@@ -21,11 +21,11 @@
 /* Moving menu indicator (like scroll bar) */
 .menu-indicator {
     position: absolute;
-    left: calc(var(--gutter) * -0.5);
-    width: 40px;
-    height: 7px;
+    left: calc(var(--gutter) * -1.7); /* Move dash further to the left */
+    width: max(25px, 2.89vw);  /* 50/1728 = 2.89% - longer */
+    height: max(4px, 0.5vw); /* 10/1728 = 0.58% - thicker */
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: max(4px, 0.463vw); /* 8/1728 = 0.463% */
     transition: top 1.2s ease; /* Match section transition duration */
     opacity: 0;
 }
@@ -39,7 +39,7 @@
     font-size: var(--font-menu);
     font-weight: 700;
     letter-spacing: 0.02em;
-    padding: 2px var(--gutter);
+    padding: 0;
     padding-left: calc(var(--gutter) * 2);
     transition: color 0.3s ease;
     text-align: right;
@@ -60,15 +60,15 @@
 /* Scroll indicator bar (no track, just the bar itself) */
 .scroll-indicator {
     position: fixed;
-    right: calc(3.2% - 7px - var(--gutter)); /* Inside nav strip, left of menu items */
-    width: 7px;
-    height: 270px;
+    right: calc(3.2% - max(3px, 0.405vw) - var(--gutter)); /* Inside nav strip, left of menu items */
+    width: max(3px, 0.405vw);  /* 7/1728 = 0.405% */
+    height: max(135px, 15.625vw); /* 270/1728 = 15.625% */
     z-index: var(--z-menu);
     opacity: 0;
     transition: opacity 0.5s ease, top 1.2s ease;
     mix-blend-mode: difference;
     background-color: #fff;
-    border-radius: 3.5px;
+    border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */
 }
 
 .scroll-indicator.visible {

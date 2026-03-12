@@ -52,7 +52,7 @@
     /* Section-specific typography */
     --font-splash-tagline: max(16px, 1.79vw);           /* 31/1728 = 1.79% */
     --font-believe-body: max(15px, 1.68vw);             /* 29/1728 = 1.68% */
-    --font-believe-line-height: max(16px, 1.74vw);      /* 30/1728 = 1.74% */
+    --font-believe-line-height: max(17px, 1.97vw);      /* 34/1728 = 1.97% - tight spacing */
     --font-what-we-do: max(60px, 6.83vw);              /* 118/1728 = 6.83% */
     --font-what-we-do-line-height: 0.87;                        /* 87% as specified */
     --font-what-we-do-letter-spacing: -2px;

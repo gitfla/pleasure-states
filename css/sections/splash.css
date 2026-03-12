@@ -6,7 +6,7 @@
 .splash-column {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: center; /* Center the images vertically */
     justify-content: center;
     padding: calc(var(--gutter) * 2);
 }
@@ -36,6 +36,7 @@
 
 .splash-text-column:nth-of-type(4) {
     grid-column: 3;  /* Tagline in column 3 */
+    padding: calc(var(--gutter) * 2) var(--gutter); /* Reduce horizontal padding for tagline */
 }
 
 .splash-text {
@@ -69,15 +70,18 @@
 }
 
 .splash-tagline {
-    position: relative;
+    position: absolute;
     z-index: 2;
     font-size: var(--font-splash-tagline);
     font-weight: 700;
     opacity: 0;
     color: var(--color-text);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     text-align: right;
-    padding-right: var(--gutter);
+    right: var(--gutter);
+    /* Position at same vertical center as images, then offset to align baselines */
+    top: 50%;
+    transform: translateY(calc(10vh - var(--font-splash-tagline) / 2)); /* Align bottom with bottom of 20vh images */
 }
 
 .splash-video-wrapper .background-video {

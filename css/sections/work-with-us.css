@@ -40,7 +40,7 @@
 
 .contact-line {
     opacity: 0;
-    margin-bottom: calc(var(--font-work-with-us-body) * 2);
+    margin-bottom: var(--font-believe-line-height); /* One line height spacing between lines */
     font-size: var(--font-work-with-us-body);
     line-height: var(--font-believe-line-height);
     color: #000;

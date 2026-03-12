@@ -8,7 +8,7 @@ const WhatWeDoSection = {
     // Gesture tracking for boundary detection
     gestureStartBoundary: { atTop: false, atBottom: false },
     lastWheelTime: 0,
-    GESTURE_TIMEOUT: 100, // MS gap to consider new gesture
+    GESTURE_TIMEOUT: 50, // MS gap to consider new gesture
     gestureHitBoundary: false, // Track if current gesture reached boundary during typing
     AUTO_SCROLL_PAUSE_THRESHOLD: 150, // MS - pause auto-scroll if wheel event within this time
     textContent: `We name things.
@@ -75,17 +75,27 @@ With a network. With taste. With teeth.`,
         typingContainer.textContent = ''; // Clear previous content
         gsap.set(typingContainer, { opacity: 1 }); // Reset opacity in case it was faded out
 
+        // Track last scroll position to detect direction
+        let lastScrollTop = textBox.scrollTop;
+
         // Add scroll event listener to detect manual scrolling
         const scrollHandler = () => {
-            // Check if user scrolled away from bottom
+            const currentScrollTop = textBox.scrollTop;
+            const scrollDirection = currentScrollTop > lastScrollTop ? 'down' : 'up';
+            lastScrollTop = currentScrollTop;
+
+            // Check if user is at bottom
             const isAtBottom = textBox.scrollTop >= (typingContainer.scrollHeight - textBox.clientHeight - 5);
 
-            if (!isAtBottom) {
+            if (!isAtBottom && scrollDirection === 'up') {
+                // Only disable auto-scroll if scrolling UP away from bottom
                 this.userHasScrolled = true;
-            } else {
-                // User scrolled back to bottom, resume auto-scroll
+            } else if (isAtBottom) {
+                // User at bottom, resume auto-scroll
                 this.userHasScrolled = false;
             }
+            // If scrolling down but not at bottom yet, don't change userHasScrolled
+            // Let auto-scroll pause mechanism handle it
         };
 
         textBox.addEventListener('scroll', scrollHandler);

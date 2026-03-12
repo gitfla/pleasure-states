@@ -42,8 +42,11 @@ const MenuController = {
             const menuRect = menu.getBoundingClientRect();
             const itemRect = activeItem.getBoundingClientRect();
 
+            // Calculate responsive indicator height: max(3px, 0.405vw)
+            const indicatorHeight = Math.max(3, window.innerWidth * 0.00405);
+
             // Calculate position relative to menu container
-            const topPosition = itemRect.top - menuRect.top + (itemRect.height / 2) - 3.5; // Center vertically (7px / 2)
+            const topPosition = itemRect.top - menuRect.top + (itemRect.height / 2) - (indicatorHeight / 2); // Center vertically
 
             menuIndicator.style.top = topPosition + 'px';
         }

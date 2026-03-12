@@ -24,12 +24,28 @@ const MenuController = {
 
     updateActiveMenuItem(sectionId) {
         const menuItems = document.querySelectorAll('.menu-item');
+        const menuIndicator = document.getElementById('menuIndicator');
+        let activeItem = null;
+
         menuItems.forEach(item => {
             if (item.dataset.target === sectionId) {
                 item.classList.add('active');
+                activeItem = item;
             } else {
                 item.classList.remove('active');
             }
         });
+
+        // Move indicator to align with active menu item
+        if (activeItem && menuIndicator) {
+            const menu = document.getElementById('mainMenu');
+            const menuRect = menu.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+
+            // Calculate position relative to menu container
+            const topPosition = itemRect.top - menuRect.top + (itemRect.height / 2) - 3.5; // Center vertically (7px / 2)
+
+            menuIndicator.style.top = topPosition + 'px';
+        }
     }
 };

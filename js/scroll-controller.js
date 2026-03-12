@@ -4,6 +4,7 @@ const ScrollController = {
     currentSection: 0,
     isTransitioning: false,
     isScrollBlocked: false,
+    ctaButtonShown: false,
     sections: [],
     sectionElements: [],
 
@@ -183,6 +184,18 @@ const ScrollController = {
 
         console.log('ScrollController: Direction:', direction);
 
+        // Update current section index early so scroll indicator and menu animate with the transition
+        const previousSection = this.currentSection;
+        this.currentSection = targetIndex;
+
+        // Update scroll indicator BEFORE starting transition so it animates in sync
+        this.updateScrollIndicator();
+
+        // Update active menu item BEFORE starting transition so it animates in sync
+        if (typeof MenuController !== 'undefined' && MenuController.updateActiveMenuItem) {
+            MenuController.updateActiveMenuItem(targetSectionData.id);
+        }
+
         // Call onLeave for current section
         if (currentSectionData.onLeave) {
             currentSectionData.onLeave();
@@ -195,10 +208,10 @@ const ScrollController = {
             console.log('ScrollController: Sliding section', targetIndex, 'up from bottom');
 
             // Ensure target section starts at 100% (below viewport)
-            gsap.set(targetSectionData.element, { y: '100%' });
+            gsap.set(targetSectionData.element, { top: '100%' });
 
             gsap.to(targetSectionData.element, {
-                y: '0%',     // Slide up to cover current
+                top: '0%',     // Slide up to cover current
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: () => this.onTransitionComplete(targetIndex)
@@ -208,7 +221,7 @@ const ScrollController = {
             console.log('ScrollController: Sliding section', targetIndex, 'down from top');
 
             // Ensure target section starts at -100% (above viewport)
-            gsap.set(targetSectionData.element, { y: '-100%' });
+            gsap.set(targetSectionData.element, { top: '-100%' });
 
             // Temporarily boost z-index so previous section can cover current section
             const currentZIndex = window.getComputedStyle(currentSectionData.element).zIndex;
@@ -217,14 +230,14 @@ const ScrollController = {
 
             // Slide previous section down to cover (current stays still)
             gsap.to(targetSectionData.element, {
-                y: '0%',
+                top: '0%',
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: () => {
                     // Reset z-index after transition
                     gsap.set(targetSectionData.element, { zIndex: '' });
                     // Move the old section out of the way
-                    gsap.set(currentSectionData.element, { y: '100%' });
+                    gsap.set(currentSectionData.element, { top: '100%' });
                     this.onTransitionComplete(targetIndex);
                 }
             });
@@ -235,7 +248,7 @@ const ScrollController = {
     onTransitionComplete(newIndex) {
         console.log('ScrollController: Transition complete, now at section', newIndex);
 
-        this.currentSection = newIndex;
+        // Note: this.currentSection was already updated at the start of goToSection
         this.isTransitioning = false;
 
         const newSectionData = this.sections[newIndex];
@@ -246,17 +259,12 @@ const ScrollController = {
         // Update scroll blocking state
         this.isScrollBlocked = newSectionData.isScrollBlocking;
 
-        // Show/hide menu based on section
+        // Show/hide menu, logo, scroll bar after transition completes
         this.updateMenuVisibility();
 
         // Update logo visibility
         if (typeof updateLogoVisibility === 'function') {
             updateLogoVisibility(newIndex);
-        }
-
-        // Update active menu item
-        if (typeof MenuController !== 'undefined' && MenuController.updateActiveMenuItem) {
-            MenuController.updateActiveMenuItem(newSectionData.id);
         }
 
         // Call onEnter for new section, passing hasAnimated flag
@@ -274,16 +282,80 @@ const ScrollController = {
     updateMenuVisibility() {
         const menu = document.getElementById('mainMenu');
         const logo = document.getElementById('siteLogo');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const ctaButton = document.getElementById('ctaButton');
 
         if (this.currentSection === 0) {
-            // Splash: hide menu and logo
+            // Splash: hide menu, logo, scroll indicator, and CTA
             menu.classList.remove('visible');
             if (logo) logo.classList.remove('visible');
+            if (scrollIndicator) scrollIndicator.classList.remove('visible');
+            if (ctaButton && this.ctaButtonShown) {
+                ctaButton.classList.add('hidden');
+            }
         } else {
-            // All other sections: show menu and logo
+            // All other sections: show menu, logo, and scroll indicator
             menu.classList.add('visible');
             if (logo) logo.classList.add('visible');
+            if (scrollIndicator) scrollIndicator.classList.add('visible');
+            // Show CTA if it's been revealed
+            if (ctaButton && this.ctaButtonShown) {
+                ctaButton.classList.remove('hidden');
+            }
+            // Note: updateScrollIndicator() is now called at the start of goToSection for sync'd animation
         }
+    },
+
+    // Update scroll indicator bar position based on current section
+    updateScrollIndicator() {
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        if (!scrollIndicator) {
+            console.log('ScrollController: scrollIndicator element not found');
+            return;
+        }
+
+        const currentIndex = this.currentSection - 1; // 0-based index for non-splash sections
+        console.log('ScrollController: updateScrollIndicator() called, currentSection:', this.currentSection, 'currentIndex:', currentIndex);
+
+        if (currentIndex < 0) {
+            console.log('ScrollController: currentIndex < 0, not updating scroll indicator');
+            return;
+        }
+
+        // Compute actual gutter value in pixels (can't use parseFloat on CSS variables with max/clamp)
+        const temp = document.createElement('div');
+        temp.style.position = 'absolute';
+        temp.style.visibility = 'hidden';
+        temp.style.width = 'var(--gutter)';
+        document.body.appendChild(temp);
+        const gutterValue = parseFloat(getComputedStyle(temp).width);
+        document.body.removeChild(temp);
+
+        const scrollBarHeight = 270; // Fixed height of scroll bar
+
+        console.log('ScrollController: gutterValue:', gutterValue, 'scrollBarHeight:', scrollBarHeight, 'window.innerHeight:', window.innerHeight);
+
+        // Calculate positions in pixels (always use top property for smooth transition)
+        let topPosition;
+
+        switch (currentIndex) {
+            case 0: // what-we-believe: 1 gutter from top
+                topPosition = gutterValue;
+                console.log('ScrollController: Section 0 (what-we-believe), topPosition:', topPosition);
+                break;
+            case 1: // what-we-do: vertically centered
+                topPosition = (window.innerHeight - scrollBarHeight) / 2;
+                console.log('ScrollController: Section 1 (what-we-do), topPosition:', topPosition);
+                break;
+            case 2: // work-with-us: 1 gutter from bottom
+                topPosition = window.innerHeight - scrollBarHeight - gutterValue;
+                console.log('ScrollController: Section 2 (work-with-us), topPosition:', topPosition);
+                break;
+        }
+
+        console.log('ScrollController: Setting scrollIndicator.style.top to:', topPosition + 'px');
+        // Apply position (transition will animate smoothly)
+        scrollIndicator.style.top = topPosition + 'px';
     },
 
     // API: Register section callbacks

@@ -1,8 +1,8 @@
 /* Navigation Menu */
 .main-menu {
     position: fixed;
-    top: 2rem;
-    right: 2rem;
+    top: var(--gutter);
+    right: 3.2%; /* Offset by nav strip width to sit in column 3 */
     z-index: var(--z-menu);
     display: flex;
     flex-direction: column;
@@ -18,42 +18,59 @@
     pointer-events: auto;
 }
 
+/* Moving menu indicator (like scroll bar) */
+.menu-indicator {
+    position: absolute;
+    left: calc(var(--gutter) * -0.5);
+    width: 40px;
+    height: 7px;
+    background-color: #fff;
+    border-radius: 8px;
+    transition: top 1.2s ease; /* Match section transition duration */
+    opacity: 0;
+}
+
+.main-menu.visible .menu-indicator {
+    opacity: 1;
+}
+
 .menu-item {
     color: var(--color-text);
-    font-size: 0.85rem;
+    font-size: var(--font-menu);
     font-weight: 700;
     letter-spacing: 0.02em;
-    padding: 0.15rem 1rem;
-    padding-left: 2rem;
+    padding: 2px var(--gutter);
+    padding-left: calc(var(--gutter) * 2);
     transition: color 0.3s ease;
     text-align: right;
     background-color: transparent;
     position: relative;
+    line-height: 1.2;
 }
 
 .menu-item:hover {
     color: var(--color-cta);
 }
 
-/* Active menu indicator */
-.menu-item::before {
-    content: '';
-    position: absolute;
-    left: -0.5rem;
-    width: 2rem;
-    height: 0.25rem;
-    background-color: currentColor;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.menu-item.active::before {
-    opacity: 1;
-}
-
 /* Ensure menu is always visible over any background */
 .main-menu {
     mix-blend-mode: difference;
+}
+
+/* Scroll indicator bar (no track, just the bar itself) */
+.scroll-indicator {
+    position: fixed;
+    right: calc(3.2% - 7px - var(--gutter)); /* Inside nav strip, left of menu items */
+    width: 7px;
+    height: 270px;
+    z-index: var(--z-menu);
+    opacity: 0;
+    transition: opacity 0.5s ease, top 1.2s ease;
+    mix-blend-mode: difference;
+    background-color: #fff;
+    border-radius: 3.5px;
+}
+
+.scroll-indicator.visible {
+    opacity: 1;
 }

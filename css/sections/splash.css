@@ -1,10 +1,6 @@
 /* Splash Section */
 #splash {
-    background-color: #000;
-}
-
-.splash-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #fff;
 }
 
 .splash-column {
@@ -12,34 +8,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: calc(var(--gutter) * 2);
 }
 
 .splash-white-column {
     background-color: #fff;
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1 / -1;  /* Full height */
 }
 
 .splash-video-wrapper {
-    grid-column: 2 / 4; /* Span from column 2 to column 4 (i.e., columns 2 and 3) */
-    grid-row: 1;
+    grid-column: 2 / 4;  /* Spans columns 2 and 3 */
+    grid-row: 1 / -1;    /* Full height */
     position: relative;
     overflow: hidden;
 }
 
 .splash-text-column {
-    grid-row: 1;
+    grid-row: 1 / -1;    /* Full height */
     background-color: transparent;
-    pointer-events: none; /* Allow clicks to pass through to video */
+    pointer-events: none;
 }
 
 .splash-text-column:nth-of-type(3) {
-    grid-column: 2; /* STATES text in column 2 */
+    grid-column: 2;  /* STATES in column 2 */
 }
 
 .splash-text-column:nth-of-type(4) {
-    grid-column: 3; /* Tagline in column 3 */
+    grid-column: 3;  /* Tagline in column 3 */
 }
 
 .splash-text {
@@ -75,13 +71,13 @@
 .splash-tagline {
     position: relative;
     z-index: 2;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    font-size: var(--font-splash-tagline);
     font-weight: 700;
-    opacity: 0; /* Hidden by default, animated by JS */
+    opacity: 0;
     color: var(--color-text);
     letter-spacing: 0.1em;
     text-align: right;
-    padding-right: 0.5rem; /* Reduced padding to fit on one line */
+    padding-right: var(--gutter);
 }
 
 .splash-video-wrapper .background-video {

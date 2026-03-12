@@ -3,17 +3,16 @@ body {
     font-family: var(--font-family-primary);
     background-color: var(--color-bg);
     color: var(--color-text);
-    line-height: var(--line-height-body);
 }
 
-/* Sections: Full-screen containers with fixed positioning for mask-lifting effect */
+/* Sections: Fixed positioning, full viewport */
 .section {
     width: 100vw;
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    overflow: hidden; /* Videos and content stay within bounds */
+    overflow: hidden;
 }
 
 /* Z-index stacking: higher index = covers previous sections */
@@ -23,36 +22,64 @@ body {
 
 #what-we-believe {
     z-index: 20;
-    transform: translateY(100%); /* Start off-screen below */
+    top: 100%; /* Start off-screen below */
 }
 
 #what-we-do {
     z-index: 30;
-    transform: translateY(100%); /* Start off-screen below */
+    top: 100%; /* Start off-screen below */
 }
 
 #work-with-us {
     z-index: 40;
-    transform: translateY(100%); /* Start off-screen below */
+    top: 100%; /* Start off-screen below */
 }
 
-/* Section Grid: Base for all sections */
+/* Section Grid: Base for all sections (modular 6×7 grid) */
 .section-grid {
     display: grid;
     width: 100%;
     height: 100%;
-    column-gap: var(--column-gap);
+    grid-template-rows: repeat(7, 1fr); /* 7 equal rows filling 100% height */
+    column-gap: 0;
+    row-gap: 0;
 }
 
-/* Grid Variations */
+/* Grid Column Templates per Section */
+
+/* Splash: 3 columns (nav absorbed into column 3) */
 .splash-grid {
-    grid-template-columns: var(--grid-splash);
+    grid-template-columns:
+        32.7% /* Band 1: 565/1728 */
+        32.7% /* Band 2: 565/1728 */
+        34.6%; /* Band 3 + nav: 598/1728 */
 }
 
-.philosophy-grid,
-.what-we-do-grid,
-.contact-grid {
-    grid-template-columns: var(--grid-3-col);
+/* Philosophy/What We Believe: 3 columns + nav strip track */
+.philosophy-grid {
+    grid-template-columns:
+        32.7% /* Band 1: 565/1728 */
+        32.7% /* Band 2: 565/1728 */
+        31.4% /* Band 3 fg: 540/1728 */
+        3.2%; /* Nav strip: 55/1728 */
+}
+
+/* What We Do: 3 columns + nav strip track */
+.what-we-do-grid {
+    grid-template-columns:
+        32.7% /* Band 1: 565/1728 */
+        32.7% /* Band 2: 565/1728 */
+        31.4% /* Band 3 fg: 540/1728 */
+        3.2%; /* Nav strip: 55/1728 */
+}
+
+/* Work With Us: 3 columns + nav strip track */
+.work-with-us-grid {
+    grid-template-columns:
+        32.7% /* Band 1: 565/1728 */
+        32.7% /* Band 2: 565/1728 */
+        31.4% /* Band 3 fg: 540/1728 */
+        3.2%; /* Nav strip: 55/1728 */
 }
 
 /* Video Placeholders: Animated gradients */

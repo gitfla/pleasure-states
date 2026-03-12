@@ -26,10 +26,19 @@
 
     <!-- Navigation Menu -->
     <nav class="main-menu" id="mainMenu">
+        <div class="menu-indicator" id="menuIndicator"></div>
         <button class="menu-item" data-target="what-we-believe">What we believe</button>
         <button class="menu-item" data-target="what-we-do">What we do</button>
         <button class="menu-item" data-target="work-with-us">Work with us</button>
     </nav>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <!-- CTA Button (positioned in work-with-us, then becomes fixed) -->
+    <a href="#" class="contact-cta" id="ctaButton">
+        FOLLOW THE FEELING
+    </a>
 
     <!-- Section 1: Splash Screen -->
     <section id="splash" class="section" data-section="splash" data-scroll-blocking="true">
@@ -41,7 +50,7 @@
 
             <!-- Video background spanning columns 2-3 -->
             <div class="splash-video-wrapper">
-                <video autoplay muted loop playsinline class="background-video">
+                <video autoplay muted loop playsinline class="background-video" poster="resources/splashscreen-poster.jpg">
                     <source src="resources/splashscreen.mov" type="video/mp4">
                 </video>
             </div>
@@ -122,9 +131,6 @@
                 <p class="contact-line" data-line="0">We work wherever pleasure takes form. Music, hospitality, fashion, wellness or something yet unnamed.</p>
                 <p class="contact-line" data-line="1">Consulting and creative collaboration by Invitation.</p>
                 <p class="contact-line" data-line="2">Feeling curious? Reach out</p>
-                <a href="#" class="contact-cta contact-line" data-line="3">
-                    FOLLOW THE FEELING
-                </a>
             </div>
         </div>
     </section>
@@ -137,6 +143,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
 
     <!-- Custom JS (order matters!) -->
+    <script src="js/utils/layout-debug.js"></script>
     <script src="js/utils/animation-helpers.js"></script>
     <script src="js/utils/video-loader.js"></script>
     <script src="js/scroll-controller.js"></script>

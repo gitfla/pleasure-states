@@ -14,16 +14,64 @@
 }
 
 :root {
-    /* Layout */
-    --section-height: 100vh;
-    --section-height-mobile: 100svh; /* Safari mobile fix */
-    --column-gap: 0; /* Columns are edge-to-edge */
+    /* ========================================
+       MODULAR GRID SYSTEM
+       Reference: 1728×1117px, 6×7 grid
+       ======================================== */
 
-    /* Grid proportions */
-    --grid-3-col: 1fr 1fr 1fr; /* Three equal columns */
-    --grid-splash: 1fr 2fr; /* Splash: 1/3 and 2/3 */
+    /* Frame dimensions (scale proportionally) */
+    --frame-width: max(320px, 100vw);
+    --frame-height: max(568px, 100vh);
 
-    /* Colors */
+    /* Grid units */
+    --cell-width: max(120px, 14.18vw);    /* 245/1728 = 14.18% */
+    --cell-height: max(80px, 11.73vh);     /* 131/1117 = 11.73% */
+    --gutter: max(12px, 1.45vw);            /* 25/1728 = 1.45% */
+
+    /* Column bands (derived from cells + gutters) */
+    --col-band-1: calc(var(--gutter) + var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
+    --col-band-2: calc(var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
+    --col-band-3-fg: calc(var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
+    --nav-strip: max(25px, 3.18vw);         /* 55/1728 = 3.18% */
+    --col-band-3-media: calc(var(--col-band-3-fg) + var(--nav-strip));
+
+    /* Inner widths */
+    --inner-width-2col: calc(var(--cell-width) + var(--gutter) + var(--cell-width));
+
+    /* ========================================
+       TYPOGRAPHY (proportional scaling)
+       ======================================== */
+    --font-family-primary: 'Alte Haas Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+
+    /* Base typography (generic fallbacks) */
+    --font-size-body: max(15px, 1.68vw);                /* Default body text */
+    --line-height-body: 1.5;
+    --font-size-h1: max(60px, 6.83vw);                 /* Large headlines */
+    --font-size-h2: max(16px, 1.79vw);                  /* Medium headlines */
+
+    /* Section-specific typography */
+    --font-splash-tagline: max(16px, 1.79vw);           /* 31/1728 = 1.79% */
+    --font-believe-body: max(15px, 1.68vw);             /* 29/1728 = 1.68% */
+    --font-believe-line-height: max(16px, 1.74vw);      /* 30/1728 = 1.74% */
+    --font-what-we-do: max(60px, 6.83vw);              /* 118/1728 = 6.83% */
+    --font-what-we-do-line-height: 0.87;                        /* 87% as specified */
+    --font-what-we-do-letter-spacing: -2px;
+    --font-work-with-us-headline: max(60px, 6.83vw);
+    --font-work-with-us-body: max(15px, 1.68vw);
+    --font-button: max(16px, 1.79vw);
+    --font-menu: max(10px, 1.04vw);                     /* 18/1728 = 1.04% */
+    --font-menu-spacing: max(3px, 0.29vw);               /* 5/1728 = 0.29% */
+
+    /* ========================================
+       BUTTONS
+       ======================================== */
+    --button-width: var(--inner-width-2col);                    /* 515px reference */
+    --button-height: max(35px, 3.99vw);                 /* 69/1728 = 3.99% */
+    --button-radius: max(14px, 1.56vw);                 /* 27/1728 = 1.56% */
+
+    /* ========================================
+       COLORS
+       ======================================== */
     --color-bg: #000000;
     --color-text: #ffffff;
     --color-text-inverted: #ffffff;
@@ -37,13 +85,9 @@
     --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
     --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 
-    /* Typography */
-    --font-family-primary: 'Alte Haas Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    --font-size-h1: clamp(2rem, 5vw, 4rem);
-    --font-size-h2: clamp(1.5rem, 4vw, 3rem);
-    --font-size-body: clamp(1rem, 2vw, 1.25rem);
-    --line-height-body: 1.6;
-
+    /* ========================================
+       ANIMATION & Z-INDEX
+       ======================================== */
     /* Animation timings */
     --duration-text-reveal: 1s;
     --duration-section-transition: 1.2s;

@@ -75,8 +75,9 @@
     opacity: 0;
     color: var(--color-text);
     letter-spacing: 0.05em;
-    text-align: left;
-    left: var(--gutter);
+    /* Center between column 3 start (32.7%) and viewport edge (100%) */
+    text-align: center;  /* Center-align text within element */
+    white-space: nowrap;  /* Prevent line wrapping */
     /* Initial position (JS will override with precise alignment) */
     top: 50%;
 }
@@ -89,6 +90,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     z-index: 0;
     opacity: 1;
     /* No transition - just stay visible, video will fade on top */
@@ -108,9 +110,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     z-index: 1;
     opacity: 0;
-    transition: opacity 250ms ease-out;
+    transition: opacity 0ms;
     /* Force GPU compositing for smoother playback */
     transform: translateZ(0);
     backface-visibility: hidden;

@@ -40,10 +40,16 @@
 
 .contact-line {
     opacity: 0;
-    margin-bottom: var(--font-believe-line-height); /* One line height spacing between lines */
+    margin-bottom: 0; /* NO base spacing - add explicitly where needed */
     font-size: var(--font-work-with-us-body);
     line-height: var(--font-believe-line-height);
     color: #000;
+}
+
+/* Add spacing where copy has empty lines */
+.contact-line[data-index="0"],
+.contact-line[data-index="1"] {
+    margin-bottom: var(--font-believe-line-height);
 }
 
 /* CTA Button (now a direct child of body for blend mode to work across all sections) */

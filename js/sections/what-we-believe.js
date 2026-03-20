@@ -27,7 +27,7 @@ const WhatWeBelieveSection = {
         console.log('WhatWeBelieveSection: onEnter() called, hasAnimated:', hasAnimated);
 
         // Store original text of last paragraph before any animation (Mod 4A)
-        const lastParagraph = document.querySelector('.philosophy-paragraph[data-index="4"]');
+        const lastParagraph = document.querySelector('.philosophy-paragraph[data-index="6"]');
         if (lastParagraph && !lastParagraph.dataset.originalText) {
             lastParagraph.dataset.originalText = lastParagraph.textContent;
         }
@@ -55,7 +55,7 @@ const WhatWeBelieveSection = {
 
         // Reveal each paragraph with stagger
         paragraphs.forEach((p, index) => {
-            if (index === 4) {
+            if (index === 6) {
                 // Last paragraph: fade in container, THEN word-by-word fade-in
                 const text = p.dataset.originalText || p.textContent;
                 const words = text.split(/(\s+)/); // Preserve whitespace
@@ -162,19 +162,23 @@ const WhatWeBelieveSection = {
     },
 
     showFinalState() {
-        // Set all animated elements to their final state immediately
+        // Set all animated elements to their final state with fade-in
         const paragraphs = document.querySelectorAll('.philosophy-paragraph');
 
         // Restore last paragraph text if it was cleared for typing (Mod 4A)
-        const lastParagraph = paragraphs[4];
+        const lastParagraph = paragraphs[6];
         if (lastParagraph && lastParagraph.dataset.originalText) {
             lastParagraph.textContent = lastParagraph.dataset.originalText;
         }
 
         const enableVertical = ScrollController?.config?.enableVerticalAnimation ?? true;
-        gsap.set(paragraphs, {
+
+        // Fade in the paragraphs instead of instant set
+        gsap.to(paragraphs, {
             opacity: 1,
-            ...(enableVertical ? { y: 0 } : {})
+            ...(enableVertical ? { y: 0 } : {}),
+            duration: 0.4,
+            ease: 'power2.out'
         });
     },
 

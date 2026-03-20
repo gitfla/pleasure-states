@@ -17,9 +17,22 @@
 .philosophy-paragraph {
     font-size: var(--font-believe-body);
     line-height: var(--font-believe-line-height);
-    margin-bottom: var(--font-believe-line-height); /* One line height spacing between paragraphs */
+    margin-bottom: 0; /* NO base spacing - add explicitly where needed */
     opacity: 0;
     color: #000;
+}
+
+/* Add spacing only where copy has empty lines */
+.philosophy-paragraph[data-index="2"] {
+    margin-bottom: var(--font-believe-line-height);
+}
+
+.philosophy-paragraph[data-index="4"] {
+    margin-bottom: var(--font-believe-line-height);
+}
+
+.philosophy-paragraph[data-index="5"] {
+    margin-bottom: var(--font-believe-line-height);
 }
 
 .philosophy-video-container {

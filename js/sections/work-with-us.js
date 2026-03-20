@@ -9,7 +9,7 @@ const WorkWithUsSection = {
     PARAGRAPH_STAGGER_DELAY: 0.4,  // Delay between paragraph animations
     HEADLINE_WORD_DELAY: 0.4,     // Delay per word in headline (70ms) - increase this to slow down headline
     BUTTON_DELAY: 0.4,             // Delay before button animation
-    SPLIT_PARAGRAPH_PART2_DELAY: 0.8,  // Delay between "Feeling curious?" and "Reach out"
+    WORD_BY_WORD_DELAY: 0.1,      // Delay per word in last paragraph (word-by-word fade)
     AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
@@ -64,19 +64,33 @@ const WorkWithUsSection = {
 
         // 1. PARAGRAPHS FIRST (Mod 5)
         paragraphs.forEach((el, index) => {
-            // Check if this paragraph contains split spans (Mod 4B)
-            const part1 = el.querySelector('.contact-line-part-1');
-            const part2 = el.querySelector('.contact-line-part-2');
+            if (index === 2) {
+                // Last paragraph: word-by-word fade-in (like what-we-believe)
+                const text = el.textContent;
+                const words = text.split(/(\s+)/); // Preserve whitespace
+                el.innerHTML = ''; // Clear text
 
-            if (part1 && part2) {
+                // Create spans for all words
+                const wordSpans = [];
+                words.forEach(word => {
+                    const span = document.createElement('span');
+                    span.textContent = word;
+                    span.style.opacity = '0';
+                    wordSpans.push(span);
+                    el.appendChild(span);
+                });
+
                 // Instantly set paragraph container visible (no fade duration)
                 this.timeline.fromTo(el, anim.from, {...anim.to, duration: 0}, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
-                // Set both spans initially invisible
-                gsap.set([part1, part2], { opacity: 0 });
-                // "Feeling curious?" appears
-                this.timeline.to(part1, { opacity: 1, duration: 0.3, ease: 'power2.out' }, '+=0');
-                // "Reach out" appears after
-                this.timeline.to(part2, { opacity: 1, duration: 0.3, ease: 'power2.out' }, `+=${this.SPLIT_PARAGRAPH_PART2_DELAY}`);
+
+                // Fade in each word sequentially
+                wordSpans.forEach((span, wordIndex) => {
+                    this.timeline.to(span, {
+                        opacity: 1,
+                        duration: 0.3,  // Faster fade for snappier feel
+                        ease: 'power2.out'
+                    }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
+                });
             } else {
                 // Regular paragraphs
                 this.timeline.fromTo(el, anim.from, anim.to, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
@@ -116,7 +130,7 @@ const WorkWithUsSection = {
 
         // 3. CTA BUTTON (Mod 5)
         if (ctaButton) {
-            this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
+this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
         }
     },
 
@@ -159,7 +173,7 @@ const WorkWithUsSection = {
     },
 
     showFinalState() {
-        // Set all animated elements to their final state immediately
+        // Set all animated elements to their final state with fade-in
         const headline = document.querySelector('.work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
         const ctaButton = document.getElementById('ctaButton');
@@ -172,23 +186,23 @@ const WorkWithUsSection = {
         const enableVertical = ScrollController?.config?.enableVerticalAnimation ?? true;
         const finalState = {
             opacity: 1,
-            ...(enableVertical ? { y: 0 } : {})
+            ...(enableVertical ? { y: 0 } : {}),
+            duration: 0.4,
+            ease: 'power2.out'
         };
 
-        gsap.set(headline, finalState);
-        gsap.set(paragraphs, finalState);
+        // Fade in the elements instead of instant set
+        gsap.to(headline, finalState);
+        gsap.to(paragraphs, finalState);
 
-        // Ensure split spans are visible (Mod 4B + Mod 5)
-        paragraphs.forEach(p => {
-            const part1 = p.querySelector('.contact-line-part-1');
-            const part2 = p.querySelector('.contact-line-part-2');
-            if (part1 && part2) {
-                gsap.set([part1, part2], { opacity: 1 });
-            }
-        });
+        // Restore last paragraph text if it was cleared for word animation
+        const lastParagraph = paragraphs[2];
+        if (lastParagraph && lastParagraph.querySelector('span')) {
+            lastParagraph.textContent = 'Get in touch with us.';
+        }
 
         if (ctaButton) {
-            gsap.set(ctaButton, finalState);
+            gsap.to(ctaButton, finalState);
             ctaButton.style.pointerEvents = 'auto';
         }
 

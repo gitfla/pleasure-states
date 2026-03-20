@@ -21,7 +21,7 @@ const WorkWithUsSection = {
     },
 
     onEnter(hasAnimated) {
-        console.log('WorkWithUsSection: onEnter() called, hasAnimated:', hasAnimated);
+        console.log('WorkWitin whUsSection: onEnter() called, hasAnimated:', hasAnimated);
 
         // Store original headline HTML and text before any animation (Mod 5)
         const headline = document.querySelector('.work-with-us-headline');

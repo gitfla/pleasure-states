@@ -28,7 +28,7 @@
 }
 
 .philosophy-video-container:nth-of-type(2) {
-    grid-column: 2 / 4;  /* Band 2, stops before nav */
+    grid-column: 2;  /* Band 2 only */
     grid-row: 1 / -1;
 }
 

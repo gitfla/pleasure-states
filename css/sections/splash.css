@@ -90,6 +90,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     z-index: 0;
     opacity: 1;
     /* No transition - just stay visible, video will fade on top */
@@ -109,9 +110,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     z-index: 1;
     opacity: 0;
-    transition: opacity 250ms ease-out;
+    transition: opacity 0ms;
     /* Force GPU compositing for smoother playback */
     transform: translateZ(0);
     backface-visibility: hidden;

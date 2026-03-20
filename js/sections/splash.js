@@ -323,7 +323,7 @@ const SplashSection = {
     },
 
     onAnimationComplete() {
-        // Only auto-advance on first visit
+        // Splash always auto-advances (not affected by autoAdvanceEnabled flag)
         if (!this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;
             setTimeout(() => {

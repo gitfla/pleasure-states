@@ -14,6 +14,8 @@ const ScrollController = {
         snapThreshold: 50, // Pixels of scroll to trigger snap
         transitionDuration: 1.2, // Seconds
         wheelDebounceDelay: 300, // MS between wheel events (increased from 150)
+        enableVerticalAnimation: false, // Enable y-axis movement in fade animations (Mod 3)
+        autoAdvanceEnabled: false, // Auto-advance to next section after animations (Mod 6, default: disabled)
     },
 
     // Initialize
@@ -74,6 +76,63 @@ const ScrollController = {
             if (this.currentSection === 2) { // what-we-do is section index 2
                 const scrollZone = this.getScrollZone(e.target, this.mouseX);
                 console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'mouseX:', this.mouseX);
+
+                // Mod 8B: Handle left column scroll with gesture detection
+                if (scrollZone === 'left-column') {
+                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
+                        // Typing is active - complete it
+                        console.log('ScrollController: Left column scroll during typing, jumping to final state');
+                        WhatWeDoSection.stopTyping();
+                        WhatWeDoSection.showFinalState();
+
+                        // Auto-scroll typing box to bottom with animation
+                        const textBox = document.getElementById('typingTextBox');
+                        const typingContainer = document.getElementById('typingContent');
+                        if (textBox && typingContainer) {
+                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
+                            gsap.to(textBox, {
+                                scrollTop: targetScroll,
+                                duration: 0.5,  // Fast animation (500ms)
+                                ease: 'power2.inOut'
+                            });
+                        }
+
+                        // Mark as interrupted and track gesture
+                        WhatWeDoSection.animationWasInterrupted = true;
+                        WhatWeDoSection.lastLeftColumnScrollTime = now;
+
+                        e.preventDefault();
+                        return;
+                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
+                        // Typing is complete
+
+                        // Check if this is a new gesture
+                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
+                            console.log('ScrollController: New left column gesture, resetting interrupt flag');
+                            WhatWeDoSection.animationWasInterrupted = false;
+                        }
+
+                        WhatWeDoSection.lastLeftColumnScrollTime = now;
+
+                        // If still interrupted (same gesture), stay on section
+                        if (WhatWeDoSection.animationWasInterrupted) {
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // New gesture - allow normal section navigation
+                        e.preventDefault();
+
+                        if (now - lastWheelTime < this.config.wheelDebounceDelay) {
+                            return;
+                        }
+                        lastWheelTime = now;
+
+                        const direction = e.deltaY > 0 ? 1 : -1;
+                        this.handleScrollAttempt(direction);
+                        return;
+                    }
+                }
 
                 if (scrollZone === 'typing-box') {
                     const direction = e.deltaY > 0 ? 1 : -1;
@@ -235,10 +294,15 @@ const ScrollController = {
 
         const currentSectionData = this.sections[this.currentSection];
 
-        // Notify current section of scroll attempt FIRST (for animation interruption)
-        // This allows sections to skip to final state even if there's no next section
+        // Notify section of scroll attempt (Mod 7: two-step interruption)
+        // Section can return false to prevent immediate transition
         if (currentSectionData.onScrollAttempt) {
-            currentSectionData.onScrollAttempt(direction);
+            const result = currentSectionData.onScrollAttempt(direction);
+            // If returns false, don't proceed with transition
+            if (result === false) {
+                console.log('ScrollController: Section prevented transition (animation interrupted)');
+                return;
+            }
         }
 
         // Calculate target section
@@ -257,6 +321,8 @@ const ScrollController = {
     // Navigate to specific section with mask-lifting effect
     goToSection(targetIndex, immediate = false) {
         console.log('ScrollController: goToSection() from', this.currentSection, 'to', targetIndex);
+        console.log('ScrollController: Current section ID:', this.sections[this.currentSection]?.id);
+        console.log('ScrollController: Target section ID:', this.sections[targetIndex]?.id);
 
         // Check if already transitioning (for menu clicks)
         if (this.isTransitioning) {
@@ -281,6 +347,8 @@ const ScrollController = {
         const direction = targetIndex > this.currentSection ? 'down' : 'up';
 
         console.log('ScrollController: Direction:', direction);
+        console.log('ScrollController: currentSectionData:', currentSectionData.id, currentSectionData.element);
+        console.log('ScrollController: targetSectionData:', targetSectionData.id, targetSectionData.element);
 
         // Update current section index early so scroll indicator and menu animate with the transition
         const previousSection = this.currentSection;
@@ -334,8 +402,14 @@ const ScrollController = {
                 onComplete: () => {
                     // Reset z-index after transition
                     gsap.set(targetSectionData.element, { zIndex: '' });
-                    // Move the old section out of the way
-                    gsap.set(currentSectionData.element, { top: '100%' });
+
+                    // Move ALL sections between target and current out of the way
+                    // (they're all stacked at top: 0% and have higher z-index than target)
+                    for (let i = targetIndex + 1; i <= previousSection; i++) {
+                        console.log('ScrollController: Moving section', i, '(' + this.sections[i].id + ') out of way to top: 100%');
+                        gsap.set(this.sections[i].element, { top: '100%' });
+                    }
+
                     this.onTransitionComplete(targetIndex);
                 }
             });
@@ -353,6 +427,13 @@ const ScrollController = {
         console.log('ScrollController: New section data:', newSectionData ? newSectionData.id : 'NULL');
         console.log('ScrollController: Has onEnter callback?', !!newSectionData.onEnter);
         console.log('ScrollController: Has been animated?', newSectionData.hasAnimated);
+
+        // DEBUG: Log all section positions
+        console.log('ScrollController: All section positions after transition:');
+        this.sections.forEach((s, i) => {
+            const top = s.element.style.top;
+            console.log(`  Section ${i} (${s.id}): top = ${top}`);
+        });
 
         // Update scroll blocking state
         this.isScrollBlocked = newSectionData.isScrollBlocking;
@@ -465,6 +546,11 @@ const ScrollController = {
         const leftColumnEnd = viewportWidth * 0.327;  // 32.7%
         const navStripStart = viewportWidth * 0.968;  // 96.8% (100% - 3.2%)
 
+        // Mod 8B: Check if mouse is in left column (video area)
+        if (mouseX <= leftColumnEnd) {
+            return 'left-column';
+        }
+
         // Check if mouse is over the typing box element or its children
         const typingBox = document.querySelector('.what-we-do-text-box');
         if (typingBox && (typingBox === target || typingBox.contains(target))) {
@@ -474,7 +560,7 @@ const ScrollController = {
             }
         }
 
-        // Default: section transition zones (left column or nav strip)
+        // Default: section transition zones
         return 'section-transition';
     },
 

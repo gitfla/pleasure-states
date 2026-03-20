@@ -2,6 +2,15 @@
 const WorkWithUsSection = {
     timeline: null,
     isAnimating: false,
+    animationWasInterrupted: false,  // Mod 7: Two-step scroll
+    autoDelayTimer: null,             // Mod 7: Two-step scroll
+
+    // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
+    PARAGRAPH_STAGGER_DELAY: 0.4,  // Delay between paragraph animations
+    HEADLINE_WORD_DELAY: 0.4,     // Delay per word in headline (70ms) - increase this to slow down headline
+    BUTTON_DELAY: 0.4,             // Delay before button animation
+    SPLIT_PARAGRAPH_PART2_DELAY: 0.8,  // Delay between "Feeling curious?" and "Reach out"
+    AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
         ScrollController.registerSection('work-with-us', {
@@ -13,6 +22,14 @@ const WorkWithUsSection = {
 
     onEnter(hasAnimated) {
         console.log('WorkWithUsSection: onEnter() called, hasAnimated:', hasAnimated);
+
+        // Store original headline HTML and text before any animation (Mod 5)
+        const headline = document.querySelector('.work-with-us-headline');
+        if (headline && !headline.dataset.originalHTML) {
+            headline.dataset.originalHTML = headline.innerHTML;  // Store HTML with <br> tags
+            headline.dataset.originalText = headline.textContent;
+        }
+
         if (hasAnimated) {
             // Section was already animated - show final state immediately
             this.showFinalState();
@@ -43,37 +60,95 @@ const WorkWithUsSection = {
             }
         });
 
-        // First animate the headline on the left
-        this.timeline.fromTo(headline,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
-        );
+        const anim = AnimationHelpers.getAnimationFromTo();
 
-        // Then animate each paragraph on the right, one by one
+        // 1. PARAGRAPHS FIRST (Mod 5)
         paragraphs.forEach((el, index) => {
-            this.timeline.fromTo(el,
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-                '+=0.4'
-            );
+            // Check if this paragraph contains split spans (Mod 4B)
+            const part1 = el.querySelector('.contact-line-part-1');
+            const part2 = el.querySelector('.contact-line-part-2');
+
+            if (part1 && part2) {
+                // Instantly set paragraph container visible (no fade duration)
+                this.timeline.fromTo(el, anim.from, {...anim.to, duration: 0}, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+                // Set both spans initially invisible
+                gsap.set([part1, part2], { opacity: 0 });
+                // "Feeling curious?" appears
+                this.timeline.to(part1, { opacity: 1, duration: 0.3, ease: 'power2.out' }, '+=0');
+                // "Reach out" appears after
+                this.timeline.to(part2, { opacity: 1, duration: 0.3, ease: 'power2.out' }, `+=${this.SPLIT_PARAGRAPH_PART2_DELAY}`);
+            } else {
+                // Regular paragraphs
+                this.timeline.fromTo(el, anim.from, anim.to, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+            }
         });
 
-        // Finally animate the CTA button
+        // 2. HEADLINE - Word-by-word fade-in with line breaks
+        headline.innerHTML = ''; // Clear
+
+        // Words with their positions: BASED | WHEREVER | THERE'S | GOOD | LIGHT
+        const wordSequence = ['BASED', 'WHEREVER', "THERE'S", 'GOOD', 'LIGHT'];
+
+        // Create spans for all words with line breaks
+        const wordSpans = [];
+        wordSequence.forEach((word, index) => {
+            if (index > 0) {
+                headline.appendChild(document.createElement('br'));
+            }
+            const span = document.createElement('span');
+            span.textContent = word;
+            span.style.opacity = '0';
+            wordSpans.push(span);
+            headline.appendChild(span);
+        });
+
+        // Instantly set headline container visible (no fade duration)
+        this.timeline.fromTo(headline, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+
+        // Fade in each word sequentially
+        wordSpans.forEach((span, index) => {
+            this.timeline.to(span, {
+                opacity: 1,
+                duration: 0.8,  // Match paragraph fade duration
+                ease: 'power2.out'
+            }, index === 0 ? '+=0' : `+=${this.HEADLINE_WORD_DELAY}`);
+        });
+
+        // 3. CTA BUTTON (Mod 5)
         if (ctaButton) {
-            this.timeline.fromTo(ctaButton,
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-                '+=0.4'
-            );
+            this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
         }
     },
 
     onScrollAttempt(direction) {
         if (this.isAnimating) {
-            // User scrolled during animation - stop and skip to final state
+            // FIRST SCROLL: Stop animation, show final state, stay on section (Mod 7)
             this.stopAnimation();
             this.showFinalState();
+            this.animationWasInterrupted = true;
+
+            // Start auto-delay timer if enabled (work-with-us is last section, no auto-advance)
+            // Timer not needed for last section but keeping pattern consistent
+            if (ScrollController.config.autoAdvanceEnabled) {
+                this.autoDelayTimer = setTimeout(() => {
+                    if (this.animationWasInterrupted) {
+                        // No advance for last section
+                        this.animationWasInterrupted = false;
+                    }
+                }, this.AUTO_ADVANCE_DELAY_MS);
+            }
+
+            return false; // Prevent immediate transition
+        } else if (this.animationWasInterrupted) {
+            // SECOND SCROLL: Allow transition (Mod 7)
+            this.animationWasInterrupted = false;
+            if (this.autoDelayTimer) {
+                clearTimeout(this.autoDelayTimer);
+                this.autoDelayTimer = null;
+            }
+            return true;
         }
+        return true; // Animation complete, allow transition
     },
 
     stopAnimation() {
@@ -89,11 +164,31 @@ const WorkWithUsSection = {
         const paragraphs = document.querySelectorAll('.contact-line');
         const ctaButton = document.getElementById('ctaButton');
 
-        gsap.set(headline, { opacity: 1, y: 0 });
-        gsap.set(paragraphs, { opacity: 1, y: 0 });
+        // Restore headline HTML with <br> tags (Mod 5)
+        if (headline && headline.dataset.originalHTML) {
+            headline.innerHTML = headline.dataset.originalHTML;  // NOT textContent
+        }
+
+        const enableVertical = ScrollController?.config?.enableVerticalAnimation ?? true;
+        const finalState = {
+            opacity: 1,
+            ...(enableVertical ? { y: 0 } : {})
+        };
+
+        gsap.set(headline, finalState);
+        gsap.set(paragraphs, finalState);
+
+        // Ensure split spans are visible (Mod 4B + Mod 5)
+        paragraphs.forEach(p => {
+            const part1 = p.querySelector('.contact-line-part-1');
+            const part2 = p.querySelector('.contact-line-part-2');
+            if (part1 && part2) {
+                gsap.set([part1, part2], { opacity: 1 });
+            }
+        });
 
         if (ctaButton) {
-            gsap.set(ctaButton, { opacity: 1, y: 0 });
+            gsap.set(ctaButton, finalState);
             ctaButton.style.pointerEvents = 'auto';
         }
 
@@ -108,5 +203,11 @@ const WorkWithUsSection = {
     onLeave() {
         // Stop animation when leaving section
         this.stopAnimation();
+        // Clean up two-step scroll state (Mod 7)
+        this.animationWasInterrupted = false;
+        if (this.autoDelayTimer) {
+            clearTimeout(this.autoDelayTimer);
+            this.autoDelayTimer = null;
+        }
     }
 };

@@ -4,15 +4,13 @@ const WhatWeBelieveSection = {
     isAnimating: false,
     hasAutoAdvanced: false,
     autoAdvanceTimer: null,           // Timer for auto-advance after animation
-    animationWasInterrupted: false,  // Mod 7: Two-step scroll
-    autoDelayTimer: null,             // Mod 7: Two-step scroll
     lastScrollTime: 0,  // Gesture detection: Track last scroll event time
     GESTURE_TIMEOUT: 300,  // Gesture detection: 300ms gap = new gesture
 
     // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
     INITIAL_DELAY: 1.0,            // Delay before first paragraph
     PARAGRAPH_DELAY: 0.6,          // Delay between paragraphs
-    WORD_BY_WORD_DELAY: 0.2,      // Delay per word in last paragraph (70ms)
+    WORD_BY_WORD_DELAY: 0.0001,      // Delay per word in last paragraph
     AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
@@ -115,41 +113,8 @@ const WhatWeBelieveSection = {
     },
 
     onScrollAttempt(direction) {
-        const now = Date.now();
-
-        // Reset interrupt flag if this is a new gesture
-        if (this.isNewGesture() && !this.isAnimating) {
-            console.log('WhatWeBelieveSection: New gesture detected, resetting interrupt flag');
-            this.animationWasInterrupted = false;
-        }
-
-        this.lastScrollTime = now;
-
         if (this.isAnimating) {
-            // FIRST SCROLL: Stop animation, show final state, stay on section (Mod 7)
-            this.stopAnimation();
-            this.showFinalState();
-            this.animationWasInterrupted = true;
-
-            // Start auto-delay timer if enabled
-            if (ScrollController.config.autoAdvanceEnabled) {
-                this.autoDelayTimer = setTimeout(() => {
-                    if (this.animationWasInterrupted) {
-                        ScrollController.advanceToNext();
-                        this.animationWasInterrupted = false;
-                    }
-                }, this.AUTO_ADVANCE_DELAY_MS);
-            }
-
-            return false; // Prevent immediate transition
-        } else if (this.animationWasInterrupted) {
-            // SECOND SCROLL: Allow transition (Mod 7)
-            this.animationWasInterrupted = false;
-            if (this.autoDelayTimer) {
-                clearTimeout(this.autoDelayTimer);
-                this.autoDelayTimer = null;
-            }
-            return true;
+            return false; // Block all scrolling during animation
         }
         return true; // Animation complete, allow transition
     },
@@ -193,12 +158,7 @@ const WhatWeBelieveSection = {
             this.autoAdvanceTimer = null;
         }
 
-        // Clean up two-step scroll state (Mod 7)
-        this.animationWasInterrupted = false;
-        this.lastScrollTime = 0;  // Reset gesture tracking
-        if (this.autoDelayTimer) {
-            clearTimeout(this.autoDelayTimer);
-            this.autoDelayTimer = null;
-        }
+        // Reset gesture tracking
+        this.lastScrollTime = 0;
     }
 };

@@ -290,7 +290,7 @@ const SplashSection = {
                 onStart: () => console.log('[PERF] PLEASURE animation started at', performance.now().toFixed(2) + 'ms'),
                 onComplete: () => console.log('[PERF] PLEASURE animation completed at', performance.now().toFixed(2) + 'ms')
             },
-            '+=0.25'
+            '+=0.3'
         );
 
         // "STATES" image appears
@@ -303,7 +303,7 @@ const SplashSection = {
                 onStart: () => console.log('[PERF] STATES animation started at', performance.now().toFixed(2) + 'ms'),
                 onComplete: () => console.log('[PERF] STATES animation completed at', performance.now().toFixed(2) + 'ms')
             },
-            '+=0.25'
+            '+=0.3'
         );
 
         // "PLEASURE IS SERIOUS BUSINESS" appears
@@ -317,7 +317,7 @@ const SplashSection = {
                     onStart: () => console.log('[PERF] Tagline animation started at', performance.now().toFixed(2) + 'ms'),
                     onComplete: () => console.log('[PERF] Tagline animation completed at', performance.now().toFixed(2) + 'ms')
                 },
-                '+=0.25'
+                '+=0.3'
             );
         }
     },
@@ -329,7 +329,7 @@ const SplashSection = {
             setTimeout(() => {
                 ScrollController.unlockScroll();
                 ScrollController.advanceToNext();
-            }, 1000);
+            }, 2500);
         }
     },
 

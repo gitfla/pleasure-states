@@ -2,14 +2,12 @@
 const WorkWithUsSection = {
     timeline: null,
     isAnimating: false,
-    animationWasInterrupted: false,  // Mod 7: Two-step scroll
-    autoDelayTimer: null,             // Mod 7: Two-step scroll
 
     // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
     PARAGRAPH_STAGGER_DELAY: 0.4,  // Delay between paragraph animations
-    HEADLINE_WORD_DELAY: 0.4,     // Delay per word in headline (70ms) - increase this to slow down headline
+    HEADLINE_WORD_DELAY: 1.0,     // Delay per word in headline (increased for pop-in effect)
     BUTTON_DELAY: 0.4,             // Delay before button animation
-    WORD_BY_WORD_DELAY: 0.1,      // Delay per word in last paragraph (word-by-word fade)
+    WORD_BY_WORD_DELAY: 0.0001,      // Delay per word in last paragraph (word-by-word fade)
     AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
@@ -62,49 +60,23 @@ const WorkWithUsSection = {
 
         const anim = AnimationHelpers.getAnimationFromTo();
 
-        // 1. PARAGRAPHS FIRST (Mod 5)
-        paragraphs.forEach((el, index) => {
-            if (index === 2) {
-                // Last paragraph: word-by-word fade-in (like what-we-believe)
-                const text = el.textContent;
-                const words = text.split(/(\s+)/); // Preserve whitespace
-                el.innerHTML = ''; // Clear text
+        // Animation order: all paragraphs except last, headline, last paragraph (word-by-word), button
+        // This handles any number of paragraphs gracefully
 
-                // Create spans for all words
-                const wordSpans = [];
-                words.forEach(word => {
-                    const span = document.createElement('span');
-                    span.textContent = word;
-                    span.style.opacity = '0';
-                    wordSpans.push(span);
-                    el.appendChild(span);
-                });
+        // 1. ALL PARAGRAPHS EXCEPT THE LAST ONE (regular fade-in)
+        const regularParagraphsCount = paragraphs.length - 1;
+        for (let i = 0; i < regularParagraphsCount; i++) {
+            this.timeline.fromTo(paragraphs[i], anim.from, anim.to, i === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+        }
 
-                // Instantly set paragraph container visible (no fade duration)
-                this.timeline.fromTo(el, anim.from, {...anim.to, duration: 0}, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
-
-                // Fade in each word sequentially
-                wordSpans.forEach((span, wordIndex) => {
-                    this.timeline.to(span, {
-                        opacity: 1,
-                        duration: 0.3,  // Faster fade for snappier feel
-                        ease: 'power2.out'
-                    }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
-                });
-            } else {
-                // Regular paragraphs
-                this.timeline.fromTo(el, anim.from, anim.to, index === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
-            }
-        });
-
-        // 2. HEADLINE - Word-by-word fade-in with line breaks
+        // 2. HEADLINE - Word-by-word pop-in with line breaks
         headline.innerHTML = ''; // Clear
 
         // Words with their positions: BASED | WHEREVER | THERE'S | GOOD | LIGHT
         const wordSequence = ['BASED', 'WHEREVER', "THERE'S", 'GOOD', 'LIGHT'];
 
         // Create spans for all words with line breaks
-        const wordSpans = [];
+        const headlineWordSpans = [];
         wordSequence.forEach((word, index) => {
             if (index > 0) {
                 headline.appendChild(document.createElement('br'));
@@ -112,55 +84,61 @@ const WorkWithUsSection = {
             const span = document.createElement('span');
             span.textContent = word;
             span.style.opacity = '0';
-            wordSpans.push(span);
+            headlineWordSpans.push(span);
             headline.appendChild(span);
         });
 
         // Instantly set headline container visible (no fade duration)
         this.timeline.fromTo(headline, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
 
-        // Fade in each word sequentially
-        wordSpans.forEach((span, index) => {
+        // Pop in each word sequentially (no fade)
+        headlineWordSpans.forEach((span, index) => {
             this.timeline.to(span, {
                 opacity: 1,
-                duration: 0.8,  // Match paragraph fade duration
-                ease: 'power2.out'
+                duration: 0,  // Instant appearance (no fade)
+                ease: 'none'
             }, index === 0 ? '+=0' : `+=${this.HEADLINE_WORD_DELAY}`);
         });
 
-        // 3. CTA BUTTON (Mod 5)
+        // 3. LAST PARAGRAPH ("get in touch with us") - word-by-word fade-in
+        if (paragraphs.length > 0) {
+            const lastParagraph = paragraphs[paragraphs.length - 1];
+            const text = lastParagraph.textContent;
+            const words = text.split(/(\s+)/); // Preserve whitespace
+            lastParagraph.innerHTML = ''; // Clear text
+
+            // Create spans for all words
+            const wordSpans = [];
+            words.forEach(word => {
+                const span = document.createElement('span');
+                span.textContent = word;
+                span.style.opacity = '0';
+                wordSpans.push(span);
+                lastParagraph.appendChild(span);
+            });
+
+            // Instantly set paragraph container visible (no fade duration)
+            this.timeline.fromTo(lastParagraph, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+
+            // Fade in each word sequentially
+            wordSpans.forEach((span, wordIndex) => {
+                this.timeline.to(span, {
+                    opacity: 1,
+                    duration: 0.3,  // Faster fade for snappier feel
+                    ease: 'power2.out'
+                }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
+            });
+        }
+
+        // 4. CTA BUTTON
         if (ctaButton) {
-this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
+            this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
         }
     },
 
     onScrollAttempt(direction) {
         if (this.isAnimating) {
-            // FIRST SCROLL: Stop animation, show final state, stay on section (Mod 7)
-            this.stopAnimation();
-            this.showFinalState();
-            this.animationWasInterrupted = true;
-
-            // Start auto-delay timer if enabled (work-with-us is last section, no auto-advance)
-            // Timer not needed for last section but keeping pattern consistent
-            if (ScrollController.config.autoAdvanceEnabled) {
-                this.autoDelayTimer = setTimeout(() => {
-                    if (this.animationWasInterrupted) {
-                        // No advance for last section
-                        this.animationWasInterrupted = false;
-                    }
-                }, this.AUTO_ADVANCE_DELAY_MS);
-            }
-
-            return false; // Prevent immediate transition
-        } else if (this.animationWasInterrupted) {
-            // SECOND SCROLL: Allow transition (Mod 7)
-            this.animationWasInterrupted = false;
-            if (this.autoDelayTimer) {
-                clearTimeout(this.autoDelayTimer);
-                this.autoDelayTimer = null;
-            }
-            return true;
+            return false; // Block all scrolling during animation
         }
         return true; // Animation complete, allow transition
     },
@@ -217,11 +195,5 @@ this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
     onLeave() {
         // Stop animation when leaving section
         this.stopAnimation();
-        // Clean up two-step scroll state (Mod 7)
-        this.animationWasInterrupted = false;
-        if (this.autoDelayTimer) {
-            clearTimeout(this.autoDelayTimer);
-            this.autoDelayTimer = null;
-        }
     }
 };

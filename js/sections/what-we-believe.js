@@ -9,8 +9,10 @@ const WhatWeBelieveSection = {
 
     // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
     INITIAL_DELAY: 1.0,            // Delay before first paragraph
-    PARAGRAPH_DELAY: 0.6,          // Delay between paragraphs
-    WORD_BY_WORD_DELAY: 0.0001,      // Delay per word in last paragraph
+    PARAGRAPH_DELAY: 1.0,          // Delay between paragraphs
+    WORD_FADE_DURATION: 0.2,       // Fade-in duration per word in last paragraph
+    WORD_BY_WORD_DELAY: 0.0,    // Delay per word in last paragraph
+    FINAL_STATE_FADE_DURATION: 0.4, // Fade-in duration when showing final state
     AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
@@ -77,7 +79,7 @@ const WhatWeBelieveSection = {
                 wordSpans.forEach((span, wordIndex) => {
                     this.timeline.to(span, {
                         opacity: 1,
-                        duration: 0.3,
+                        duration: this.WORD_FADE_DURATION,
                         ease: 'power2.out'
                     }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
                 });
@@ -142,7 +144,7 @@ const WhatWeBelieveSection = {
         gsap.to(paragraphs, {
             opacity: 1,
             ...(enableVertical ? { y: 0 } : {}),
-            duration: 0.4,
+            duration: this.FINAL_STATE_FADE_DURATION,
             ease: 'power2.out'
         });
     },

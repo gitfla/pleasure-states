@@ -3,6 +3,11 @@ const SplashSection = {
     timeline: null,
     hasAutoAdvanced: false,
 
+    // ANIMATION TIMING CONSTANTS (in seconds)
+    ELEMENT_FADE_DURATION: 0.3,    // Fade-in duration for images and tagline
+    ELEMENT_DELAY: 0.6,             // Delay between element appearances
+    FINAL_DELAY_MS: 2500,           // MS - delay after animation before auto-advance
+
     initVideo() {
         const video = document.querySelector('.splash-video');
         const poster = document.querySelector('.splash-video-poster');
@@ -285,12 +290,12 @@ const SplashSection = {
             { opacity: 0 },
             {
                 opacity: 1,
-                duration: 0.5,
+                duration: this.ELEMENT_FADE_DURATION,
                 ease: 'power2.out',
                 onStart: () => console.log('[PERF] PLEASURE animation started at', performance.now().toFixed(2) + 'ms'),
                 onComplete: () => console.log('[PERF] PLEASURE animation completed at', performance.now().toFixed(2) + 'ms')
             },
-            '+=0.3'
+            `+=${this.ELEMENT_DELAY}`
         );
 
         // "STATES" image appears
@@ -298,12 +303,12 @@ const SplashSection = {
             { opacity: 0 },
             {
                 opacity: 1,
-                duration: 0.5,
+                duration: this.ELEMENT_FADE_DURATION,
                 ease: 'power2.out',
                 onStart: () => console.log('[PERF] STATES animation started at', performance.now().toFixed(2) + 'ms'),
                 onComplete: () => console.log('[PERF] STATES animation completed at', performance.now().toFixed(2) + 'ms')
             },
-            '+=0.3'
+            `+=${this.ELEMENT_DELAY}`
         );
 
         // "PLEASURE IS SERIOUS BUSINESS" appears
@@ -312,12 +317,12 @@ const SplashSection = {
                 { opacity: 0 },
                 {
                     opacity: 1,
-                    duration: 0.4,
+                    duration: this.ELEMENT_FADE_DURATION,
                     ease: 'power2.out',
                     onStart: () => console.log('[PERF] Tagline animation started at', performance.now().toFixed(2) + 'ms'),
                     onComplete: () => console.log('[PERF] Tagline animation completed at', performance.now().toFixed(2) + 'ms')
                 },
-                '+=0.3'
+                `+=${this.ELEMENT_DELAY}`
             );
         }
     },
@@ -329,7 +334,7 @@ const SplashSection = {
             setTimeout(() => {
                 ScrollController.unlockScroll();
                 ScrollController.advanceToNext();
-            }, 2500);
+            }, this.FINAL_DELAY_MS);
         }
     },
 

@@ -5,9 +5,11 @@ const WorkWithUsSection = {
 
     // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
     PARAGRAPH_STAGGER_DELAY: 0.4,  // Delay between paragraph animations
-    HEADLINE_WORD_DELAY: 1.0,     // Delay per word in headline (increased for pop-in effect)
-    BUTTON_DELAY: 0.4,             // Delay before button animation
-    WORD_BY_WORD_DELAY: 0.0001,      // Delay per word in last paragraph (word-by-word fade)
+    HEADLINE_WORD_DELAY: 1.0,      // Delay per word in headline (increased for pop-in effect)
+    BUTTON_DELAY: 0.6,             // Delay before button animation
+    WORD_FADE_DURATION: 0.2,       // Fade-in duration per word in last paragraph
+    WORD_BY_WORD_DELAY: 0.0,    // Delay per word in last paragraph (word-by-word fade)
+    FINAL_STATE_FADE_DURATION: 0.4, // Fade-in duration when showing final state
     AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
 
     init() {
@@ -124,7 +126,7 @@ const WorkWithUsSection = {
             wordSpans.forEach((span, wordIndex) => {
                 this.timeline.to(span, {
                     opacity: 1,
-                    duration: 0.3,  // Faster fade for snappier feel
+                    duration: this.WORD_FADE_DURATION,
                     ease: 'power2.out'
                 }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
             });
@@ -165,7 +167,7 @@ const WorkWithUsSection = {
         const finalState = {
             opacity: 1,
             ...(enableVertical ? { y: 0 } : {}),
-            duration: 0.4,
+            duration: this.FINAL_STATE_FADE_DURATION,
             ease: 'power2.out'
         };
 

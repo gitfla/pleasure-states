@@ -1,8 +1,8 @@
 // Reusable animation patterns
 const AnimationHelpers = {
-    // ANIMATION TIMING CONSTANTS (in seconds)
-    DEFAULT_FADE_DURATION: 0.6,     // Default fade-in duration for elements
-    DEFAULT_VERTICAL_OFFSET: 20,    // Default vertical offset for animations (in pixels)
+    // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
+    DEFAULT_FADE_DURATION: TimingConstants.FADE_PARAGRAPH,  // 0.6s - Default fade-in duration for elements
+    DEFAULT_VERTICAL_OFFSET: 20,                            // Default vertical offset for animations (in pixels)
 
     // Get animation config based on ScrollController settings (Mod 3)
     // Returns from/to objects for GSAP animations with optional vertical animation

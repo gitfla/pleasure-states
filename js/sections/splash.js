@@ -3,10 +3,10 @@ const SplashSection = {
     timeline: null,
     hasAutoAdvanced: false,
 
-    // ANIMATION TIMING CONSTANTS (in seconds)
-    ELEMENT_FADE_DURATION: 0.3,    // Fade-in duration for images and tagline
-    ELEMENT_DELAY: 0.6,             // Delay between element appearances
-    FINAL_DELAY_MS: 2500,           // MS - delay after animation before auto-advance
+    // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
+    ELEMENT_FADE_DURATION: TimingConstants.FADE_PARAGRAPH,  // 0.6s - Fade-in duration for images and tagline
+    ELEMENT_DELAY: TimingConstants.DELAY_SHORT,             // 0.6s - Delay between element appearances
+    FINAL_DELAY_MS: TimingConstants.DELAY_LONG * 1000,     // 2500ms - Delay after animation before auto-advance
 
     initVideo() {
         const video = document.querySelector('.splash-video');

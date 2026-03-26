@@ -3,14 +3,15 @@ const WorkWithUsSection = {
     timeline: null,
     isAnimating: false,
 
-    // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
-    PARAGRAPH_STAGGER_DELAY: 0.4,  // Delay between paragraph animations
-    HEADLINE_WORD_DELAY: 1.0,      // Delay per word in headline (increased for pop-in effect)
-    BUTTON_DELAY: 0.6,             // Delay before button animation
-    WORD_FADE_DURATION: 0.2,       // Fade-in duration per word in last paragraph
-    WORD_BY_WORD_DELAY: 0.0,    // Delay per word in last paragraph (word-by-word fade)
-    FINAL_STATE_FADE_DURATION: 0.4, // Fade-in duration when showing final state
-    AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
+    // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
+    INITIAL_DELAY: 0,                                          // 0s - No delay, start immediately when section transition completes
+    PARAGRAPH_STAGGER_DELAY: TimingConstants.DELAY_MEDIUM,     // 1.2s - Delay between paragraph animations
+    HEADLINE_WORD_DELAY: TimingConstants.DELAY_MEDIUM,         // 1.2s - Delay per word in headline (increased for pop-in effect)
+    BUTTON_DELAY: TimingConstants.DELAY_SHORT,                 // 0.6s - Delay before button animation
+    WORD_FADE_DURATION: TimingConstants.FADE_WORD,             // 0.2s - Fade-in duration per word in last paragraph
+    WORD_BY_WORD_DELAY: TimingConstants.WORD_INSTANT_DELAY,   // 0.1s - Delay per word in last paragraph (word-by-word fade)
+    FINAL_STATE_FADE_DURATION: TimingConstants.FADE_PARAGRAPH, // 0.6s - Fade-in duration when showing final state
+    AUTO_ADVANCE_DELAY_MS: TimingConstants.DELAY_MEDIUM * 1000, // 1200ms - Delay before auto-advancing after animation interrupt
 
     init() {
         ScrollController.registerSection('work-with-us', {
@@ -45,6 +46,13 @@ const WorkWithUsSection = {
         const paragraphs = document.querySelectorAll('.contact-line');
         const ctaButton = document.getElementById('ctaButton');
 
+        // Set reference timestamp for this section
+        const referenceTimestamp = performance.now();
+        console.log('[TIMING] Work-with-us animation START - REFERENCE T=0ms');
+
+        // Track previous element end time for gap calculations
+        let previousElementEndTime = null;
+
         this.timeline = gsap.timeline({
             onComplete: () => {
                 console.log('WorkWithUsSection: Animation complete');
@@ -68,7 +76,26 @@ const WorkWithUsSection = {
         // 1. ALL PARAGRAPHS EXCEPT THE LAST ONE (regular fade-in)
         const regularParagraphsCount = paragraphs.length - 1;
         for (let i = 0; i < regularParagraphsCount; i++) {
-            this.timeline.fromTo(paragraphs[i], anim.from, anim.to, i === 0 ? 0 : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+            this.timeline.fromTo(paragraphs[i], anim.from, {
+                ...anim.to,
+                onStart: () => {
+                    const startTime = performance.now();
+                    const relativeTime = Math.round(startTime - referenceTimestamp);
+                    let gapInfo = '';
+                    if (previousElementEndTime !== null) {
+                        const gap = Math.round(startTime - previousElementEndTime);
+                        gapInfo = ` (gap from previous end: ${gap}ms)`;
+                    }
+                    console.log(`[TIMING] Paragraph ${i} START at T=${relativeTime}ms${gapInfo}`);
+                },
+                onComplete: () => {
+                    const endTime = performance.now();
+                    previousElementEndTime = endTime;
+                    const relativeTime = Math.round(endTime - referenceTimestamp);
+                    const duration = Math.round(anim.to.duration * 1000);
+                    console.log(`[TIMING] Paragraph ${i} END at T=${relativeTime}ms (duration: ${duration}ms)`);
+                }
+            }, i === 0 ? this.INITIAL_DELAY : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
         }
 
         // 2. HEADLINE - Word-by-word pop-in with line breaks
@@ -91,14 +118,43 @@ const WorkWithUsSection = {
         });
 
         // Instantly set headline container visible (no fade duration)
-        this.timeline.fromTo(headline, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+        this.timeline.fromTo(headline, anim.from, {
+            ...anim.to,
+            duration: 0,
+            onStart: () => {
+                const startTime = performance.now();
+                const relativeTime = Math.round(startTime - referenceTimestamp);
+                let gapInfo = '';
+                if (previousElementEndTime !== null) {
+                    const gap = Math.round(startTime - previousElementEndTime);
+                    gapInfo = ` (gap from previous end: ${gap}ms)`;
+                }
+                console.log(`[TIMING] Headline container START at T=${relativeTime}ms${gapInfo}`);
+            }
+        }, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
 
         // Pop in each word sequentially (no fade)
         headlineWordSpans.forEach((span, index) => {
             this.timeline.to(span, {
                 opacity: 1,
                 duration: 0,  // Instant appearance (no fade)
-                ease: 'none'
+                ease: 'none',
+                onStart: () => {
+                    const startTime = performance.now();
+                    const relativeTime = Math.round(startTime - referenceTimestamp);
+                    let gapInfo = '';
+                    if (index > 0 && previousElementEndTime !== null) {
+                        const gap = Math.round(startTime - previousElementEndTime);
+                        gapInfo = ` (gap from previous word: ${gap}ms)`;
+                    }
+                    console.log(`[TIMING] Headline word "${span.textContent}" START at T=${relativeTime}ms${gapInfo}`);
+                },
+                onComplete: () => {
+                    const endTime = performance.now();
+                    previousElementEndTime = endTime;
+                    const relativeTime = Math.round(endTime - referenceTimestamp);
+                    console.log(`[TIMING] Headline word "${span.textContent}" END at T=${relativeTime}ms (instant)`);
+                }
             }, index === 0 ? '+=0' : `+=${this.HEADLINE_WORD_DELAY}`);
         });
 
@@ -120,21 +176,64 @@ const WorkWithUsSection = {
             });
 
             // Instantly set paragraph container visible (no fade duration)
-            this.timeline.fromTo(lastParagraph, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+            this.timeline.fromTo(lastParagraph, anim.from, {
+                ...anim.to,
+                duration: 0,
+                onStart: () => {
+                    const startTime = performance.now();
+                    const relativeTime = Math.round(startTime - referenceTimestamp);
+                    let gapInfo = '';
+                    if (previousElementEndTime !== null) {
+                        const gap = Math.round(startTime - previousElementEndTime);
+                        gapInfo = ` (gap from previous end: ${gap}ms)`;
+                    }
+                    console.log(`[TIMING] Last paragraph container START at T=${relativeTime}ms${gapInfo}`);
+                }
+            }, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
 
             // Fade in each word sequentially
             wordSpans.forEach((span, wordIndex) => {
                 this.timeline.to(span, {
                     opacity: 1,
                     duration: this.WORD_FADE_DURATION,
-                    ease: 'power2.out'
+                    ease: 'power2.out',
+                    onStart: () => {
+                        const startTime = performance.now();
+                        const relativeTime = Math.round(startTime - referenceTimestamp);
+                        console.log(`[TIMING] Last paragraph word "${span.textContent.trim()}" START at T=${relativeTime}ms`);
+                    },
+                    onComplete: () => {
+                        const endTime = performance.now();
+                        previousElementEndTime = endTime;
+                        const relativeTime = Math.round(endTime - referenceTimestamp);
+                        const duration = Math.round(this.WORD_FADE_DURATION * 1000);
+                        console.log(`[TIMING] Last paragraph word "${span.textContent.trim()}" END at T=${relativeTime}ms (duration: ${duration}ms)`);
+                    }
                 }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
             });
         }
 
         // 4. CTA BUTTON
         if (ctaButton) {
-            this.timeline.fromTo(ctaButton, anim.from, anim.to, `+=${this.BUTTON_DELAY}`);
+            this.timeline.fromTo(ctaButton, anim.from, {
+                ...anim.to,
+                onStart: () => {
+                    const startTime = performance.now();
+                    const relativeTime = Math.round(startTime - referenceTimestamp);
+                    let gapInfo = '';
+                    if (previousElementEndTime !== null) {
+                        const gap = Math.round(startTime - previousElementEndTime);
+                        gapInfo = ` (gap from previous end: ${gap}ms)`;
+                    }
+                    console.log(`[TIMING] CTA Button START at T=${relativeTime}ms${gapInfo}`);
+                },
+                onComplete: () => {
+                    const endTime = performance.now();
+                    const relativeTime = Math.round(endTime - referenceTimestamp);
+                    const duration = Math.round(anim.to.duration * 1000);
+                    console.log(`[TIMING] CTA Button END at T=${relativeTime}ms (duration: ${duration}ms)`);
+                }
+            }, `+=${this.BUTTON_DELAY}`);
         }
     },
 

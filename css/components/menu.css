@@ -9,7 +9,7 @@
     gap: clamp(3px, 0.45vh, 5px); /* 5/1117 = 0.45vh, vertical spacing */
     opacity: 0;  /* Hidden by default */
     pointer-events: none;  /* Can't click when hidden */
-    transition: opacity 0.5s ease;
+    transition: opacity 0.6s ease; /* Unified with FADE_PARAGRAPH */
 }
 
 /* Show menu (controlled by JavaScript) */
@@ -65,7 +65,7 @@
     height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
     z-index: var(--z-menu);
     opacity: 0;
-    transition: opacity 0.5s ease, top 1.2s ease;
+    transition: opacity 0.6s ease, top 1.2s ease; /* Unified opacity with FADE_PARAGRAPH */
     mix-blend-mode: difference;
     background-color: #fff;
     border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */

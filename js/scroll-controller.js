@@ -8,6 +8,9 @@ const ScrollController = {
     mouseX: 0,  // Track mouse X position for zone-based scrolling
     sections: [],
     sectionElements: [],
+    timingReferenceTimestamp: null,  // Reference timestamp for timing logs
+    logoFadeStartTime: null,  // Track when logo fade starts
+    logoFadeEndTime: null,  // Track when logo fade ends
 
     // Configuration
     config: {
@@ -428,6 +431,12 @@ const ScrollController = {
         console.log('ScrollController: Has onEnter callback?', !!newSectionData.onEnter);
         console.log('ScrollController: Has been animated?', newSectionData.hasAnimated);
 
+        // Set reference timestamp for timing logs when entering what-we-believe
+        if (newSectionData.id === 'what-we-believe') {
+            this.timingReferenceTimestamp = performance.now();
+            console.log('[TIMING] Section transition complete - REFERENCE T=0ms');
+        }
+
         // DEBUG: Log all section positions
         console.log('ScrollController: All section positions after transition:');
         this.sections.forEach((s, i) => {
@@ -475,7 +484,29 @@ const ScrollController = {
         } else {
             // All other sections: show menu, logo, and scroll indicator
             menu.classList.add('visible');
-            if (logo) logo.classList.add('visible');
+            if (logo) {
+                logo.classList.add('visible');
+
+                // Log logo fade start time if we have a timing reference
+                if (this.timingReferenceTimestamp !== null) {
+                    this.logoFadeStartTime = performance.now();
+                    const relativeTime = Math.round(this.logoFadeStartTime - this.timingReferenceTimestamp);
+                    console.log(`[TIMING] Logo fade START at T=${relativeTime}ms`);
+
+                    // Add transitionend listener to log when logo fade completes
+                    const onLogoTransitionEnd = (e) => {
+                        if (e.propertyName === 'opacity') {
+                            const endTime = performance.now();
+                            this.logoFadeEndTime = endTime;  // Store for gap calculation
+                            const relativeEndTime = Math.round(endTime - this.timingReferenceTimestamp);
+                            const duration = Math.round(endTime - this.logoFadeStartTime);
+                            console.log(`[TIMING] Logo fade END at T=${relativeEndTime}ms (duration: ${duration}ms)`);
+                            logo.removeEventListener('transitionend', onLogoTransitionEnd);
+                        }
+                    };
+                    logo.addEventListener('transitionend', onLogoTransitionEnd);
+                }
+            }
             if (scrollIndicator) scrollIndicator.classList.add('visible');
             // Show CTA if it's been revealed
             if (ctaButton && this.ctaButtonShown) {

@@ -4,16 +4,16 @@ const WhatWeBelieveSection = {
     isAnimating: false,
     hasAutoAdvanced: false,
     autoAdvanceTimer: null,           // Timer for auto-advance after animation
-    animationWasInterrupted: false,  // Mod 7: Two-step scroll
-    autoDelayTimer: null,             // Mod 7: Two-step scroll
     lastScrollTime: 0,  // Gesture detection: Track last scroll event time
     GESTURE_TIMEOUT: 300,  // Gesture detection: 300ms gap = new gesture
 
-    // ANIMATION TIMING CONSTANTS (in seconds, except where noted in MS)
-    INITIAL_DELAY: 1.0,            // Delay before first paragraph
-    PARAGRAPH_DELAY: 0.6,          // Delay between paragraphs
-    WORD_BY_WORD_DELAY: 0.2,      // Delay per word in last paragraph (70ms)
-    AUTO_ADVANCE_DELAY_MS: 800,    // MS - delay before auto-advancing after animation interrupt
+    // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
+    INITIAL_DELAY: TimingConstants.DELAY_MEDIUM + TimingConstants.FADE_PARAGRAPH,  // 1.8s - Accounts for logo fade (0.6s) + gap (1.2s) to match paragraph spacing
+    PARAGRAPH_DELAY: TimingConstants.DELAY_MEDIUM,          // 1.2s - Delay between paragraphs
+    WORD_FADE_DURATION: TimingConstants.FADE_WORD,          // 0.2s - Fade-in duration per word in last paragraph
+    WORD_BY_WORD_DELAY: TimingConstants.WORD_INSTANT_DELAY, // 0.0s - Delay per word in last paragraph
+    FINAL_STATE_FADE_DURATION: TimingConstants.FADE_PARAGRAPH, // 0.6s - Fade-in duration when showing final state
+    AUTO_ADVANCE_DELAY_MS: TimingConstants.DELAY_MEDIUM * 1000, // 1000ms - Delay before auto-advancing after animation interrupt
 
     init() {
         ScrollController.registerSection('what-we-believe', {
@@ -53,6 +53,9 @@ const WhatWeBelieveSection = {
         const initialDelay = this.INITIAL_DELAY;
         const paragraphDelay = this.PARAGRAPH_DELAY;
 
+        // Track timing for gap calculations
+        let previousElementEndTime = null;
+
         // Reveal each paragraph with stagger
         paragraphs.forEach((p, index) => {
             if (index === 6) {
@@ -79,14 +82,47 @@ const WhatWeBelieveSection = {
                 wordSpans.forEach((span, wordIndex) => {
                     this.timeline.to(span, {
                         opacity: 1,
-                        duration: 0.3,
+                        duration: this.WORD_FADE_DURATION,
                         ease: 'power2.out'
                     }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
                 });
             } else {
                 // Regular paragraph
                 const anim = AnimationHelpers.getAnimationFromTo();
-                this.timeline.fromTo(p, anim.from, anim.to,
+                this.timeline.fromTo(p, anim.from, {
+                    ...anim.to,
+                    onStart: () => {
+                        // Log paragraph start time
+                        if (ScrollController.timingReferenceTimestamp !== null) {
+                            const startTime = performance.now();
+                            const relativeTime = Math.round(startTime - ScrollController.timingReferenceTimestamp);
+
+                            // Calculate gap from previous element
+                            let gapInfo = '';
+                            if (index === 0 && ScrollController.logoFadeEndTime !== null) {
+                                // First paragraph - calculate gap from logo end
+                                const gap = Math.round(startTime - ScrollController.logoFadeEndTime);
+                                gapInfo = ` (gap from logo end: ${gap}ms)`;
+                            } else if (previousElementEndTime !== null) {
+                                // Subsequent paragraphs - calculate gap from previous paragraph
+                                const gap = Math.round(startTime - previousElementEndTime);
+                                gapInfo = ` (gap from P${index - 1} end: ${gap}ms)`;
+                            }
+
+                            console.log(`[TIMING] Paragraph ${index} START at T=${relativeTime}ms${gapInfo}`);
+                        }
+                    },
+                    onComplete: () => {
+                        // Log paragraph end time
+                        if (ScrollController.timingReferenceTimestamp !== null) {
+                            const endTime = performance.now();
+                            previousElementEndTime = endTime;
+                            const relativeTime = Math.round(endTime - ScrollController.timingReferenceTimestamp);
+                            const duration = Math.round(anim.to.duration * 1000);
+                            console.log(`[TIMING] Paragraph ${index} END at T=${relativeTime}ms (duration: ${duration}ms)`);
+                        }
+                    }
+                },
                     index === 0 ? initialDelay : `+=${paragraphDelay}`
                 );
             }
@@ -115,41 +151,8 @@ const WhatWeBelieveSection = {
     },
 
     onScrollAttempt(direction) {
-        const now = Date.now();
-
-        // Reset interrupt flag if this is a new gesture
-        if (this.isNewGesture() && !this.isAnimating) {
-            console.log('WhatWeBelieveSection: New gesture detected, resetting interrupt flag');
-            this.animationWasInterrupted = false;
-        }
-
-        this.lastScrollTime = now;
-
         if (this.isAnimating) {
-            // FIRST SCROLL: Stop animation, show final state, stay on section (Mod 7)
-            this.stopAnimation();
-            this.showFinalState();
-            this.animationWasInterrupted = true;
-
-            // Start auto-delay timer if enabled
-            if (ScrollController.config.autoAdvanceEnabled) {
-                this.autoDelayTimer = setTimeout(() => {
-                    if (this.animationWasInterrupted) {
-                        ScrollController.advanceToNext();
-                        this.animationWasInterrupted = false;
-                    }
-                }, this.AUTO_ADVANCE_DELAY_MS);
-            }
-
-            return false; // Prevent immediate transition
-        } else if (this.animationWasInterrupted) {
-            // SECOND SCROLL: Allow transition (Mod 7)
-            this.animationWasInterrupted = false;
-            if (this.autoDelayTimer) {
-                clearTimeout(this.autoDelayTimer);
-                this.autoDelayTimer = null;
-            }
-            return true;
+            return false; // Block all scrolling during animation
         }
         return true; // Animation complete, allow transition
     },
@@ -177,7 +180,7 @@ const WhatWeBelieveSection = {
         gsap.to(paragraphs, {
             opacity: 1,
             ...(enableVertical ? { y: 0 } : {}),
-            duration: 0.4,
+            duration: this.FINAL_STATE_FADE_DURATION,
             ease: 'power2.out'
         });
     },
@@ -193,12 +196,7 @@ const WhatWeBelieveSection = {
             this.autoAdvanceTimer = null;
         }
 
-        // Clean up two-step scroll state (Mod 7)
-        this.animationWasInterrupted = false;
-        this.lastScrollTime = 0;  // Reset gesture tracking
-        if (this.autoDelayTimer) {
-            clearTimeout(this.autoDelayTimer);
-            this.autoDelayTimer = null;
-        }
+        // Reset gesture tracking
+        this.lastScrollTime = 0;
     }
 };

@@ -6,7 +6,7 @@ const WorkWithUsSection = {
     // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
     INITIAL_DELAY: 0,                                          // 0s - No delay, start immediately when section transition completes
     PARAGRAPH_STAGGER_DELAY: TimingConstants.DELAY_MEDIUM,     // 1.2s - Delay between paragraph animations
-    HEADLINE_WORD_DELAY: TimingConstants.DELAY_MEDIUM,         // 1.2s - Delay per word in headline (increased for pop-in effect)
+    HEADLINE_WORD_DELAY: TimingConstants.DELAY_SHORT,          // 0.6s - Delay per word in headline pop-in
     BUTTON_DELAY: TimingConstants.DELAY_SHORT,                 // 0.6s - Delay before button animation
     WORD_FADE_DURATION: TimingConstants.FADE_WORD,             // 0.2s - Fade-in duration per word in last paragraph
     WORD_BY_WORD_DELAY: TimingConstants.WORD_INSTANT_DELAY,   // 0.1s - Delay per word in last paragraph (word-by-word fade)

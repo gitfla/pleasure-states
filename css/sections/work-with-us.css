@@ -66,7 +66,7 @@
 .contact-cta {
     position: fixed;
     right: calc(31.4vw + var(--nav-strip) - var(--gutter) - var(--button-width));
-    bottom: calc((100vh / 7) + (var(--gutter) * 2));
+    bottom: calc((100vh / 7) + var(--gutter) - var(--button-height));  /* Top of button aligns with top of last cell */
     z-index: var(--z-menu);
 
     display: flex;

@@ -52,7 +52,7 @@
         z-index: 1001;
         background: transparent;
         border: none;
-        color: #000; /* Black to be visible on all backgrounds */
+        color: #fff; /* White with blend mode for visibility */
         font-size: var(--font-splash-tagline); /* Same height as PLEASURE STATES logo */
         font-weight: 400; /* Not bold */
         letter-spacing: 0.02em;
@@ -63,6 +63,7 @@
         pointer-events: none;
         transition: opacity 0.6s ease;
         line-height: 1; /* Remove extra line height spacing */
+        mix-blend-mode: difference; /* Blend like the logo */
     }
 
     /* Show on what-we-believe and after */
@@ -233,52 +234,6 @@
 
 
     /* ========================================
-       DEBUG: Visual grid overlay for all sections
-       ======================================== */
-
-    .section::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        pointer-events: none;
-        z-index: 9999;
-
-        background-image:
-            /* Top gutter (gutter 1) - RED */
-            linear-gradient(to bottom,
-                rgba(255, 0, 0, 0.2) 0%,
-                rgba(255, 0, 0, 0.2) 3.33vh,
-                transparent 3.33vh),
-
-            /* Gutter 2 (after Cell 1) - GREEN */
-            linear-gradient(to bottom,
-                transparent 0%,
-                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
-                rgba(0, 255, 0, 0.2) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
-                rgba(0, 255, 0, 0.2) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
-                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh)),
-
-            /* Cell 1 - BLUE */
-            linear-gradient(to bottom,
-                transparent 0%,
-                transparent calc(3.33vh),
-                rgba(0, 0, 255, 0.15) calc(3.33vh),
-                rgba(0, 0, 255, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
-                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7))),
-
-            /* Cell 2 - YELLOW */
-            linear-gradient(to bottom,
-                transparent 0%,
-                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
-                rgba(255, 255, 0, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
-                rgba(255, 255, 0, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
-                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh + ((100vh - (8 * 3.33vh)) / 7)));
-    }
-
-    /* ========================================
        SECTION: WHAT WE BELIEVE
        ======================================== */
 
@@ -352,6 +307,8 @@
 
     .what-we-do-text-box {
         padding-right: var(--gutter); /* Remove extra nav strip padding on mobile */
+        height: 100vh; /* Fallback for older browsers */
+        height: 100svh; /* Use small viewport height - visible screen only */
     }
 
     .typing-content {
@@ -382,9 +339,11 @@
         color: #fff;
         white-space: normal; /* Allow wrapping for animation */
         word-wrap: break-word;
-        /* Position so bottom aligns with bottom of Cell 6 */
+        /* Position so top aligns with vertical center of visible screen */
         position: absolute;
-        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)); /* Gutter 8 + Cell 7 = bottom of Cell 6 */
+        top: 50vh; /* Fallback for older browsers */
+        top: 50svh; /* Use small viewport height - visible screen center */
+        bottom: auto; /* Override desktop bottom positioning */
         left: var(--gutter);
         right: var(--gutter);
     }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Pleasure States</title>
 
     <!-- Favicon -->
@@ -32,13 +32,26 @@
         <img src="resources/Fixed_WORMARK.png" alt="Pleasure States">
     </a>
 
-    <!-- Navigation Menu -->
+    <!-- Navigation Menu (Desktop) -->
     <nav class="main-menu" id="mainMenu">
         <div class="menu-indicator" id="menuIndicator"></div>
         <button class="menu-item" data-target="what-we-believe">What we believe</button>
         <button class="menu-item" data-target="what-we-do">What we do</button>
         <button class="menu-item" data-target="work-with-us">Work with us</button>
     </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">MENU</button>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+        <button class="mobile-menu-close" id="mobileMenuClose">CLOSE</button>
+        <nav class="mobile-menu-nav">
+            <button class="mobile-menu-item" data-target="what-we-believe">What we believe</button>
+            <button class="mobile-menu-item" data-target="what-we-do">What we do</button>
+            <button class="mobile-menu-item" data-target="work-with-us">Work with us</button>
+        </nav>
+    </div>
 
     <!-- Scroll Indicator -->
     <div class="scroll-indicator" id="scrollIndicator"></div>
@@ -79,6 +92,10 @@
             <div class="splash-column splash-text-column">
                 <h1 class="splash-tagline" data-line="3">PLEASURE IS SERIOUS BUSINESS</h1>
             </div>
+
+            <!-- Mobile-only elements -->
+            <div class="mobile-splash-tagline">PLEASURE IS SERIOUS BUSINESS</div>
+            <div class="mobile-splash-arrow"></div>
         </div>
     </section>
 
@@ -134,18 +151,23 @@
         </div>
     </section>
 
-    <!-- Section 4: Work with us -->
-    <section id="work-with-us" class="section" data-section="work-with-us" data-auto-advance="false">
+    <!-- Section 4: Work with us - Part 1 (Headline) -->
+    <section id="work-with-us-1" class="section" data-section="work-with-us-1" data-auto-advance="true">
         <div class="section-grid work-with-us-grid">
-            <!-- Column 1: Large text (2/3 width) -->
+            <!-- Video background + headline -->
             <div class="work-with-us-image-container">
                 <video autoplay muted loop playsinline class="background-video">
                     <source src="resources/work-video.mp4" type="video/mp4">
                 </video>
                 <h2 class="work-with-us-headline">BASED<br>WHEREVER<br>THERE'S<br>GOOD<br>LIGHT</h2>
             </div>
+        </div>
+    </section>
 
-            <!-- Column 2: Text panel (1/3 width) -->
+    <!-- Section 5: Work with us - Part 2 (Content + CTA) -->
+    <section id="work-with-us-2" class="section" data-section="work-with-us-2" data-auto-advance="false">
+        <div class="section-grid work-with-us-grid">
+            <!-- Text panel -->
             <div class="work-with-us-text-container">
                 <p class="contact-line" data-index="0">We work wherever pleasure takes form. In hospitality, nightlife, food and drink, and any industry that wants to make feeling the point.</p>
                 <p class="contact-line" data-index="1">Consulting and creative collaboration for those who believe.</p>
@@ -172,6 +194,8 @@
     <script src="js/sections/what-we-do.js"></script>
     <script src="js/sections/work-with-us.js"></script>
     <script src="js/menu.js"></script>
+    <script src="js/mobile-menu.js"></script>
     <script src="js/main.js"></script>
+
 </body>
 </html>

@@ -14,12 +14,223 @@ const WorkWithUsSection = {
     AUTO_ADVANCE_DELAY_MS: TimingConstants.DELAY_MEDIUM * 1000, // 1200ms - Delay before auto-advancing after animation interrupt
 
     init() {
-        ScrollController.registerSection('work-with-us', {
-            onEnter: (hasAnimated) => this.onEnter(hasAnimated),
-            onLeave: () => this.onLeave(),
-            onScrollAttempt: (direction) => this.onScrollAttempt(direction)
+        // Register work-with-us-1 (headline section)
+        ScrollController.registerSection('work-with-us-1', {
+            onEnter: (hasAnimated) => this.onEnter1(hasAnimated),
+            onLeave: () => this.onLeave1(),
+            onScrollAttempt: (direction) => this.onScrollAttempt1(direction)
+        });
+
+        // Register work-with-us-2 (paragraphs + button section)
+        ScrollController.registerSection('work-with-us-2', {
+            onEnter: (hasAnimated) => this.onEnter2(hasAnimated),
+            onLeave: () => this.onLeave2(),
+            onScrollAttempt: (direction) => this.onScrollAttempt2(direction)
+        });
+
+        // Legacy: Also register 'work-with-us' for desktop compatibility
+        const legacySection = document.getElementById('work-with-us');
+        if (legacySection) {
+            ScrollController.registerSection('work-with-us', {
+                onEnter: (hasAnimated) => this.onEnter(hasAnimated),
+                onLeave: () => this.onLeave(),
+                onScrollAttempt: (direction) => this.onScrollAttempt(direction)
+            });
+        }
+    },
+
+    // ========================================
+    // WORK WITH US - PART 1 (Headline)
+    // ========================================
+
+    onEnter1(hasAnimated) {
+        console.log('WorkWithUsSection Part 1: onEnter() called, hasAnimated:', hasAnimated);
+
+        const headline = document.querySelector('#work-with-us-1 .work-with-us-headline');
+        if (headline && !headline.dataset.originalHTML) {
+            headline.dataset.originalHTML = headline.innerHTML;
+            headline.dataset.originalText = headline.textContent;
+        }
+
+        if (hasAnimated) {
+            this.showFinalState1();
+        } else {
+            this.animateHeadline();
+        }
+    },
+
+    onLeave1() {
+        console.log('WorkWithUsSection Part 1: onLeave() called');
+        if (this.timeline1) {
+            this.timeline1.kill();
+        }
+    },
+
+    onScrollAttempt1(direction) {
+        if (direction === 'down') {
+            // If animation is complete or interrupted, allow scroll to part 2
+            if (!this.isAnimating || this.animationComplete) {
+                return true; // Allow scroll
+            }
+        }
+        return true; // Allow scrolling in this section
+    },
+
+    showFinalState1() {
+        const headline = document.querySelector('#work-with-us-1 .work-with-us-headline');
+        const words = headline ? headline.textContent.trim().split(/\s+/).filter(w => w) : [];
+
+        words.forEach(() => {
+            gsap.set(headline, { opacity: 1 });
         });
     },
+
+    animateHeadline() {
+        console.log('[WORK WITH US 1] ========================================');
+        console.log('[WORK WITH US 1] animateHeadline() called');
+
+        this.isAnimating = true;
+        const headline = document.querySelector('#work-with-us-1 .work-with-us-headline');
+        if (!headline) {
+            console.error('[WORK WITH US 1] Headline element not found!');
+            return;
+        }
+
+        // Get original HTML with line breaks
+        const originalHTML = headline.dataset.originalHTML;
+
+        // Replace <br> tags with spaces to properly split words
+        const textWithSpaces = originalHTML.replace(/<br\s*\/?>/gi, ' ');
+        // Create temporary element to get text content without HTML tags
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = textWithSpaces;
+        const words = tempDiv.textContent.trim().split(/\s+/).filter(w => w);
+
+        console.log('[WORK WITH US 1] Original HTML:', originalHTML);
+        console.log('[WORK WITH US 1] Text with spaces:', textWithSpaces);
+        console.log('[WORK WITH US 1] Words:', words);
+        console.log('[WORK WITH US 1] Word count:', words.length);
+        console.log('[WORK WITH US 1] Timing constants:', {
+            INITIAL_DELAY: this.INITIAL_DELAY,
+            HEADLINE_WORD_DELAY: this.HEADLINE_WORD_DELAY
+        });
+
+        // Create GSAP timeline
+        this.timeline1 = gsap.timeline({
+            onStart: () => {
+                console.log('[WORK WITH US 1] Timeline started');
+            },
+            onComplete: () => {
+                console.log('[WORK WITH US 1] Timeline completed');
+                this.isAnimating = false;
+                this.animationComplete = true;
+                // Restore original HTML with line breaks
+                headline.innerHTML = originalHTML;
+            }
+        });
+
+        // Clear headline and make visible
+        headline.textContent = '';
+        headline.style.opacity = '1';
+        console.log('[WORK WITH US 1] Headline cleared, opacity set to 1');
+
+        // Show words one by one (no fade, instant appearance)
+        let currentText = '';
+        words.forEach((word, i) => {
+            const delay = i === 0 ? this.INITIAL_DELAY : `+=${this.HEADLINE_WORD_DELAY}`;
+            console.log(`[WORK WITH US 1] Scheduling word ${i} "${word}" with delay: ${delay}`);
+
+            this.timeline1.call(() => {
+                currentText += (i > 0 ? ' ' : '') + word;
+                headline.textContent = currentText;
+                console.log(`[WORK WITH US 1] ✅ Word ${i} "${word}" appeared at ${performance.now().toFixed(2)}ms`);
+                console.log(`[WORK WITH US 1] Current text: "${currentText}"`);
+            }, null, delay);
+        });
+
+        console.log('[WORK WITH US 1] Timeline setup complete, total duration:', this.timeline1.duration());
+        console.log('[WORK WITH US 1] ========================================');
+    },
+
+    // ========================================
+    // WORK WITH US - PART 2 (Paragraphs + Button)
+    // ========================================
+
+    onEnter2(hasAnimated) {
+        console.log('WorkWithUsSection Part 2: onEnter() called, hasAnimated:', hasAnimated);
+
+        if (hasAnimated) {
+            this.showFinalState2();
+        } else {
+            this.animateParagraphs();
+        }
+    },
+
+    onLeave2() {
+        console.log('WorkWithUsSection Part 2: onLeave() called');
+        if (this.timeline2) {
+            this.timeline2.kill();
+        }
+    },
+
+    onScrollAttempt2(direction) {
+        // Allow scrolling freely in part 2
+        return true;
+    },
+
+    showFinalState2() {
+        const paragraphs = document.querySelectorAll('#work-with-us-2 .contact-line');
+        const ctaButton = document.getElementById('ctaButton');
+
+        gsap.set(paragraphs, { opacity: 1 });
+        if (ctaButton) {
+            gsap.set(ctaButton, { opacity: 1, pointerEvents: 'auto' });
+        }
+    },
+
+    animateParagraphs() {
+        this.isAnimating = true;
+        const paragraphs = document.querySelectorAll('#work-with-us-2 .contact-line');
+        const ctaButton = document.getElementById('ctaButton');
+
+        // Create timeline
+        this.timeline2 = gsap.timeline({
+            onComplete: () => {
+                this.isAnimating = false;
+            }
+        });
+
+        // Animate paragraphs
+        paragraphs.forEach((p, i) => {
+            this.timeline2.fromTo(p,
+                { opacity: 0 },
+                {
+                    opacity: 1,
+                    duration: TimingConstants.FADE_PARAGRAPH,
+                    ease: 'power2.out'
+                },
+                i === 0 ? this.INITIAL_DELAY : `+=${this.PARAGRAPH_STAGGER_DELAY}`
+            );
+        });
+
+        // Animate CTA button
+        if (ctaButton) {
+            this.timeline2.fromTo(ctaButton,
+                { opacity: 0, pointerEvents: 'none' },
+                {
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                    duration: TimingConstants.FADE_PARAGRAPH,
+                    ease: 'power2.out'
+                },
+                `+=${this.BUTTON_DELAY}`
+            );
+        }
+    },
+
+    // ========================================
+    // LEGACY: Original combined section (for desktop)
+    // ========================================
 
     onEnter(hasAnimated) {
         console.log('WorkWitin whUsSection: onEnter() called, hasAnimated:', hasAnimated);

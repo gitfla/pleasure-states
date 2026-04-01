@@ -11,12 +11,12 @@ const WhatWeDoSection = {
     animationWasInterrupted: false,  // Mod 7: Two-step scroll
     autoDelayTimer: null,             // Mod 7: Two-step scroll
 
-    // Gesture tracking for boundary detection
+    // Gesture tracking for boundary detection (wheel and touch events)
     gestureStartBoundary: { atTop: false, atBottom: false },
-    lastWheelTime: 0,
-    GESTURE_TIMEOUT: 50, // MS gap to consider new gesture
+    lastWheelTime: 0,  // Shared timestamp for both wheel and touch events
+    GESTURE_TIMEOUT: 50, // MS gap to consider new gesture (wheel or touch)
     gestureHitBoundary: false, // Track if current gesture reached boundary during typing
-    AUTO_SCROLL_PAUSE_THRESHOLD: 150, // MS - pause auto-scroll if wheel event within this time
+    AUTO_SCROLL_PAUSE_THRESHOLD: 150, // MS - pause auto-scroll if wheel/touch event within this time
 
     // Gesture tracking for left column scroll interruption
     lastLeftColumnScrollTime: 0,  // Track left column scroll events

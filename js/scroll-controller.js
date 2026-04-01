@@ -237,30 +237,175 @@ const ScrollController = {
 
         // Touch events (mobile)
         let touchStartY = 0;
+        let touchStartElement = null;  // Track where touch began for zone detection
         let touchMoved = false;
 
         window.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
+            touchStartElement = e.target;  // Capture touch target for zone detection
             touchMoved = false;
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
-            // Block if scroll is locked or transition in progress
-            if (this.isScrollBlocked || this.isTransitioning) {
+            const now = Date.now();
+
+            // Block if scroll is locked (splash screen)
+            if (this.isScrollBlocked) {
                 e.preventDefault();
+                return;
+            }
+
+            // Block if transition is in progress
+            if (this.isTransitioning) {
+                e.preventDefault();
+                console.log('ScrollController: Touch scroll ignored - transition in progress');
                 return;
             }
 
             const touchEndY = e.touches[0].clientY;
             const deltaY = touchStartY - touchEndY;
+            const direction = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
 
+            // Check if we're in what-we-do section
+            if (this.currentSection === 2) { // what-we-do is section index 2
+                const touchX = e.touches[0].clientX;
+                const scrollZone = this.getScrollZone(touchStartElement, touchX);
+                console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'touchX:', touchX);
+
+                // Handle left column touch with gesture detection (same as desktop)
+                if (scrollZone === 'left-column') {
+                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
+                        // Typing is active - complete it
+                        console.log('ScrollController: Left column touch during typing, jumping to final state');
+                        WhatWeDoSection.stopTyping();
+                        WhatWeDoSection.showFinalState();
+
+                        // Auto-scroll typing box to bottom with animation
+                        const textBox = document.getElementById('typingTextBox');
+                        const typingContainer = document.getElementById('typingContent');
+                        if (textBox && typingContainer) {
+                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
+                            gsap.to(textBox, {
+                                scrollTop: targetScroll,
+                                duration: 0.5,  // Fast animation (500ms)
+                                ease: 'power2.inOut'
+                            });
+                        }
+
+                        // Mark as interrupted and track gesture
+                        WhatWeDoSection.animationWasInterrupted = true;
+                        WhatWeDoSection.lastLeftColumnScrollTime = now;
+
+                        e.preventDefault();
+                        return;
+                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
+                        // Typing is complete - check if new gesture
+                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
+                            console.log('ScrollController: New left column touch gesture, resetting interrupt flag');
+                            WhatWeDoSection.animationWasInterrupted = false;
+                        }
+
+                        WhatWeDoSection.lastLeftColumnScrollTime = now;
+
+                        // If still interrupted (same gesture), stay on section
+                        if (WhatWeDoSection.animationWasInterrupted) {
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // New gesture - allow normal section navigation
+                        if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
+                            e.preventDefault();
+                            touchMoved = true;
+                            this.handleScrollAttempt(direction);
+                        }
+                        return;
+                    }
+                }
+
+                // Handle typing box touch with boundary checking (same as desktop wheel events)
+                if (scrollZone === 'typing-box') {
+                    // Access WhatWeDoSection for gesture tracking
+                    if (typeof WhatWeDoSection !== 'undefined') {
+                        // Detect if this is a new gesture
+                        const isNewGesture = WhatWeDoSection.isNewGesture();
+                        console.log('ScrollController: Touch gesture check - isNewGesture:', isNewGesture);
+
+                        if (isNewGesture) {
+                            console.log('ScrollController: NEW TOUCH GESTURE DETECTED - calling handleGestureStart()');
+                            WhatWeDoSection.handleGestureStart();
+                        }
+
+                        // Update last wheel time for gesture tracking (shared between wheel and touch)
+                        WhatWeDoSection.lastWheelTime = now;
+
+                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping);
+
+                        // During typing: kill momentum once boundary is reached
+                        if (WhatWeDoSection.isTyping) {
+                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
+                                               (direction === -1 && currentBoundary.atTop);
+
+                            if (atBoundary) {
+                                // Mark that this gesture has hit the boundary
+                                if (!WhatWeDoSection.gestureHitBoundary) {
+                                    WhatWeDoSection.gestureHitBoundary = true;
+                                    console.log('ScrollController: Touch gesture hit boundary during typing, allowing this event');
+                                    // Allow this event to go through (reaches boundary naturally)
+                                    return;
+                                } else {
+                                    // Already hit boundary in this gesture - kill remaining momentum
+                                    e.preventDefault();
+                                    console.log('ScrollController: PREVENTED - Killing touch momentum after hitting boundary during typing');
+                                    return;
+                                }
+                            } else {
+                                // Not at boundary - reset flag (content may have grown, creating new bottom)
+                                WhatWeDoSection.gestureHitBoundary = false;
+                            }
+
+                            // Not at boundary - allow scroll
+                            console.log('ScrollController: Allowing touch scroll during typing (not at boundary)');
+                            return;
+                        }
+
+                        // After typing: check if should transition
+                        if (this.canTransitionFromTypingBox(direction)) {
+                            // Only trigger if swipe exceeds threshold and hasn't been triggered yet
+                            if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
+                                e.preventDefault();
+                                touchMoved = true;
+                                console.log('ScrollController: Was at boundary when touch gesture started, transitioning');
+                                this.handleScrollAttempt(direction);
+                            }
+                            return;
+                        }
+
+                        // Check if currently at boundary (just arrived this gesture)
+                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                            e.preventDefault();
+                            console.log('ScrollController: Reached boundary with touch, preventing scroll (wait for next gesture)');
+                            return;
+                        }
+
+                        // Not at boundary - allow scroll
+                        console.log('ScrollController: Not at boundary, allowing touch scroll');
+                        return;
+                    }
+
+                    return;
+                }
+            }
+
+            // For all other cases, prevent default and handle section transitions
             // Only trigger if swipe exceeds threshold and hasn't been triggered yet
             if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
                 e.preventDefault();
                 touchMoved = true;
-                const direction = deltaY > 0 ? 1 : -1;
                 this.handleScrollAttempt(direction);
             }
+
         }, { passive: false });
 
         // Track mouse position for zone-based scrolling

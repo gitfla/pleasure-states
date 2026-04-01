@@ -102,3 +102,36 @@
     --typing-speed: 30; /* Characters per second */
     --typing-box-height: 60vh;
 }
+
+/* Mobile-specific variables */
+@media (max-width: 768px) {
+    :root {
+        /* Override gutter for mobile - use small viewport height (svh) */
+        --gutter: 3.33vh; /* Fallback for older browsers */
+        --gutter: 3.33svh; /* Small viewport height - browser UI visible */
+
+        /* Mobile grid system - use svh for accurate positioning */
+        --mobile-cell-height: calc((100vh - (8 * 3.33vh)) / 7); /* Fallback */
+        --mobile-cell-height: calc((100svh - (8 * 3.33svh)) / 7); /* Small viewport */
+
+        /* Mobile typography */
+        --font-mobile-menu: 37px;
+        --font-mobile-menu-line-height: 87px;
+        --font-mobile-menu-letter-spacing: -0.05em; /* -5% */
+
+        --font-mobile-typing: 58px;
+        --font-mobile-typing-line-height: 0.87; /* 87% */
+        --font-mobile-typing-letter-spacing: -0.02em; /* -2% */
+
+        --font-mobile-headline: 58px;
+        --font-mobile-headline-line-height: 0.87; /* 87% */
+        --font-mobile-headline-letter-spacing: -0.02em; /* -2% */
+
+        /* Mobile scroll indicator */
+        --scroll-indicator-mobile-width: 4px;
+        --scroll-indicator-mobile-height: 82px;
+
+        /* Mobile arrow */
+        --arrow-size-mobile: 15px;
+    }
+}

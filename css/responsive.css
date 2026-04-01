@@ -1,9 +1,433 @@
-/* Responsive Design - Mobile will be implemented in MVP Phase 3 */
+/* ========================================
+   DESKTOP: Hide Mobile Elements
+   ======================================== */
 
-@media (max-width: 768px) {
-    /* Mobile styles will be added in Phase 3 */
+@media (min-width: 769px) {
+    .mobile-menu-toggle,
+    .mobile-menu-overlay,
+    .mobile-splash-tagline,
+    .mobile-splash-arrow {
+        display: none;
+    }
 }
 
-@media (max-width: 480px) {
-    /* Extra small device styles will be added in Phase 3 */
+/* ========================================
+   MOBILE RESPONSIVE DESIGN
+   Breakpoint: max-width 768px
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* ========================================
+       GLOBAL LAYOUT OVERRIDES
+       ======================================== */
+
+    /* Hide desktop menu, show mobile menu */
+    .main-menu {
+        display: none;
+    }
+
+    /* Hide desktop scroll indicator on mobile */
+    .scroll-indicator {
+        display: none;
+    }
+
+    /* Adjust logo for mobile - top align with Cell 1 */
+    .site-logo {
+        top: 3.33vh; /* Start of Cell 1 (after top gutter) */
+        left: var(--gutter);
+        width: auto;
+        max-width: 60%;
+        padding: 0;
+        align-items: flex-start; /* Top align */
+    }
+
+    /* ========================================
+       MOBILE MENU TOGGLE
+       ======================================== */
+
+    .mobile-menu-toggle {
+        position: fixed;
+        top: 3.33vh; /* Align with start of Cell 1, same as logo */
+        right: var(--gutter);
+        z-index: 1001;
+        background: transparent;
+        border: none;
+        color: #000; /* Black to be visible on all backgrounds */
+        font-size: var(--font-splash-tagline); /* Same height as PLEASURE STATES logo */
+        font-weight: 400; /* Not bold */
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        padding: 0;
+        display: block;
+        opacity: 0; /* Hidden by default */
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+        line-height: 1; /* Remove extra line height spacing */
+    }
+
+    /* Show on what-we-believe and after */
+    .mobile-menu-toggle.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* ========================================
+       MOBILE MENU OVERLAY
+       ======================================== */
+
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #fff; /* White background, not black */
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .mobile-menu-overlay.active {
+        transform: translateX(0);
+    }
+
+    .mobile-menu-close {
+        position: absolute;
+        top: 3.33vh; /* Align with start of Cell 1, same as MENU */
+        right: var(--gutter);
+        background: transparent;
+        border: none;
+        color: #000; /* Black text on white background */
+        font-size: var(--font-splash-tagline); /* Same as MENU */
+        font-weight: 400; /* Not bold */
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1; /* Remove extra line height spacing, same as MENU */
+    }
+
+    .mobile-menu-nav {
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter)); /* Start at cell 2 instead of cell 3 */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0; /* No gap - spacing handled by line-height */
+    }
+
+    .mobile-menu-item {
+        background: transparent;
+        border: none;
+        color: #000; /* Black text on white background */
+        font-size: var(--font-mobile-menu);
+        font-weight: 700;
+        line-height: var(--font-mobile-menu-line-height);
+        letter-spacing: var(--font-mobile-menu-letter-spacing);
+        cursor: pointer;
+        padding: 0;
+        text-align: center;
+    }
+
+    /* ========================================
+       SECTION: SPLASH
+       ======================================== */
+
+    #splash {
+        background-color: #000; /* Ensure background while video loads */
+    }
+
+    /* Container for absolute positioning - grid is conceptual only */
+    .splash-grid {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        display: block; /* Override grid display */
+    }
+
+    /* Hide ALL desktop splash elements */
+    .splash-white-column,
+    .splash-column,
+    .splash-text-column {
+        display: none !important;
+    }
+
+    /* Video spans full section */
+    .splash-video-wrapper {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    /* Mobile logo - using ::before pseudo-element */
+    /* Centered in cell 1 - center line should go through vertical middle of logo */
+    #splash::before {
+        content: '';
+        position: fixed; /* Use fixed to match tagline positioning */
+        top: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2)); /* EXACT center of cell 1 */
+        left: 3.33vh; /* Left gutter */
+        right: 3.33vh; /* Right gutter */
+        transform: translateY(-50%); /* Only vertical centering */
+        width: auto; /* Let left/right constrain it */
+        height: auto;
+        aspect-ratio: 4 / 1;
+        background-image: url('../resources/PS_logotype-01.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: 10;
+        mix-blend-mode: difference;
+        filter: invert(1); /* Invert black logo to white */
+        opacity: 0;
+        transition: opacity 0.6s ease; /* Fade in over 0.6s */
+    }
+
+    #splash.logo-visible::before {
+        opacity: 1;
+    }
+
+    /* Mobile tagline */
+    /* Centered in Cell 7 - center line should go through vertical middle of text */
+    .mobile-splash-tagline {
+        display: block;
+        position: fixed; /* Use fixed so it's always relative to viewport */
+        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2)); /* EXACT center of cell 7 */
+        left: 3.33vh; /* Left gutter - SAME as logo */
+        right: 3.33vh; /* Right gutter - SAME as logo */
+        transform: translateY(50%); /* Vertical centering on the line */
+        text-align: center;
+        font-size: clamp(18px, 5vw, 28px); /* Responsive: scales with viewport width */
+        font-weight: 700;
+        line-height: 1.1;
+        color: #fff;
+        z-index: 10;
+        opacity: 0; /* GSAP will animate this */
+        letter-spacing: 0;
+        mix-blend-mode: difference;
+    }
+
+    /* Down arrow - centered horizontally, centered in bottom gutter vertically */
+    .mobile-splash-arrow {
+        display: block;
+        position: fixed; /* Use fixed so it's always relative to viewport */
+        bottom: calc(3.33vh / 2 - (var(--arrow-size-mobile) / 2)); /* Center of gutter minus half arrow height */
+        left: calc(50% - (var(--arrow-size-mobile) / 2)); /* Center minus half arrow width */
+        width: var(--arrow-size-mobile); /* 15px from plan */
+        height: var(--arrow-size-mobile); /* 15px from plan */
+        border-right: 2px solid #fff;
+        border-bottom: 2px solid #fff;
+        transform: rotate(45deg); /* Just rotate, positioning handles centering */
+        opacity: 0;
+        /* No transition - GSAP handles animation */
+        z-index: 10;
+        mix-blend-mode: difference;
+        filter: invert(1);
+    }
+
+
+    /* ========================================
+       DEBUG: Visual grid overlay for all sections
+       ======================================== */
+
+    .section::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 9999;
+
+        background-image:
+            /* Top gutter (gutter 1) - RED */
+            linear-gradient(to bottom,
+                rgba(255, 0, 0, 0.2) 0%,
+                rgba(255, 0, 0, 0.2) 3.33vh,
+                transparent 3.33vh),
+
+            /* Gutter 2 (after Cell 1) - GREEN */
+            linear-gradient(to bottom,
+                transparent 0%,
+                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
+                rgba(0, 255, 0, 0.2) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
+                rgba(0, 255, 0, 0.2) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
+                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh)),
+
+            /* Cell 1 - BLUE */
+            linear-gradient(to bottom,
+                transparent 0%,
+                transparent calc(3.33vh),
+                rgba(0, 0, 255, 0.15) calc(3.33vh),
+                rgba(0, 0, 255, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
+                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7))),
+
+            /* Cell 2 - YELLOW */
+            linear-gradient(to bottom,
+                transparent 0%,
+                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
+                rgba(255, 255, 0, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh),
+                rgba(255, 255, 0, 0.15) calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh + ((100vh - (8 * 3.33vh)) / 7)),
+                transparent calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7) + 3.33vh + ((100vh - (8 * 3.33vh)) / 7)));
+    }
+
+    /* ========================================
+       SECTION: WHAT WE BELIEVE
+       ======================================== */
+
+    .philosophy-grid {
+        grid-template-columns: 1fr; /* Single column */
+    }
+
+    /* Hide video containers on mobile */
+    .philosophy-video-container {
+        display: none;
+    }
+
+    /* Text container - full width */
+    .philosophy-text-container {
+        grid-column: 1;
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+        padding-left: var(--gutter);
+        padding-right: var(--gutter);
+    }
+
+    /* Increase paragraph font size on mobile */
+    .philosophy-text-container p {
+        font-size: clamp(20px, 5.5vw, 26px);
+        line-height: 1.5;
+    }
+
+    /* Mobile scroll indicator for this section */
+    #what-we-believe .scroll-indicator-mobile {
+        display: block;
+        position: fixed;
+        right: calc(var(--gutter) / 2);
+        top: 50%;
+        transform: translateY(-50%);
+        width: var(--scroll-indicator-mobile-width);
+        height: var(--scroll-indicator-mobile-height);
+        background-color: #000;
+        border-radius: 2px;
+        z-index: var(--z-menu);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+    }
+
+    #what-we-believe .scroll-indicator-mobile.visible {
+        opacity: 1;
+    }
+
+    /* ========================================
+       SECTION: WHAT WE DO
+       ======================================== */
+
+    .what-we-do-grid {
+        grid-template-columns: 1fr; /* Single column */
+    }
+
+    /* Video background - show on mobile */
+    .what-we-do-video-container {
+        display: block; /* Show video on mobile */
+        grid-column: 1;
+        grid-row: 1 / -1;
+        z-index: 1;
+    }
+
+    /* Text wrapper - overlays video */
+    .what-we-do-text-wrapper {
+        grid-column: 1;
+        grid-row: 1 / -1;
+        background-color: transparent; /* Transparent to show video */
+        z-index: 2;
+        position: relative;
+    }
+
+    .what-we-do-text-box {
+        padding-right: var(--gutter); /* Remove extra nav strip padding on mobile */
+    }
+
+    .typing-content {
+        font-size: var(--font-mobile-typing);
+        line-height: var(--font-mobile-typing-line-height);
+        letter-spacing: var(--font-mobile-typing-letter-spacing);
+        color: #000; /* Ensure text is black on white background */
+    }
+
+    /* ========================================
+       SECTION: WORK WITH US - PART 1
+       ======================================== */
+
+    #work-with-us-1 .work-with-us-grid {
+        grid-template-columns: 1fr; /* Single column */
+    }
+
+    #work-with-us-1 .work-with-us-image-container {
+        grid-column: 1;
+        grid-row: 1 / -1;
+    }
+
+    #work-with-us-1 .work-with-us-headline {
+        font-size: var(--font-mobile-headline);
+        line-height: var(--font-mobile-headline-line-height);
+        letter-spacing: var(--font-mobile-headline-letter-spacing);
+        mix-blend-mode: difference;
+        color: #fff;
+        white-space: normal; /* Allow wrapping for animation */
+        word-wrap: break-word;
+        /* Position so bottom aligns with bottom of Cell 6 */
+        position: absolute;
+        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7)); /* Gutter 8 + Cell 7 = bottom of Cell 6 */
+        left: var(--gutter);
+        right: var(--gutter);
+    }
+
+    /* ========================================
+       SECTION: WORK WITH US - PART 2
+       ======================================== */
+
+    #work-with-us-2 {
+        background-color: #fff;
+    }
+
+    #work-with-us-2 .work-with-us-grid {
+        grid-template-columns: 1fr; /* Single column */
+    }
+
+    #work-with-us-2 .work-with-us-text-container {
+        grid-column: 1;
+        grid-row: 1 / -1;
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+    }
+
+    /* Increase paragraph font size on mobile */
+    #work-with-us-2 .work-with-us-text-container p {
+        font-size: clamp(20px, 5.5vw, 26px);
+        line-height: 1.5;
+    }
+
+    /* ========================================
+       CTA BUTTON
+       ======================================== */
+
+    .contact-cta {
+        /* Adjust button positioning for mobile - full width minus gutters */
+        left: var(--gutter);
+        right: var(--gutter);
+        bottom: calc(var(--gutter) * 2);
+        width: auto; /* Let left/right define the width */
+        max-width: none; /* Remove max-width restriction */
+        transform: none; /* No transform needed */
+    }
+
+    .contact-cta:hover {
+        transform: translateY(-2px);
+    }
 }

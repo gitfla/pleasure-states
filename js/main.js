@@ -9,6 +9,11 @@ function updateLogoVisibility(sectionIndex) {
     } else {
         logo.classList.remove('visible');
     }
+
+    // Also update mobile menu visibility
+    if (typeof MobileMenuController !== 'undefined' && MobileMenuController.updateMenuVisibility) {
+        MobileMenuController.updateMenuVisibility();
+    }
 }
 
 // Main Entry Point - Initialize all modules when DOM is ready
@@ -24,8 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     WhatWeDoSection.init();
     WorkWithUsSection.init();
 
-    // Initialize menu
+    // Initialize menu (desktop and mobile)
     MenuController.init();
+    if (typeof MobileMenuController !== 'undefined') {
+        MobileMenuController.init();
+    }
 
     // Start the experience (triggers splash animation)
     ScrollController.start();

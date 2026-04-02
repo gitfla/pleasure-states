@@ -160,9 +160,19 @@ const WorkWithUsSection = {
         console.log('WorkWithUsSection Part 2: onEnter() called, hasAnimated:', hasAnimated);
 
         if (hasAnimated) {
-            this.showFinalState2();
+            // Desktop: use legacy final state, Mobile: use mobile final state
+            if (!ScrollController.isMobile) {
+                this.showFinalState();  // Existing desktop final state method
+            } else {
+                this.showFinalState2();  // Mobile final state
+            }
         } else {
-            this.animateParagraphs();
+            // Desktop: use existing full animation, Mobile: use simple paragraph animation
+            if (!ScrollController.isMobile) {
+                this.animateElements();  // Existing desktop animation (lines 254-449)
+            } else {
+                this.animateParagraphs();  // Mobile animation
+            }
         }
     },
 
@@ -253,7 +263,8 @@ const WorkWithUsSection = {
 
     animateElements() {
         this.isAnimating = true;
-        const headline = document.querySelector('.work-with-us-headline');
+        // Target work-with-us-2's headline specifically (not work-with-us-1's which is hidden on desktop)
+        const headline = document.querySelector('#work-with-us-2 .work-with-us-headline');
         const paragraphs = document.querySelectorAll('.contact-line');
         const ctaButton = document.getElementById('ctaButton');
 

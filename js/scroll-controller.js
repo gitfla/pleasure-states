@@ -6,6 +6,7 @@ const ScrollController = {
     isScrollBlocked: false,
     ctaButtonShown: false,
     mouseX: 0,  // Track mouse X position for zone-based scrolling
+    isMobile: window.innerWidth <= 768,  // Track viewport mode explicitly
     sections: [],
     sectionElements: [],
     timingReferenceTimestamp: null,  // Reference timestamp for timing logs
@@ -27,6 +28,14 @@ const ScrollController = {
         this.cacheSections();
         console.log('ScrollController: Cached', this.sections.length, 'sections');
         this.registerEventListeners();
+
+        // Debounce resize to avoid excessive calls
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.handleResize(), 250);
+        });
+
         // Don't call positionOnSplash() here - it will be called after sections register
     },
 
@@ -36,13 +45,79 @@ const ScrollController = {
         this.positionOnSplash();
     },
 
+    // Full re-initialization (for viewport mode changes)
+    reinitialize() {
+        console.log('ScrollController: Full re-initialization triggered');
+
+        // Save current section ID for remapping (not index, which will change)
+        const currentSectionId = this.sections[this.currentSection]?.id;
+        console.log('ScrollController: Current section before re-init:', currentSectionId);
+
+        // Re-cache sections (will filter based on new isMobile state)
+        this.cacheSections();
+
+        // Remap to equivalent section by ID, not index
+        // Special case: work-with-us-1 on mobile -> work-with-us-2 on desktop
+        let targetId = currentSectionId;
+        if (currentSectionId === 'work-with-us-1' && !this.isMobile) {
+            targetId = 'work-with-us-2';  // Mobile work-with-us-1 -> desktop work-with-us
+            console.log('ScrollController: Remapping work-with-us-1 -> work-with-us-2 for desktop');
+        }
+
+        // Find new index for this section ID
+        const newIndex = this.sections.findIndex(s => s.id === targetId);
+        if (newIndex !== -1) {
+            this.currentSection = newIndex;
+            console.log('ScrollController: Remapped to section', newIndex, '(' + targetId + ')');
+        } else {
+            // Fallback: clamp to valid range
+            this.currentSection = Math.min(this.currentSection, this.sections.length - 1);
+            console.warn('ScrollController: Could not remap section, clamped to', this.currentSection);
+        }
+
+        // Reset state flags that may be stale
+        this.isTransitioning = false;  // Cancel any in-flight transitions
+        // Note: hasAnimated flags are on section objects, rebuilt with sections array
+
+        // Update all UI components
+        this.updateScrollIndicator();
+        this.updateMenuVisibility();
+
+        // Re-sync menu active state
+        if (typeof MenuController !== 'undefined') {
+            const newSectionId = this.sections[this.currentSection]?.id;
+            if (newSectionId) {
+                MenuController.updateActiveMenuItem(newSectionId);
+            }
+        }
+
+        console.log('ScrollController: Re-init complete,', this.sections.length, 'sections, now at', this.sections[this.currentSection]?.id);
+    },
+
+    // Handle window resize (viewport mode changes)
+    handleResize() {
+        const nowMobile = window.innerWidth <= 768;
+
+        // Viewport mode changed - refresh page to reinitialize cleanly
+        if (this.isMobile !== nowMobile) {
+            console.log('Viewport mode changed:', this.isMobile ? 'mobile→desktop' : 'desktop→mobile', '- refreshing page');
+            window.location.reload();
+        }
+    },
+
     // Cache all section elements and metadata
     cacheSections() {
         this.sectionElements = Array.from(document.querySelectorAll('[data-section]'));
+
+        // Filter out work-with-us-1 on desktop
+        if (!this.isMobile) {
+            this.sectionElements = this.sectionElements.filter(el => el.id !== 'work-with-us-1');
+        }
+
         this.sections = this.sectionElements.map((el, index) => ({
             element: el,
             id: el.id,
-            index: index,
+            index: index,  // Re-indexed after filtering
             isScrollBlocking: el.dataset.scrollBlocking === 'true',
             autoAdvance: el.dataset.autoAdvance === 'true',
             hasAnimated: false, // Track if section has been animated
@@ -703,9 +778,12 @@ const ScrollController = {
                 topPosition = (window.innerHeight - scrollBarHeight) / 2;
                 console.log('ScrollController: Section 1 (what-we-do), topPosition:', topPosition);
                 break;
-            case 2: // work-with-us: align with bottom of last menu item (1 gutter from bottom)
+            case 2: // work-with-us-1 (mobile only)
+            case 3: // work-with-us-2
+                // Both work-with-us sections share the same indicator position (bottom)
+                // Indicator represents menu item, not individual sections
                 topPosition = window.innerHeight - scrollBarHeight - gutterValue;
-                console.log('ScrollController: Section 2 (work-with-us), topPosition:', topPosition);
+                console.log('ScrollController: Section', currentIndex, '(work-with-us), topPosition:', topPosition);
                 break;
         }
 

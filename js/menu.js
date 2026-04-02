@@ -8,7 +8,12 @@ const MenuController = {
                 const targetSectionId = e.target.dataset.target;
                 console.log('Menu clicked:', targetSectionId);
 
-                const targetSection = ScrollController.sections.find(s => s.id === targetSectionId);
+                // Find section by menu target OR by id
+                // Use getAttribute as fallback for better browser compatibility
+                const targetSection = ScrollController.sections.find(s => {
+                    const menuTarget = s.element.dataset.menuTarget || s.element.getAttribute('data-menu-target');
+                    return menuTarget === targetSectionId || s.id === targetSectionId;
+                });
                 console.log('Found section:', targetSection ? targetSection.id : 'NOT FOUND', 'at index:', targetSection ? targetSection.index : 'N/A');
 
                 if (targetSection) {
@@ -27,8 +32,12 @@ const MenuController = {
         const menuIndicator = document.getElementById('menuIndicator');
         let activeItem = null;
 
+        // Get the menu target for this section (or use section ID if no alias)
+        const section = ScrollController.sections.find(s => s.id === sectionId);
+        const menuTarget = section?.element.dataset.menuTarget || sectionId;
+
         menuItems.forEach(item => {
-            if (item.dataset.target === sectionId) {
+            if (item.dataset.target === menuTarget) {
                 item.classList.add('active');
                 activeItem = item;
             } else {

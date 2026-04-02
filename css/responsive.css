@@ -9,6 +9,17 @@
     .mobile-splash-arrow {
         display: none;
     }
+
+    /* Desktop: Hide work-with-us-1 (headline-only section is mobile-only) */
+    #work-with-us-1 {
+        display: none !important;
+        /* Force completely out of stacking context to prevent transition interference */
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        z-index: -1 !important;  /* Below all visible sections (splash is z-index: 10) */
+        top: 100% !important;    /* Off-screen below viewport */
+    }
 }
 
 /* ========================================
@@ -257,7 +268,7 @@
     /* Increase paragraph font size on mobile */
     .philosophy-text-container p {
         font-size: clamp(20px, 5.5vw, 26px);
-        line-height: 1.5;
+        line-height: 1.35;
     }
 
     /* Mobile scroll indicator for this section */
@@ -369,7 +380,12 @@
     /* Increase paragraph font size on mobile */
     #work-with-us-2 .work-with-us-text-container p {
         font-size: clamp(20px, 5.5vw, 26px);
-        line-height: 1.5;
+        line-height: 1.35;
+    }
+
+    /* Hide work-with-us-2 image container on mobile (only show in work-with-us-1) */
+    #work-with-us-2 .work-with-us-image-container {
+        display: none !important;
     }
 
     /* ========================================

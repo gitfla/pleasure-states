@@ -13,6 +13,26 @@
     <meta name="apple-mobile-web-app-title" content="PStates" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- SEO & Social Media Meta Tags -->
+    <meta name="description" content="PLEASURE IS SERIOUS BUSINESS">
+
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pleasurestates.com">
+    <meta property="og:title" content="Pleasure States">
+    <meta property="og:description" content="PLEASURE IS SERIOUS BUSINESS">
+    <meta property="og:image" content="https://pleasurestates.com/resources/PS_logotype-01.png">
+    <meta property="og:image:width" content="600">
+    <meta property="og:image:height" content="400">
+    <meta property="og:site_name" content="Pleasure States">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://pleasurestates.com">
+    <meta name="twitter:title" content="Pleasure States">
+    <meta name="twitter:description" content="PLEASURE IS SERIOUS BUSINESS">
+    <meta name="twitter:image" content="https://pleasurestates.com/resources/PS_logotype-01.png">
+
     <!-- CSS -->
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/variables.css">
@@ -57,7 +77,7 @@
     <div class="scroll-indicator" id="scrollIndicator"></div>
 
     <!-- CTA Button (positioned in work-with-us, then becomes fixed) -->
-    <a href="#" class="contact-cta" id="ctaButton">
+    <a href="mailto:hello@pleasurestates.com" class="contact-cta" id="ctaButton">
         FOLLOW THE FEELING
     </a>
 
@@ -165,8 +185,16 @@
     </section>
 
     <!-- Section 5: Work with us - Part 2 (Content + CTA) -->
-    <section id="work-with-us-2" class="section" data-section="work-with-us-2" data-auto-advance="false">
+    <section id="work-with-us-2" class="section" data-section="work-with-us-2" data-menu-target="work-with-us" data-auto-advance="false">
         <div class="section-grid work-with-us-grid">
+            <!-- Video background + headline (desktop only) -->
+            <div class="work-with-us-image-container work-with-us-2-image">
+                <video autoplay muted loop playsinline class="background-video">
+                    <source src="resources/work-video.mp4" type="video/mp4">
+                </video>
+                <h2 class="work-with-us-headline">BASED<br>WHEREVER<br>THERE'S<br>GOOD<br>LIGHT</h2>
+            </div>
+
             <!-- Text panel -->
             <div class="work-with-us-text-container">
                 <p class="contact-line" data-index="0">We work wherever pleasure takes form. In hospitality, nightlife, food and drink, and any industry that wants to make feeling the point.</p>

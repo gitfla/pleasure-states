@@ -67,13 +67,10 @@ const WorkWithUsSection = {
     },
 
     onScrollAttempt1(direction) {
-        if (direction === 'down') {
-            // If animation is complete or interrupted, allow scroll to part 2
-            if (!this.isAnimating || this.animationComplete) {
-                return true; // Allow scroll
-            }
+        if (this.isAnimating && !this.animationComplete) {
+            return false; // Block scrolling during animation
         }
-        return true; // Allow scrolling in this section
+        return true; // Animation complete, allow transition
     },
 
     showFinalState1() {

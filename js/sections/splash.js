@@ -19,7 +19,7 @@ const SplashSection = {
 
         console.log('[VIDEO] Initiating aggressive preload');
 
-        // Explicitly start loading the video
+        // Explicitly start loading the video (ensures buffering for poster crossfade)
         video.load();
 
         const startPlayback = () => {
@@ -27,6 +27,9 @@ const SplashSection = {
 
             // Reset to start
             video.currentTime = 0;
+
+            // Set muted via JS property (iOS Safari requires this, not just the attribute)
+            video.muted = true;
 
             video.play()
                 .then(() => {
@@ -44,6 +47,7 @@ const SplashSection = {
                 .catch(err => {
                     console.error('[VIDEO] Autoplay prevented:', err);
                     // Fallback: show video immediately if autoplay blocked
+                    // Retry on user interaction is handled globally by initMobileVideoAutoplay()
                     video.classList.add('visible');
                 });
         };

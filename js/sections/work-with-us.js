@@ -67,13 +67,10 @@ const WorkWithUsSection = {
     },
 
     onScrollAttempt1(direction) {
-        if (direction === 'down') {
-            // If animation is complete or interrupted, allow scroll to part 2
-            if (!this.isAnimating || this.animationComplete) {
-                return true; // Allow scroll
-            }
+        if (this.isAnimating && !this.animationComplete) {
+            return false; // Block scrolling during animation
         }
-        return true; // Allow scrolling in this section
+        return true; // Animation complete, allow transition
     },
 
     showFinalState1() {
@@ -193,6 +190,13 @@ const WorkWithUsSection = {
         const ctaButton = document.getElementById('ctaButton');
 
         gsap.set(paragraphs, { opacity: 1 });
+
+        // Restore last paragraph text if it was split into word spans
+        const lastParagraph = paragraphs[paragraphs.length - 1];
+        if (lastParagraph && lastParagraph.dataset.originalText) {
+            lastParagraph.textContent = lastParagraph.dataset.originalText;
+        }
+
         if (ctaButton) {
             gsap.set(ctaButton, { opacity: 1, pointerEvents: 'auto' });
         }
@@ -202,6 +206,12 @@ const WorkWithUsSection = {
         this.isAnimating = true;
         const paragraphs = document.querySelectorAll('#work-with-us-2 .contact-line');
         const ctaButton = document.getElementById('ctaButton');
+        const lastIndex = paragraphs.length - 1;
+
+        // Store original text of last paragraph for restoration
+        if (paragraphs[lastIndex] && !paragraphs[lastIndex].dataset.originalText) {
+            paragraphs[lastIndex].dataset.originalText = paragraphs[lastIndex].textContent;
+        }
 
         // Create timeline
         this.timeline2 = gsap.timeline({
@@ -212,15 +222,45 @@ const WorkWithUsSection = {
 
         // Animate paragraphs
         paragraphs.forEach((p, i) => {
-            this.timeline2.fromTo(p,
-                { opacity: 0 },
-                {
-                    opacity: 1,
-                    duration: TimingConstants.FADE_PARAGRAPH,
-                    ease: 'power2.out'
-                },
-                i === 0 ? this.INITIAL_DELAY : `+=${this.PARAGRAPH_STAGGER_DELAY}`
-            );
+            if (i === lastIndex) {
+                // Last paragraph: word-by-word fade-in (same pattern as what-we-believe)
+                const text = p.dataset.originalText || p.textContent;
+                const words = text.split(/(\s+)/); // Preserve whitespace
+                p.innerHTML = '';
+
+                const wordSpans = [];
+                words.forEach(word => {
+                    const span = document.createElement('span');
+                    span.textContent = word;
+                    span.style.opacity = '0';
+                    wordSpans.push(span);
+                    p.appendChild(span);
+                });
+
+                const anim = AnimationHelpers.getAnimationFromTo();
+                // Instantly set paragraph container visible
+                this.timeline2.fromTo(p, anim.from, {...anim.to, duration: 0}, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
+
+                // Fade in each word sequentially
+                wordSpans.forEach((span, wordIndex) => {
+                    this.timeline2.to(span, {
+                        opacity: 1,
+                        duration: this.WORD_FADE_DURATION,
+                        ease: 'power2.out'
+                    }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
+                });
+            } else {
+                // Regular paragraph fade-in
+                this.timeline2.fromTo(p,
+                    { opacity: 0 },
+                    {
+                        opacity: 1,
+                        duration: TimingConstants.FADE_PARAGRAPH,
+                        ease: 'power2.out'
+                    },
+                    i === 0 ? this.INITIAL_DELAY : `+=${this.PARAGRAPH_STAGGER_DELAY}`
+                );
+            }
         });
 
         // Animate CTA button

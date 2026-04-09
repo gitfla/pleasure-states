@@ -76,7 +76,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
     },
 
     onEnter(hasAnimated) {
-        console.log('WhatWeDoSection: onEnter() called, hasAnimated:', hasAnimated);
 
         // Initialize gesture tracking
         this.gestureStartBoundary = this.checkCurrentBoundary();
@@ -92,16 +91,12 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
     },
 
     startTyping() {
-        console.log('WhatWeDoSection: startTyping() called');
         this.isTyping = true;
         this.userHasScrolled = false; // Reset flag at start of typing
         this.currentTypingSpeed = 1; // Reset to normal speed
 
         const typingContainer = document.getElementById('typingContent');
         const textBox = document.getElementById('typingTextBox');
-
-        console.log('WhatWeDoSection: typingContainer:', typingContainer);
-        console.log('WhatWeDoSection: textBox:', textBox);
 
         typingContainer.textContent = ''; // Clear previous content
         gsap.set(typingContainer, { opacity: 1 }); // Reset opacity in case it was faded out
@@ -115,7 +110,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
 
             // Ignore scroll events from our own auto-scrolling
             if (currentScrollTop === this.lastProgrammaticScrollTop) {
-                console.log('WhatWeDoSection: Ignoring auto-scroll event at position:', currentScrollTop);
                 this.lastProgrammaticScrollTop = -1; // Reset after ignoring
                 return;
             }
@@ -130,14 +124,11 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
 
             // Speed up typing if scrolling down during typing
             if (this.isTyping && scrollDirection === 'down') {
-                console.log('WhatWeDoSection: USER scroll down during typing - isScrollable:', isScrollable, 'isAtBottom:', isAtBottom);
 
                 if (!isScrollable || isAtBottom) {
                     // Speed up if: content not scrollable yet OR at bottom
-                    console.log('WhatWeDoSection: Triggering speedup (not scrollable or at bottom)');
                     this.speedUpTyping();
                 } else {
-                    console.log('WhatWeDoSection: Not triggering speedup - content is scrollable and not at bottom');
                 }
             }
 
@@ -163,8 +154,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
             // Only handle wheel events when content is NOT scrollable
             // When scrollable, the scroll handler will handle it
             if (e.deltaY > 0 && !isScrollable) {
-                console.log('WhatWeDoSection: Wheel down during typing - content not scrollable');
-                console.log('WhatWeDoSection: Triggering speedup from wheel (not scrollable)');
                 this.speedUpTyping();
             }
         };
@@ -215,9 +204,7 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
         // Only auto-advance on first visit and if enabled
         if (ScrollController.config.autoAdvanceEnabled && !this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;
-            console.log('WhatWeDoSection: Setting auto-advance timer for', this.AUTO_ADVANCE_DELAY_MS, 'ms');
             this.autoAdvanceTimer = setTimeout(() => {
-                console.log('WhatWeDoSection: Auto-advance timer fired');
                 ScrollController.advanceToNext();
             }, this.AUTO_ADVANCE_DELAY_MS);
         }
@@ -290,7 +277,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
 
         // Speed up if not already fast
         if (this.currentTypingSpeed === 1) {
-            console.log('WhatWeDoSection: Speeding up typing to 3x');
             this.currentTypingSpeed = 3;
             this.typingTimeline.timeScale(3);
         }
@@ -298,7 +284,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
         // Start new reset timer - will reset to 1x after 500ms of no scrolling
         this.speedResetTimer = setTimeout(() => {
             if (this.typingTimeline && this.currentTypingSpeed === 3) {
-                console.log('WhatWeDoSection: Resetting typing to normal speed (500ms elapsed)');
                 this.currentTypingSpeed = 1;
                 this.typingTimeline.timeScale(1);
             }
@@ -321,7 +306,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
 
         // Clean up auto-advance timer
         if (this.autoAdvanceTimer) {
-            console.log('WhatWeDoSection: Clearing auto-advance timer');
             clearTimeout(this.autoAdvanceTimer);
             this.autoAdvanceTimer = null;
         }
@@ -358,7 +342,6 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
         // Capture current boundary state at start of new gesture
         this.gestureStartBoundary = this.checkCurrentBoundary();
         this.gestureHitBoundary = false; // Reset for new gesture
-        console.log('WhatWeDoSection: New gesture started, boundary state:', this.gestureStartBoundary);
     },
 
     // Check current boundary state (for preventDefault during typing)
@@ -386,11 +369,9 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
     },
 
     isAtScrollBoundary(direction) {
-        console.log('WhatWeDoSection: isAtScrollBoundary() called, direction:', direction);
 
         // Only allow boundary transitions when typing is complete
         if (this.isTyping) {
-            console.log('WhatWeDoSection: isTyping is true, returning false');
             return false;
         }
 
@@ -403,16 +384,12 @@ We're not an agency. We're a practice. With a network. With taste. With teeth.`,
             const wasAtBottom = this.gestureStartBoundary.atBottom;
             const stillAtBottom = currentBoundary.atBottom;
 
-            console.log('WhatWeDoSection: Check down transition - wasAtBottom:', wasAtBottom, 'stillAtBottom:', stillAtBottom);
-
             // Only transition if we started at bottom AND still at bottom
             return wasAtBottom && stillAtBottom;
         } else {
             // Scrolling up: were we at top when gesture started?
             const wasAtTop = this.gestureStartBoundary.atTop;
             const stillAtTop = currentBoundary.atTop;
-
-            console.log('WhatWeDoSection: Check up transition - wasAtTop:', wasAtTop, 'stillAtTop:', stillAtTop);
 
             // Only transition if we started at top AND still at top
             return wasAtTop && stillAtTop;

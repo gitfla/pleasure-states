@@ -6,7 +6,6 @@ const MenuController = {
         menuItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 const targetSectionId = e.target.dataset.target;
-                console.log('Menu clicked:', targetSectionId);
 
                 // Find section by menu target OR by id
                 // Use getAttribute as fallback for better browser compatibility
@@ -14,14 +13,12 @@ const MenuController = {
                     const menuTarget = s.element.dataset.menuTarget || s.element.getAttribute('data-menu-target');
                     return menuTarget === targetSectionId || s.id === targetSectionId;
                 });
-                console.log('Found section:', targetSection ? targetSection.id : 'NOT FOUND', 'at index:', targetSection ? targetSection.index : 'N/A');
 
                 if (targetSection) {
                     // Unlock scroll if splash screen is blocking
                     ScrollController.unlockScroll();
                     ScrollController.goToSection(targetSection.index);
                 } else {
-                    console.error('Menu: Could not find section with id:', targetSectionId);
                 }
             });
         });

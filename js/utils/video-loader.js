@@ -13,7 +13,6 @@ const VideoLoader = {
                 // Play when ready
                 video.addEventListener('canplay', () => {
                     video.play().catch(err => {
-                        console.warn('Video autoplay prevented:', err);
                     });
                 }, { once: true });
             }
@@ -31,7 +30,6 @@ const VideoLoader = {
         const videos = container.querySelectorAll('video');
         videos.forEach(video => {
             video.play().catch(err => {
-                console.warn('Video play failed:', err);
             });
         });
     }

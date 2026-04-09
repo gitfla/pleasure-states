@@ -12,6 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="PStates" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href="https://pleasurestates.com/" />
 
     <!-- SEO & Social Media Meta Tags -->
     <meta name="description" content="PLEASURE IS SERIOUS BUSINESS">
@@ -205,25 +206,27 @@
     </section>
 
     <!-- GSAP Core -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <!-- GSAP ScrollTrigger Plugin -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <!-- GSAP ScrollTo Plugin -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
 
-    <!-- Custom JS (order matters!) -->
-    <script src="js/utils/timing-constants.js"></script> <!-- Must load first - base constants used everywhere -->
-    <script src="js/utils/layout-debug.js"></script>
-    <script src="js/utils/animation-helpers.js"></script>
-    <script src="js/utils/video-loader.js"></script>
-    <script src="js/scroll-controller.js"></script>
-    <script src="js/sections/splash.js"></script>
-    <script src="js/sections/what-we-believe.js"></script>
-    <script src="js/sections/what-we-do.js"></script>
-    <script src="js/sections/work-with-us.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/mobile-menu.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Custom JS (order matters — defer preserves document order) -->
+    <script defer src="js/utils/timing-constants.js"></script>
+    <script defer src="js/utils/animation-helpers.js"></script>
+    <script defer src="js/utils/video-loader.js"></script>
+    <script defer src="js/scroll-controller.js"></script>
+    <script defer src="js/sections/splash.js"></script>
+    <script defer src="js/sections/what-we-believe.js"></script>
+    <script defer src="js/sections/what-we-do.js"></script>
+    <script defer src="js/sections/work-with-us.js"></script>
+    <script defer src="js/menu.js"></script>
+    <script defer src="js/mobile-menu.js"></script>
+    <script defer src="js/main.js"></script>
+
+    <!-- Vercel Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
 
 </body>
 </html>

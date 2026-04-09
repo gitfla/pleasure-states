@@ -24,9 +24,7 @@ const ScrollController = {
 
     // Initialize
     init() {
-        console.log('ScrollController: init() called');
         this.cacheSections();
-        console.log('ScrollController: Cached', this.sections.length, 'sections');
         this.registerEventListeners();
 
         // Debounce resize to avoid excessive calls
@@ -41,17 +39,14 @@ const ScrollController = {
 
     // Start the experience (called after all sections are initialized)
     start() {
-        console.log('ScrollController: start() called');
         this.positionOnSplash();
     },
 
     // Full re-initialization (for viewport mode changes)
     reinitialize() {
-        console.log('ScrollController: Full re-initialization triggered');
 
         // Save current section ID for remapping (not index, which will change)
         const currentSectionId = this.sections[this.currentSection]?.id;
-        console.log('ScrollController: Current section before re-init:', currentSectionId);
 
         // Re-cache sections (will filter based on new isMobile state)
         this.cacheSections();
@@ -61,18 +56,15 @@ const ScrollController = {
         let targetId = currentSectionId;
         if (currentSectionId === 'work-with-us-1' && !this.isMobile) {
             targetId = 'work-with-us-2';  // Mobile work-with-us-1 -> desktop work-with-us
-            console.log('ScrollController: Remapping work-with-us-1 -> work-with-us-2 for desktop');
         }
 
         // Find new index for this section ID
         const newIndex = this.sections.findIndex(s => s.id === targetId);
         if (newIndex !== -1) {
             this.currentSection = newIndex;
-            console.log('ScrollController: Remapped to section', newIndex, '(' + targetId + ')');
         } else {
             // Fallback: clamp to valid range
             this.currentSection = Math.min(this.currentSection, this.sections.length - 1);
-            console.warn('ScrollController: Could not remap section, clamped to', this.currentSection);
         }
 
         // Reset state flags that may be stale
@@ -91,7 +83,6 @@ const ScrollController = {
             }
         }
 
-        console.log('ScrollController: Re-init complete,', this.sections.length, 'sections, now at', this.sections[this.currentSection]?.id);
     },
 
     // Handle window resize (viewport mode changes)
@@ -100,7 +91,6 @@ const ScrollController = {
 
         // Viewport mode changed - refresh page to reinitialize cleanly
         if (this.isMobile !== nowMobile) {
-            console.log('Viewport mode changed:', this.isMobile ? 'mobile→desktop' : 'desktop→mobile', '- refreshing page');
             window.location.reload();
         }
     },
@@ -146,20 +136,17 @@ const ScrollController = {
             // Block if transition is in progress (prevents rapid scrolling through sections)
             if (this.isTransitioning) {
                 e.preventDefault();
-                console.log('ScrollController: Scroll ignored - transition in progress');
                 return;
             }
 
             // Check if we're in what-we-do section
             if (this.currentSection === 2) { // what-we-do is section index 2
                 const scrollZone = this.getScrollZone(e.target, this.mouseX);
-                console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'mouseX:', this.mouseX);
 
                 // Mod 8B: Handle left column scroll with gesture detection
                 if (scrollZone === 'left-column') {
                     if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
                         // Typing is active - complete it
-                        console.log('ScrollController: Left column scroll during typing, jumping to final state');
                         WhatWeDoSection.stopTyping();
                         WhatWeDoSection.showFinalState();
 
@@ -186,7 +173,6 @@ const ScrollController = {
 
                         // Check if this is a new gesture
                         if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            console.log('ScrollController: New left column gesture, resetting interrupt flag');
                             WhatWeDoSection.animationWasInterrupted = false;
                         }
 
@@ -220,10 +206,8 @@ const ScrollController = {
                         // Detect if this is a new gesture
                         const timeSinceLastWheel = now - WhatWeDoSection.lastWheelTime;
                         const isNewGesture = WhatWeDoSection.isNewGesture();
-                        console.log('ScrollController: Gesture check - timeSinceLastWheel:', timeSinceLastWheel, 'ms, isNewGesture:', isNewGesture, 'threshold:', WhatWeDoSection.GESTURE_TIMEOUT, 'ms');
 
                         if (isNewGesture) {
-                            console.log('ScrollController: NEW GESTURE DETECTED - calling handleGestureStart()');
                             WhatWeDoSection.handleGestureStart();
                         }
 
@@ -231,8 +215,6 @@ const ScrollController = {
                         WhatWeDoSection.lastWheelTime = now;
 
                         const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-
-                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping, 'gestureHitBoundary:', WhatWeDoSection.gestureHitBoundary);
 
                         // During typing: kill momentum once boundary is reached
                         if (WhatWeDoSection.isTyping) {
@@ -243,13 +225,11 @@ const ScrollController = {
                                 // Mark that this gesture has hit the boundary
                                 if (!WhatWeDoSection.gestureHitBoundary) {
                                     WhatWeDoSection.gestureHitBoundary = true;
-                                    console.log('ScrollController: Gesture hit boundary during typing, allowing this event');
                                     // Allow this event to go through (reaches boundary naturally)
                                     return;
                                 } else {
                                     // Already hit boundary in this gesture - kill remaining momentum
                                     e.preventDefault();
-                                    console.log('ScrollController: PREVENTED - Killing momentum after hitting boundary during typing');
                                     return;
                                 }
                             } else {
@@ -258,18 +238,15 @@ const ScrollController = {
                             }
 
                             // Not at boundary - allow scroll
-                            console.log('ScrollController: Allowing scroll during typing (not at boundary)');
                             return;
                         }
 
                         // After typing: check if should transition
                         if (this.canTransitionFromTypingBox(direction)) {
                             e.preventDefault();
-                            console.log('ScrollController: Was at boundary when gesture started, transitioning');
 
                             // Apply debouncing
                             if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                                console.log('ScrollController: Transition debounced');
                                 return;
                             }
 
@@ -281,12 +258,10 @@ const ScrollController = {
                         // Check if currently at boundary (just arrived this gesture)
                         if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
                             e.preventDefault();
-                            console.log('ScrollController: Reached boundary, preventing scroll (wait for next gesture)');
                             return;
                         }
 
                         // Not at boundary - allow scroll
-                        console.log('ScrollController: Not at boundary, allowing scroll');
                         return;
                     }
 
@@ -299,7 +274,6 @@ const ScrollController = {
 
             // Debounce: ignore rapid wheel events
             if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                console.log('ScrollController: Scroll ignored - debounced');
                 return;
             }
 
@@ -333,7 +307,6 @@ const ScrollController = {
             // Block if transition is in progress
             if (this.isTransitioning) {
                 e.preventDefault();
-                console.log('ScrollController: Touch scroll ignored - transition in progress');
                 return;
             }
 
@@ -345,13 +318,11 @@ const ScrollController = {
             if (this.currentSection === 2) { // what-we-do is section index 2
                 const touchX = e.touches[0].clientX;
                 const scrollZone = this.getScrollZone(touchStartElement, touchX);
-                console.log('ScrollController: In what-we-do section, scrollZone:', scrollZone, 'touchX:', touchX);
 
                 // Handle left column touch with gesture detection (same as desktop)
                 if (scrollZone === 'left-column') {
                     if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
                         // Typing is active - complete it
-                        console.log('ScrollController: Left column touch during typing, jumping to final state');
                         WhatWeDoSection.stopTyping();
                         WhatWeDoSection.showFinalState();
 
@@ -376,7 +347,6 @@ const ScrollController = {
                     } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
                         // Typing is complete - check if new gesture
                         if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            console.log('ScrollController: New left column touch gesture, resetting interrupt flag');
                             WhatWeDoSection.animationWasInterrupted = false;
                         }
 
@@ -404,10 +374,8 @@ const ScrollController = {
                     if (typeof WhatWeDoSection !== 'undefined') {
                         // Detect if this is a new gesture
                         const isNewGesture = WhatWeDoSection.isNewGesture();
-                        console.log('ScrollController: Touch gesture check - isNewGesture:', isNewGesture);
 
                         if (isNewGesture) {
-                            console.log('ScrollController: NEW TOUCH GESTURE DETECTED - calling handleGestureStart()');
                             WhatWeDoSection.handleGestureStart();
                         }
 
@@ -415,7 +383,6 @@ const ScrollController = {
                         WhatWeDoSection.lastWheelTime = now;
 
                         const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-                        console.log('ScrollController: Current boundary state:', currentBoundary, 'direction:', direction, 'isTyping:', WhatWeDoSection.isTyping);
 
                         // During typing: kill momentum once boundary is reached
                         if (WhatWeDoSection.isTyping) {
@@ -426,13 +393,11 @@ const ScrollController = {
                                 // Mark that this gesture has hit the boundary
                                 if (!WhatWeDoSection.gestureHitBoundary) {
                                     WhatWeDoSection.gestureHitBoundary = true;
-                                    console.log('ScrollController: Touch gesture hit boundary during typing, allowing this event');
                                     // Allow this event to go through (reaches boundary naturally)
                                     return;
                                 } else {
                                     // Already hit boundary in this gesture - kill remaining momentum
                                     e.preventDefault();
-                                    console.log('ScrollController: PREVENTED - Killing touch momentum after hitting boundary during typing');
                                     return;
                                 }
                             } else {
@@ -441,7 +406,6 @@ const ScrollController = {
                             }
 
                             // Not at boundary - allow scroll
-                            console.log('ScrollController: Allowing touch scroll during typing (not at boundary)');
                             return;
                         }
 
@@ -451,7 +415,6 @@ const ScrollController = {
                             if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
                                 e.preventDefault();
                                 touchMoved = true;
-                                console.log('ScrollController: Was at boundary when touch gesture started, transitioning');
                                 this.handleScrollAttempt(direction);
                             }
                             return;
@@ -460,12 +423,10 @@ const ScrollController = {
                         // Check if currently at boundary (just arrived this gesture)
                         if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
                             e.preventDefault();
-                            console.log('ScrollController: Reached boundary with touch, preventing scroll (wait for next gesture)');
                             return;
                         }
 
                         // Not at boundary - allow scroll
-                        console.log('ScrollController: Not at boundary, allowing touch scroll');
                         return;
                     }
 
@@ -491,7 +452,6 @@ const ScrollController = {
 
     // Position viewport on splash screen
     positionOnSplash() {
-        console.log('ScrollController: positionOnSplash() called');
         this.currentSection = 0;
         this.isScrollBlocked = true;
 
@@ -500,10 +460,8 @@ const ScrollController = {
 
         // Trigger splash animation
         if (this.sections[0] && this.sections[0].onEnter) {
-            console.log('ScrollController: Triggering splash onEnter callback');
             this.sections[0].onEnter();
         } else {
-            console.error('ScrollController: Splash section onEnter callback not registered!');
         }
     },
 
@@ -511,7 +469,6 @@ const ScrollController = {
     handleScrollAttempt(direction) {
         // Check if already transitioning
         if (this.isTransitioning) {
-            console.log('ScrollController: Already transitioning, ignoring scroll');
             return;
         }
 
@@ -523,7 +480,6 @@ const ScrollController = {
             const result = currentSectionData.onScrollAttempt(direction);
             // If returns false, don't proceed with transition
             if (result === false) {
-                console.log('ScrollController: Section prevented transition (animation interrupted)');
                 return;
             }
         }
@@ -533,7 +489,6 @@ const ScrollController = {
 
         // Validate target - prevent going back to splash (index 0)
         if (targetIndex < 1 || targetIndex >= this.sections.length) {
-            console.log('ScrollController: Cannot scroll beyond boundaries (splash locked)');
             return; // Can't scroll to splash or beyond end
         }
 
@@ -543,22 +498,16 @@ const ScrollController = {
 
     // Navigate to specific section with mask-lifting effect
     goToSection(targetIndex, immediate = false) {
-        console.log('ScrollController: goToSection() from', this.currentSection, 'to', targetIndex);
-        console.log('ScrollController: Current section ID:', this.sections[this.currentSection]?.id);
-        console.log('ScrollController: Target section ID:', this.sections[targetIndex]?.id);
 
         // Check if already transitioning (for menu clicks)
         if (this.isTransitioning) {
-            console.log('ScrollController: Transition already in progress, ignoring');
             return;
         }
         if (targetIndex === this.currentSection) {
-            console.log('ScrollController: Already at target section');
             return;
         }
         // Prevent navigating to splash (index 0) or beyond boundaries
         if (targetIndex < 1 || targetIndex >= this.sections.length) {
-            console.log('ScrollController: Invalid target index (splash locked)');
             return;
         }
 
@@ -568,10 +517,6 @@ const ScrollController = {
         const currentSectionData = this.sections[this.currentSection];
         const targetSectionData = this.sections[targetIndex];
         const direction = targetIndex > this.currentSection ? 'down' : 'up';
-
-        console.log('ScrollController: Direction:', direction);
-        console.log('ScrollController: currentSectionData:', currentSectionData.id, currentSectionData.element);
-        console.log('ScrollController: targetSectionData:', targetSectionData.id, targetSectionData.element);
 
         // Update current section index early so scroll indicator and menu animate with the transition
         const previousSection = this.currentSection;
@@ -594,7 +539,6 @@ const ScrollController = {
 
         if (direction === 'down') {
             // Scrolling forward: Next section slides up from bottom to cover current
-            console.log('ScrollController: Sliding section', targetIndex, 'up from bottom');
 
             // Ensure target section starts at 100% (below viewport)
             gsap.set(targetSectionData.element, { top: '100%' });
@@ -607,7 +551,6 @@ const ScrollController = {
             });
         } else {
             // Scrolling backward: Previous section slides down from top to cover current
-            console.log('ScrollController: Sliding section', targetIndex, 'down from top');
 
             // Ensure target section starts at -100% (above viewport)
             gsap.set(targetSectionData.element, { top: '-100%' });
@@ -629,7 +572,6 @@ const ScrollController = {
                     // Move ALL sections between target and current out of the way
                     // (they're all stacked at top: 0% and have higher z-index than target)
                     for (let i = targetIndex + 1; i <= previousSection; i++) {
-                        console.log('ScrollController: Moving section', i, '(' + this.sections[i].id + ') out of way to top: 100%');
                         gsap.set(this.sections[i].element, { top: '100%' });
                     }
 
@@ -641,27 +583,20 @@ const ScrollController = {
 
     // Called when transition animation completes
     onTransitionComplete(newIndex) {
-        console.log('ScrollController: Transition complete, now at section', newIndex);
 
         // Note: this.currentSection was already updated at the start of goToSection
         this.isTransitioning = false;
 
         const newSectionData = this.sections[newIndex];
-        console.log('ScrollController: New section data:', newSectionData ? newSectionData.id : 'NULL');
-        console.log('ScrollController: Has onEnter callback?', !!newSectionData.onEnter);
-        console.log('ScrollController: Has been animated?', newSectionData.hasAnimated);
 
         // Set reference timestamp for timing logs when entering what-we-believe
         if (newSectionData.id === 'what-we-believe') {
             this.timingReferenceTimestamp = performance.now();
-            console.log('[TIMING] Section transition complete - REFERENCE T=0ms');
         }
 
         // DEBUG: Log all section positions
-        console.log('ScrollController: All section positions after transition:');
         this.sections.forEach((s, i) => {
             const top = s.element.style.top;
-            console.log(`  Section ${i} (${s.id}): top = ${top}`);
         });
 
         // Update scroll blocking state
@@ -677,12 +612,10 @@ const ScrollController = {
 
         // Call onEnter for new section, passing hasAnimated flag
         if (newSectionData.onEnter) {
-            console.log('ScrollController: Calling onEnter for section', newSectionData.id);
             newSectionData.onEnter(newSectionData.hasAnimated);
             // Mark as animated after first visit
             newSectionData.hasAnimated = true;
         } else {
-            console.warn('ScrollController: No onEnter callback for section', newSectionData.id);
         }
     },
 
@@ -711,7 +644,6 @@ const ScrollController = {
                 if (this.timingReferenceTimestamp !== null) {
                     this.logoFadeStartTime = performance.now();
                     const relativeTime = Math.round(this.logoFadeStartTime - this.timingReferenceTimestamp);
-                    console.log(`[TIMING] Logo fade START at T=${relativeTime}ms`);
 
                     // Add transitionend listener to log when logo fade completes
                     const onLogoTransitionEnd = (e) => {
@@ -720,7 +652,6 @@ const ScrollController = {
                             this.logoFadeEndTime = endTime;  // Store for gap calculation
                             const relativeEndTime = Math.round(endTime - this.timingReferenceTimestamp);
                             const duration = Math.round(endTime - this.logoFadeStartTime);
-                            console.log(`[TIMING] Logo fade END at T=${relativeEndTime}ms (duration: ${duration}ms)`);
                             logo.removeEventListener('transitionend', onLogoTransitionEnd);
                         }
                     };
@@ -740,15 +671,12 @@ const ScrollController = {
     updateScrollIndicator() {
         const scrollIndicator = document.getElementById('scrollIndicator');
         if (!scrollIndicator) {
-            console.log('ScrollController: scrollIndicator element not found');
             return;
         }
 
         const currentIndex = this.currentSection - 1; // 0-based index for non-splash sections
-        console.log('ScrollController: updateScrollIndicator() called, currentSection:', this.currentSection, 'currentIndex:', currentIndex);
 
         if (currentIndex < 0) {
-            console.log('ScrollController: currentIndex < 0, not updating scroll indicator');
             return;
         }
 
@@ -764,30 +692,24 @@ const ScrollController = {
         // Calculate responsive scroll bar height: max(135px, 24.17vh)
         const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
 
-        console.log('ScrollController: gutterValue:', gutterValue, 'scrollBarHeight:', scrollBarHeight, 'window.innerHeight:', window.innerHeight);
-
         // Calculate positions in pixels (always use top property for smooth transition)
         let topPosition;
 
         switch (currentIndex) {
             case 0: // what-we-believe: align with top of first menu item (1 gutter from top)
                 topPosition = gutterValue;
-                console.log('ScrollController: Section 0 (what-we-believe), topPosition:', topPosition);
                 break;
             case 1: // what-we-do: vertically centered
                 topPosition = (window.innerHeight - scrollBarHeight) / 2;
-                console.log('ScrollController: Section 1 (what-we-do), topPosition:', topPosition);
                 break;
             case 2: // work-with-us-1 (mobile only)
             case 3: // work-with-us-2
                 // Both work-with-us sections share the same indicator position (bottom)
                 // Indicator represents menu item, not individual sections
                 topPosition = window.innerHeight - scrollBarHeight - gutterValue;
-                console.log('ScrollController: Section', currentIndex, '(work-with-us), topPosition:', topPosition);
                 break;
         }
 
-        console.log('ScrollController: Setting scrollIndicator.style.top to:', topPosition + 'px');
         // Apply position (transition will animate smoothly)
         scrollIndicator.style.top = topPosition + 'px';
     },
@@ -820,27 +742,20 @@ const ScrollController = {
 
     // Check if typing box allows section transition from boundary
     canTransitionFromTypingBox(direction) {
-        console.log('ScrollController: canTransitionFromTypingBox() called, direction:', direction);
-        console.log('ScrollController: currentSection:', this.currentSection);
 
         // Only applies to what-we-do section (index 2)
         if (this.currentSection !== 2) {
-            console.log('ScrollController: Not in what-we-do section, returning false');
             return false;
         }
 
         const currentSectionData = this.sections[this.currentSection];
-        console.log('ScrollController: currentSectionData:', currentSectionData ? currentSectionData.id : 'NULL');
-        console.log('ScrollController: Has isAtScrollBoundary callback?', typeof currentSectionData.isAtScrollBoundary === 'function');
 
         // Delegate to section's boundary check method
         if (typeof currentSectionData.isAtScrollBoundary === 'function') {
             const result = currentSectionData.isAtScrollBoundary(direction);
-            console.log('ScrollController: isAtScrollBoundary returned:', result);
             return result;
         }
 
-        console.log('ScrollController: No isAtScrollBoundary callback, returning false');
         return false;
     },
 

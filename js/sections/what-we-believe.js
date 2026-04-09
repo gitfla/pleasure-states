@@ -24,7 +24,6 @@ const WhatWeBelieveSection = {
     },
 
     onEnter(hasAnimated) {
-        console.log('WhatWeBelieveSection: onEnter() called, hasAnimated:', hasAnimated);
 
         // Store original text of last paragraph before any animation (Mod 4A)
         const lastParagraph = document.querySelector('.philosophy-paragraph[data-index="6"]');
@@ -109,7 +108,6 @@ const WhatWeBelieveSection = {
                                 gapInfo = ` (gap from P${index - 1} end: ${gap}ms)`;
                             }
 
-                            console.log(`[TIMING] Paragraph ${index} START at T=${relativeTime}ms${gapInfo}`);
                         }
                     },
                     onComplete: () => {
@@ -119,7 +117,6 @@ const WhatWeBelieveSection = {
                             previousElementEndTime = endTime;
                             const relativeTime = Math.round(endTime - ScrollController.timingReferenceTimestamp);
                             const duration = Math.round(anim.to.duration * 1000);
-                            console.log(`[TIMING] Paragraph ${index} END at T=${relativeTime}ms (duration: ${duration}ms)`);
                         }
                     }
                 },
@@ -135,9 +132,7 @@ const WhatWeBelieveSection = {
         // Only auto-advance on first visit and if enabled
         if (ScrollController.config.autoAdvanceEnabled && !this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;
-            console.log('WhatWeBelieveSection: Setting auto-advance timer for', this.AUTO_ADVANCE_DELAY_MS, 'ms');
             this.autoAdvanceTimer = setTimeout(() => {
-                console.log('WhatWeBelieveSection: Auto-advance timer fired');
                 ScrollController.advanceToNext();
             }, this.AUTO_ADVANCE_DELAY_MS);
         }
@@ -191,7 +186,6 @@ const WhatWeBelieveSection = {
 
         // Clean up auto-advance timer
         if (this.autoAdvanceTimer) {
-            console.log('WhatWeBelieveSection: Clearing auto-advance timer');
             clearTimeout(this.autoAdvanceTimer);
             this.autoAdvanceTimer = null;
         }

@@ -4,6 +4,7 @@
     src: url('../resources/alte_haas_grotesk/AlteHaasGroteskRegular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -11,6 +12,7 @@
     src: url('../resources/alte_haas_grotesk/AlteHaasGroteskBold.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
+    font-display: swap;
 }
 
 :root {

@@ -32,7 +32,6 @@ function initMobileVideoAutoplay() {
     document.addEventListener('touchstart', retryAll, { once: true });
     document.addEventListener('click', retryAll, { once: true });
 
-    console.log('[MOBILE] initMobileVideoAutoplay: attempted play() on', videos.length, 'videos');
 }
 
 // Logo visibility handler - updated to work with scroll controller
@@ -55,7 +54,6 @@ function updateLogoVisibility(sectionIndex) {
 
 // Main Entry Point - Initialize all modules when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('=== Pleasure States Initializing ===');
 
     // On mobile, remove sources from videos that are CSS-hidden to prevent unnecessary downloads
     if (window.innerWidth <= 768) {
@@ -68,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             video.querySelectorAll('source').forEach(s => s.remove());
             video.load(); // Reset after removing sources
         });
-        console.log('[MOBILE] Removed hidden video sources to save bandwidth');
     }
 
     // Explicitly play visible mobile videos (after hidden ones are stripped)
@@ -91,8 +88,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the experience (triggers splash animation)
     ScrollController.start();
-
-    // Log ready state
-    console.log('=== Pleasure States initialized ===');
-    console.log('Sections:', ScrollController.sections.length);
 });

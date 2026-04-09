@@ -1,5 +1,30 @@
 # Debug screenshots and reference files
-references/debug/
+references/
 
 # Temporary/backup files
 resources/12.03 - cópia/
+
+# Unused/legacy video files
+resources/clip-a-optimized.mp4
+resources/clip-b-optimized.mp4
+resources/splashscreen-720p.mp4
+resources/work-video-original.mp4
+
+# Unused/legacy images and files
+resources/PS_logotype-04.png
+resources/splashscreen-poster.jpg
+resources/final_copy.txt
+resources/frames/
+resources/favicon/
+
+# Internal planning docs
+PLAN.md
+DESIGN_IMPLEMENTATION_PLAN.md
+DESIGN_PLAN.md
+
+# Debug tooling
+js/utils/layout-debug.js
+
+# OS files
+.DS_Store
+**/.DS_Store

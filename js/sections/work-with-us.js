@@ -44,7 +44,6 @@ const WorkWithUsSection = {
     // ========================================
 
     onEnter1(hasAnimated) {
-        console.log('WorkWithUsSection Part 1: onEnter() called, hasAnimated:', hasAnimated);
 
         const headline = document.querySelector('#work-with-us-1 .work-with-us-headline');
         if (headline && !headline.dataset.originalHTML) {
@@ -60,7 +59,6 @@ const WorkWithUsSection = {
     },
 
     onLeave1() {
-        console.log('WorkWithUsSection Part 1: onLeave() called');
         if (this.timeline1) {
             this.timeline1.kill();
         }
@@ -83,13 +81,10 @@ const WorkWithUsSection = {
     },
 
     animateHeadline() {
-        console.log('[WORK WITH US 1] ========================================');
-        console.log('[WORK WITH US 1] animateHeadline() called');
 
         this.isAnimating = true;
         const headline = document.querySelector('#work-with-us-1 .work-with-us-headline');
         if (!headline) {
-            console.error('[WORK WITH US 1] Headline element not found!');
             return;
         }
 
@@ -103,22 +98,11 @@ const WorkWithUsSection = {
         tempDiv.innerHTML = textWithSpaces;
         const words = tempDiv.textContent.trim().split(/\s+/).filter(w => w);
 
-        console.log('[WORK WITH US 1] Original HTML:', originalHTML);
-        console.log('[WORK WITH US 1] Text with spaces:', textWithSpaces);
-        console.log('[WORK WITH US 1] Words:', words);
-        console.log('[WORK WITH US 1] Word count:', words.length);
-        console.log('[WORK WITH US 1] Timing constants:', {
-            INITIAL_DELAY: this.INITIAL_DELAY,
-            HEADLINE_WORD_DELAY: this.HEADLINE_WORD_DELAY
-        });
-
         // Create GSAP timeline
         this.timeline1 = gsap.timeline({
             onStart: () => {
-                console.log('[WORK WITH US 1] Timeline started');
             },
             onComplete: () => {
-                console.log('[WORK WITH US 1] Timeline completed');
                 this.isAnimating = false;
                 this.animationComplete = true;
                 // Restore original HTML with line breaks
@@ -129,24 +113,18 @@ const WorkWithUsSection = {
         // Clear headline and make visible
         headline.textContent = '';
         headline.style.opacity = '1';
-        console.log('[WORK WITH US 1] Headline cleared, opacity set to 1');
 
         // Show words one by one (no fade, instant appearance)
         let currentText = '';
         words.forEach((word, i) => {
             const delay = i === 0 ? this.INITIAL_DELAY : `+=${this.HEADLINE_WORD_DELAY}`;
-            console.log(`[WORK WITH US 1] Scheduling word ${i} "${word}" with delay: ${delay}`);
 
             this.timeline1.call(() => {
                 currentText += (i > 0 ? ' ' : '') + word;
                 headline.textContent = currentText;
-                console.log(`[WORK WITH US 1] ✅ Word ${i} "${word}" appeared at ${performance.now().toFixed(2)}ms`);
-                console.log(`[WORK WITH US 1] Current text: "${currentText}"`);
             }, null, delay);
         });
 
-        console.log('[WORK WITH US 1] Timeline setup complete, total duration:', this.timeline1.duration());
-        console.log('[WORK WITH US 1] ========================================');
     },
 
     // ========================================
@@ -154,7 +132,6 @@ const WorkWithUsSection = {
     // ========================================
 
     onEnter2(hasAnimated) {
-        console.log('WorkWithUsSection Part 2: onEnter() called, hasAnimated:', hasAnimated);
 
         if (hasAnimated) {
             // Desktop: use legacy final state, Mobile: use mobile final state
@@ -174,7 +151,6 @@ const WorkWithUsSection = {
     },
 
     onLeave2() {
-        console.log('WorkWithUsSection Part 2: onLeave() called');
         if (this.timeline2) {
             this.timeline2.kill();
         }
@@ -283,7 +259,6 @@ const WorkWithUsSection = {
     // ========================================
 
     onEnter(hasAnimated) {
-        console.log('WorkWitin whUsSection: onEnter() called, hasAnimated:', hasAnimated);
 
         // Store original headline HTML and text before any animation (Mod 5)
         const headline = document.querySelector('.work-with-us-headline');
@@ -310,14 +285,12 @@ const WorkWithUsSection = {
 
         // Set reference timestamp for this section
         const referenceTimestamp = performance.now();
-        console.log('[TIMING] Work-with-us animation START - REFERENCE T=0ms');
 
         // Track previous element end time for gap calculations
         let previousElementEndTime = null;
 
         this.timeline = gsap.timeline({
             onComplete: () => {
-                console.log('WorkWithUsSection: Animation complete');
                 this.isAnimating = false;
                 // Enable pointer events on button
                 if (ctaButton) {
@@ -348,14 +321,12 @@ const WorkWithUsSection = {
                         const gap = Math.round(startTime - previousElementEndTime);
                         gapInfo = ` (gap from previous end: ${gap}ms)`;
                     }
-                    console.log(`[TIMING] Paragraph ${i} START at T=${relativeTime}ms${gapInfo}`);
                 },
                 onComplete: () => {
                     const endTime = performance.now();
                     previousElementEndTime = endTime;
                     const relativeTime = Math.round(endTime - referenceTimestamp);
                     const duration = Math.round(anim.to.duration * 1000);
-                    console.log(`[TIMING] Paragraph ${i} END at T=${relativeTime}ms (duration: ${duration}ms)`);
                 }
             }, i === 0 ? this.INITIAL_DELAY : `+=${this.PARAGRAPH_STAGGER_DELAY}`);
         }
@@ -391,7 +362,6 @@ const WorkWithUsSection = {
                     const gap = Math.round(startTime - previousElementEndTime);
                     gapInfo = ` (gap from previous end: ${gap}ms)`;
                 }
-                console.log(`[TIMING] Headline container START at T=${relativeTime}ms${gapInfo}`);
             }
         }, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
 
@@ -409,13 +379,11 @@ const WorkWithUsSection = {
                         const gap = Math.round(startTime - previousElementEndTime);
                         gapInfo = ` (gap from previous word: ${gap}ms)`;
                     }
-                    console.log(`[TIMING] Headline word "${span.textContent}" START at T=${relativeTime}ms${gapInfo}`);
                 },
                 onComplete: () => {
                     const endTime = performance.now();
                     previousElementEndTime = endTime;
                     const relativeTime = Math.round(endTime - referenceTimestamp);
-                    console.log(`[TIMING] Headline word "${span.textContent}" END at T=${relativeTime}ms (instant)`);
                 }
             }, index === 0 ? '+=0' : `+=${this.HEADLINE_WORD_DELAY}`);
         });
@@ -449,7 +417,6 @@ const WorkWithUsSection = {
                         const gap = Math.round(startTime - previousElementEndTime);
                         gapInfo = ` (gap from previous end: ${gap}ms)`;
                     }
-                    console.log(`[TIMING] Last paragraph container START at T=${relativeTime}ms${gapInfo}`);
                 }
             }, `+=${this.PARAGRAPH_STAGGER_DELAY}`);
 
@@ -462,14 +429,12 @@ const WorkWithUsSection = {
                     onStart: () => {
                         const startTime = performance.now();
                         const relativeTime = Math.round(startTime - referenceTimestamp);
-                        console.log(`[TIMING] Last paragraph word "${span.textContent.trim()}" START at T=${relativeTime}ms`);
                     },
                     onComplete: () => {
                         const endTime = performance.now();
                         previousElementEndTime = endTime;
                         const relativeTime = Math.round(endTime - referenceTimestamp);
                         const duration = Math.round(this.WORD_FADE_DURATION * 1000);
-                        console.log(`[TIMING] Last paragraph word "${span.textContent.trim()}" END at T=${relativeTime}ms (duration: ${duration}ms)`);
                     }
                 }, wordIndex === 0 ? '+=0' : `+=${this.WORD_BY_WORD_DELAY}`);
             });
@@ -487,13 +452,11 @@ const WorkWithUsSection = {
                         const gap = Math.round(startTime - previousElementEndTime);
                         gapInfo = ` (gap from previous end: ${gap}ms)`;
                     }
-                    console.log(`[TIMING] CTA Button START at T=${relativeTime}ms${gapInfo}`);
                 },
                 onComplete: () => {
                     const endTime = performance.now();
                     const relativeTime = Math.round(endTime - referenceTimestamp);
                     const duration = Math.round(anim.to.duration * 1000);
-                    console.log(`[TIMING] CTA Button END at T=${relativeTime}ms (duration: ${duration}ms)`);
                 }
             }, `+=${this.BUTTON_DELAY}`);
         }

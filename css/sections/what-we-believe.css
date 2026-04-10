@@ -10,7 +10,7 @@
     flex-direction: column;
     justify-content: flex-start;
     padding: 0 var(--gutter);
-    padding-top: calc((100vh / 7) + (var(--gutter) * 2)); /* 1 cell + 2 gutters from top */
+    padding-top: calc(var(--gutter) + var(--desktop-cell-height) + var(--gutter)); /* start of cell 2 */
     background-color: #fff;
 }
 

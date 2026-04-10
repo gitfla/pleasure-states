@@ -77,16 +77,22 @@ const MobileMenuController = {
             } else {
                 menuToggle.classList.remove('visible');
             }
-        } else {
         }
     },
 
     openMenu() {
         const menuOverlay = document.getElementById('mobileMenuOverlay');
         const menuToggle = document.getElementById('mobileMenuToggle');
+        const siteLogo = document.getElementById('siteLogo');
 
         if (menuOverlay) {
             menuOverlay.classList.add('active');
+        }
+
+        // Switch logo from blend mode to normal + invert so it reads black on white overlay
+        if (siteLogo) {
+            siteLogo.style.mixBlendMode = 'normal';
+            siteLogo.style.filter = 'invert(1)';
         }
 
         // Optionally hide the toggle while menu is open
@@ -99,9 +105,16 @@ const MobileMenuController = {
     closeMenu() {
         const menuOverlay = document.getElementById('mobileMenuOverlay');
         const menuToggle = document.getElementById('mobileMenuToggle');
+        const siteLogo = document.getElementById('siteLogo');
 
         if (menuOverlay) {
             menuOverlay.classList.remove('active');
+        }
+
+        // Restore logo blend mode
+        if (siteLogo) {
+            siteLogo.style.mixBlendMode = '';
+            siteLogo.style.filter = '';
         }
 
         // Show toggle again

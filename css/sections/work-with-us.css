@@ -22,7 +22,7 @@
 
 .work-with-us-headline {
     position: absolute;
-    top: calc((100vh / 7) + (var(--gutter) * 2)); /* 1 cell + 2 gutters from top */
+    top: calc(var(--gutter) + var(--desktop-cell-height) + var(--gutter)); /* start of cell 2 */
     left: var(--gutter);
     z-index: 2;
     font-size: var(--font-work-with-us-headline);
@@ -44,8 +44,8 @@
     text-align: left;
     background-color: #fff;
     padding: 0 var(--gutter);
-    padding-top: calc((100vh / 7) + (var(--gutter) * 2)); /* 1 cell + 2 gutters from top */
-    padding-bottom: calc((100vh / 7) + (var(--gutter) * 2)); /* 1 cell + 2 gutters from bottom */
+    padding-top: calc(var(--gutter) + var(--desktop-cell-height) + var(--gutter)); /* start of cell 2 */
+    padding-bottom: calc(var(--gutter) + var(--desktop-cell-height) + var(--gutter)); /* end of cell 6 */
 }
 
 .contact-line {
@@ -58,7 +58,8 @@
 
 /* Add spacing where copy has empty lines */
 .contact-line[data-index="0"],
-.contact-line[data-index="1"] {
+.contact-line[data-index="1"],
+.contact-line[data-index="2"] {
     margin-bottom: var(--font-believe-line-height);
 }
 
@@ -66,7 +67,7 @@
 .contact-cta {
     position: fixed;
     right: calc(31.4vw + var(--nav-strip) - var(--gutter) - var(--button-width));
-    bottom: calc((100vh / 7) + var(--gutter) - var(--button-height));  /* Top of button aligns with top of last cell */
+    bottom: calc(2 * var(--gutter) + var(--desktop-cell-height));  /* Bottom of button aligns with bottom of second-to-last cell */
     z-index: var(--z-menu);
 
     display: flex;

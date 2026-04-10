@@ -58,7 +58,8 @@
 
 /* Add spacing where copy has empty lines */
 .contact-line[data-index="0"],
-.contact-line[data-index="1"] {
+.contact-line[data-index="1"],
+.contact-line[data-index="2"] {
     margin-bottom: var(--font-believe-line-height);
 }
 

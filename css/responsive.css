@@ -27,6 +27,69 @@
    Breakpoint: max-width 768px
    ======================================== */
 
+/* ========================================
+   MOBILE GRID DEBUG OVERLAY
+   ======================================== */
+
+@media (max-width: 768px) {
+    body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        background:
+            /* 8 gutters at top of each row */
+            /* gutter 1: 0 to 3.33vh */
+            linear-gradient(to bottom,
+                rgba(255, 0, 0, 0.15) 0,
+                rgba(255, 0, 0, 0.15) 3.33vh,
+                /* cell 1 */
+                rgba(255, 192, 203, 0.1) 3.33vh,
+                rgba(255, 192, 203, 0.1) calc(3.33vh + (100vh - 8 * 3.33vh) / 7),
+                /* gutter 2 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh + (100vh - 8 * 3.33vh) / 7),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7),
+                /* cell 2 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7 * 2),
+                /* gutter 3 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7 * 2),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 2),
+                /* cell 3 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 2),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 3),
+                /* gutter 4 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 3),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 3),
+                /* cell 4 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 3),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 4),
+                /* gutter 5 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 4),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 4),
+                /* cell 5 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 4),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 5),
+                /* gutter 6 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 5),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 5),
+                /* cell 6 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 5),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 6),
+                /* gutter 7 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 6),
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 6),
+                /* cell 7 */
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 6),
+                rgba(255, 192, 203, 0.1) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 7),
+                /* gutter 8 */
+                rgba(255, 0, 0, 0.15) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 7),
+                rgba(255, 0, 0, 0.15) 100%
+            );
+    }
+}
+
 @media (max-width: 768px) {
     /* ========================================
        GLOBAL LAYOUT OVERRIDES
@@ -50,6 +113,7 @@
         max-width: 60%;
         padding: 0;
         align-items: flex-start; /* Top align */
+        z-index: 1001; /* Above mobile menu overlay */
     }
 
     /* ========================================
@@ -121,12 +185,48 @@
         line-height: 1; /* Remove extra line height spacing, same as MENU */
     }
 
+    .mobile-menu-social {
+        position: absolute;
+        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2));
+        transform: translateY(50%);
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        font-size: var(--font-splash-tagline);
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        color: #000;
+    }
+
+    .mobile-menu-social-link {
+        color: #000;
+        text-decoration: none;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 0.87;
+    }
+
+    .mobile-menu-social-divider {
+        color: #000;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 0.87;
+    }
+
     .mobile-menu-nav {
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter)); /* Start at cell 2 instead of cell 3 */
+        position: absolute;
+        /* Visual bottom of "What we believe" aligns with bottom of cell 2.
+           Line box top = cell2-bottom - line-height + (line-height - font-size)/2 */
+        top: calc(2 * (3.33vh + (100vh - 8 * 3.33vh) / 7) - var(--font-mobile-menu-line-height) + ((var(--font-mobile-menu-line-height) - var(--font-mobile-menu)) / 2));
+        left: 0;
+        right: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0; /* No gap - spacing handled by line-height */
+        gap: 0; /* spacing handled by line-height */
     }
 
     .mobile-menu-item {
@@ -184,8 +284,8 @@
         content: '';
         position: fixed; /* Use fixed to match tagline positioning */
         top: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2)); /* EXACT center of cell 1 */
-        left: 3.33vh; /* Left gutter */
-        right: 3.33vh; /* Right gutter */
+        left: 3.33vh;
+        right: 3.33vh;
         transform: translateY(-50%); /* Only vertical centering */
         width: auto; /* Let left/right constrain it */
         height: auto;
@@ -228,19 +328,19 @@
     /* Down arrow - centered horizontally, centered in bottom gutter vertically */
     .mobile-splash-arrow {
         display: block;
-        position: fixed; /* Use fixed so it's always relative to viewport */
+        position: fixed;
         bottom: calc(3.33vh / 2 - (var(--arrow-size-mobile) / 2)); /* Center of gutter minus half arrow height */
         left: calc(50% - (var(--arrow-size-mobile) / 2)); /* Center minus half arrow width */
-        width: var(--arrow-size-mobile); /* 15px from plan */
-        height: var(--arrow-size-mobile); /* 15px from plan */
-        border-right: 2px solid #fff;
-        border-bottom: 2px solid #fff;
-        transform: rotate(45deg); /* Just rotate, positioning handles centering */
+        width: var(--arrow-size-mobile); /* 15px */
+        height: var(--arrow-size-mobile); /* 15px */
+        background-image: url('../../resources/down-arrow.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
         opacity: 0;
         /* No transition - GSAP handles animation */
         z-index: 10;
         mix-blend-mode: difference;
-        filter: invert(1);
     }
 
 
@@ -260,7 +360,7 @@
     /* Text container - full width */
     .philosophy-text-container {
         grid-column: 1;
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh);
         padding-left: var(--gutter);
         padding-right: var(--gutter);
     }
@@ -318,6 +418,7 @@
 
     .what-we-do-text-box {
         padding-right: var(--gutter); /* Remove extra nav strip padding on mobile */
+        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh); /* Start at cell 2 */
         height: 100vh; /* Fallback for older browsers */
         height: 100svh; /* Use small viewport height - visible screen only */
     }
@@ -350,10 +451,11 @@
         color: #fff;
         white-space: normal; /* Allow wrapping for animation */
         word-wrap: break-word;
-        /* Position so top aligns with vertical center of visible screen */
+        /* Bottom of last line aligns with bottom of second-to-last cell.
+           Second-to-last cell bottom = 100vh - 2*gutter - cell.
+           Block height = 5 lines * (font-size * line-height) */
         position: absolute;
-        top: 50vh; /* Fallback for older browsers */
-        top: 50svh; /* Use small viewport height - visible screen center */
+        top: calc(100vh - 2 * var(--gutter) - var(--mobile-cell-height) - 5 * var(--font-mobile-headline) * var(--font-mobile-headline-line-height));
         bottom: auto; /* Override desktop bottom positioning */
         left: var(--gutter);
         right: var(--gutter);
@@ -374,7 +476,7 @@
     #work-with-us-2 .work-with-us-text-container {
         grid-column: 1;
         grid-row: 1 / -1;
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh);
     }
 
     /* Increase paragraph font size on mobile */

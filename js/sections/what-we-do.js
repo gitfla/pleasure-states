@@ -64,7 +64,9 @@ We eat together.
 
 We think fast when we need to. We work slow when it matters.
 
-We're not an agency. We're a practice. With a network. With taste. With teeth.`,
+We're not an agency. We're a practice.
+
+With a network. With taste. With teeth.`,
 
     init() {
         ScrollController.registerSection('what-we-do', {

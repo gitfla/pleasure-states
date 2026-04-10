@@ -29,6 +29,7 @@
     --cell-width: clamp(120px, 14.18vw, 245px);    /* 245/1728 = 14.18% */
     --cell-height: clamp(80px, 11.73vh, 131px);     /* 131/1117 = 11.73% */
     --gutter: clamp(12px, 1.45vw, 25px);            /* 25/1728 = 1.45% */
+    --desktop-cell-height: calc((100vh - 8 * var(--gutter)) / 7); /* Derived from viewport so rows fill exactly 100vh */
 
     /* Column bands (derived from cells + gutters) */
     --col-band-1: calc(var(--gutter) + var(--cell-width) + var(--gutter) + var(--cell-width) + var(--gutter));
@@ -108,13 +109,24 @@
 /* Mobile-specific variables */
 @media (max-width: 768px) {
     :root {
-        /* Override gutter for mobile - use small viewport height (svh) */
-        --gutter: 3.33vh; /* Fallback for older browsers */
-        --gutter: 3.33svh; /* Small viewport height - browser UI visible */
+        /* Safe area insets for edge-pinned elements (notch, home indicator) */
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
 
-        /* Mobile grid system - use svh for accurate positioning */
-        --mobile-cell-height: calc((100vh - (8 * 3.33vh)) / 7); /* Fallback */
-        --mobile-cell-height: calc((100svh - (8 * 3.33svh)) / 7); /* Small viewport */
+        /* Tier 1: CSS baseline using dvh (dynamic viewport height — follows visible area) */
+        --app-h: 100dvh;
+        --app-w: 100dvw;
+        /* Gutter ratio: 25px / 1117px reference height = 2.238% */
+        --gutter: calc(var(--app-h) * 0.02238);
+        --mobile-cell-height: calc((var(--app-h) - (8 * var(--gutter))) / 7);
+
+        /* Tier 2: JS precision vars — set by viewport.js via visualViewport API */
+        /* Falls back to CSS baseline if JS hasn't run yet */
+        --precision-h: var(--app-h-js, var(--app-h));
+        --precision-gutter: calc(var(--precision-h) * 0.02238);
+        --precision-cell-height: calc((var(--precision-h) - (8 * var(--precision-gutter))) / 7);
 
         /* Mobile typography */
         --font-mobile-menu: 37px;
@@ -135,5 +147,15 @@
 
         /* Mobile arrow */
         --arrow-size-mobile: 15px;
+    }
+}
+
+/* dvh fallback for older browsers without dvh support */
+@supports not (height: 100dvh) {
+    @media (max-width: 768px) {
+        :root {
+            --app-h: 100vh;
+            --app-w: 100vw;
+        }
     }
 }

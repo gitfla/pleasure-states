@@ -17,8 +17,94 @@
         visibility: hidden !important;
         opacity: 0 !important;
         pointer-events: none !important;
-        z-index: -1 !important;  /* Below all visible sections (splash is z-index: 10) */
-        top: 100% !important;    /* Off-screen below viewport */
+        z-index: -1 !important; /* Below all visible sections (splash is z-index: 10) */
+        top: 100% !important; /* Off-screen below viewport */
+    }
+}
+
+/* ========================================
+   DESKTOP GRID DEBUG OVERLAY
+   6 cells × 7 rows with gutters
+   Horizontal: G, C, G, C, G+G, C, G, C, G+G, C, G, C, G, [nav]
+   (double gutter at band boundaries: bands are 32.7% | 32.7% | 31.4% | 3.2% nav)
+   Vertical: 8 gutters, 7 cells (same as mobile but using 100vh / no-gap rows)
+   Using --gutter (1.45vw) and --cell-width (14.18vw) from variables.css
+   ======================================== */
+
+@media (min-width: 769px) {
+    body::before {
+        display: none; /* Debug grid — remove this line to show */
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        background:
+            /* COLUMNS: G C G C G+G C G C G+G C G C G nav */
+            linear-gradient(
+                to right,
+                /* G1 */ rgba(255, 0, 0, 0.15) 0,
+                rgba(255, 0, 0, 0.15) var(--gutter),
+                /* C1 */ rgba(255, 192, 203, 0.12) var(--gutter),
+                rgba(255, 192, 203, 0.12) calc(var(--gutter) + var(--cell-width)),
+                /* G2 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) + var(--cell-width)),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--cell-width)),
+                /* C2 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 2 + var(--cell-width)),
+                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 2 + var(--cell-width) * 2),
+                /* G3+G4 (double) */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--cell-width) * 2),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--cell-width) * 2),
+                /* C3 */ rgba(255, 192, 203, 0.12) calc(var(--gutter) * 4 + var(--cell-width) * 2),
+                rgba(255, 192, 203, 0.12) calc(var(--gutter) * 4 + var(--cell-width) * 3),
+                /* G5 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--cell-width) * 3),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--cell-width) * 3),
+                /* C4 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 5 + var(--cell-width) * 3),
+                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 5 + var(--cell-width) * 4),
+                /* G6+G7 (double) */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--cell-width) * 4),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--cell-width) * 4),
+                /* C5 */ rgba(255, 192, 203, 0.12) calc(var(--gutter) * 7 + var(--cell-width) * 4),
+                rgba(255, 192, 203, 0.12) calc(var(--gutter) * 7 + var(--cell-width) * 5),
+                /* G8 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--cell-width) * 5),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 8 + var(--cell-width) * 5),
+                /* C6 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 8 + var(--cell-width) * 5),
+                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 8 + var(--cell-width) * 6),
+                /* Nav strip (no trailing gutter in band 3) */
+                rgba(100, 100, 255, 0.15) calc(var(--gutter) * 8 + var(--cell-width) * 6),
+                rgba(100, 100, 255, 0.15) 100%
+            ),
+            /* ROWS: G, C, G, C, G... (8 gutters, 7 cells) using --gutter and --cell-height */
+            linear-gradient(
+                to bottom,
+                /* G1 */ rgba(255, 0, 0, 0.15) 0,
+                rgba(255, 0, 0, 0.15) var(--gutter),
+                /* C1 */ rgba(255, 192, 203, 0.08) var(--gutter),
+                rgba(255, 192, 203, 0.08) calc(var(--gutter) + var(--desktop-cell-height)),
+                /* G2 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) + var(--desktop-cell-height)),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--desktop-cell-height)),
+                /* C2 */ transparent calc(var(--gutter) * 2 + var(--desktop-cell-height)),
+                transparent calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
+                /* G3 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
+                /* C3 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
+                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
+                /* G4 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
+                /* C4 */ transparent calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
+                transparent calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
+                /* G5 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
+                /* C5 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
+                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
+                /* G6 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
+                /* C6 */ transparent calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
+                transparent calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
+                /* G7 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
+                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
+                /* C7 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
+                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
+                /* G8 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
+                rgba(255, 0, 0, 0.15) 100%
+            );
     }
 }
 
@@ -33,60 +119,64 @@
 
 @media (max-width: 768px) {
     body::after {
-        content: '';
+        display: none; /* Debug grid — remove this line to show */
+        content: "";
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--precision-h);
         z-index: 9999;
         pointer-events: none;
         background:
-            /* 8 gutters at top of each row */
-            /* gutter 1: 0 to 3.33vh */
-            linear-gradient(to bottom,
-                rgba(255, 0, 0, 0.15) 0,
-                rgba(255, 0, 0, 0.15) 3.33vh,
-                /* cell 1 */
-                rgba(255, 192, 203, 0.1) 3.33vh,
-                rgba(255, 192, 203, 0.1) calc(3.33vh + (100vh - 8 * 3.33vh) / 7),
-                /* gutter 2 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh + (100vh - 8 * 3.33vh) / 7),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7),
-                /* cell 2 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7 * 2),
-                /* gutter 3 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 2 + (100vh - 8 * 3.33vh) / 7 * 2),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 2),
-                /* cell 3 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 2),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 3),
-                /* gutter 4 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 3 + (100vh - 8 * 3.33vh) / 7 * 3),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 3),
-                /* cell 4 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 3),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 4),
-                /* gutter 5 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 4 + (100vh - 8 * 3.33vh) / 7 * 4),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 4),
-                /* cell 5 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 4),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 5),
-                /* gutter 6 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 5 + (100vh - 8 * 3.33vh) / 7 * 5),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 5),
-                /* cell 6 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 5),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 6),
-                /* gutter 7 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 6 + (100vh - 8 * 3.33vh) / 7 * 6),
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 6),
-                /* cell 7 */
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 6),
-                rgba(255, 192, 203, 0.1) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 7),
-                /* gutter 8 */
-                rgba(255, 0, 0, 0.15) calc(3.33vh * 7 + (100vh - 8 * 3.33vh) / 7 * 7),
+            /* COLUMNS: left gutter | content | center gutter | content | right gutter */
+            linear-gradient(
+                to right,
+                rgba(255, 0, 0, 0.15) 0%,
+                rgba(255, 0, 0, 0.15) 2.238%,
+                transparent 2.238%,
+                transparent calc(50% - 1.119%),
+                rgba(255, 0, 0, 0.15) calc(50% - 1.119%),
+                rgba(255, 0, 0, 0.15) calc(50% + 1.119%),
+                transparent calc(50% + 1.119%),
+                transparent calc(100% - 2.238%),
+                rgba(255, 0, 0, 0.15) calc(100% - 2.238%),
                 rgba(255, 0, 0, 0.15) 100%
-            );
+            ),
+            /* ROWS: G=2.238%, C=11.728% — 8×2.238 + 7×11.728 = 17.904 + 82.096 = 100% */
+            linear-gradient(
+            to bottom,
+            /* gutter 1 */  rgba(255, 0, 0, 0.15) 0%,
+            rgba(255, 0, 0, 0.15) 2.238%,
+            /* cell 1 */    rgba(255, 192, 203, 0.1) 2.238%,
+            rgba(255, 192, 203, 0.1) 13.966%,
+            /* gutter 2 */  rgba(255, 0, 0, 0.15) 13.966%,
+            rgba(255, 0, 0, 0.15) 16.204%,
+            /* cell 2 */    rgba(255, 192, 203, 0.1) 16.204%,
+            rgba(255, 192, 203, 0.1) 27.932%,
+            /* gutter 3 */  rgba(255, 0, 0, 0.15) 27.932%,
+            rgba(255, 0, 0, 0.15) 30.17%,
+            /* cell 3 */    rgba(255, 192, 203, 0.1) 30.17%,
+            rgba(255, 192, 203, 0.1) 41.898%,
+            /* gutter 4 */  rgba(255, 0, 0, 0.15) 41.898%,
+            rgba(255, 0, 0, 0.15) 44.136%,
+            /* cell 4 */    rgba(255, 192, 203, 0.1) 44.136%,
+            rgba(255, 192, 203, 0.1) 55.864%,
+            /* gutter 5 */  rgba(255, 0, 0, 0.15) 55.864%,
+            rgba(255, 0, 0, 0.15) 58.102%,
+            /* cell 5 */    rgba(255, 192, 203, 0.1) 58.102%,
+            rgba(255, 192, 203, 0.1) 69.83%,
+            /* gutter 6 */  rgba(255, 0, 0, 0.15) 69.83%,
+            rgba(255, 0, 0, 0.15) 72.068%,
+            /* cell 6 */    rgba(255, 192, 203, 0.1) 72.068%,
+            rgba(255, 192, 203, 0.1) 83.796%,
+            /* gutter 7 */  rgba(255, 0, 0, 0.15) 83.796%,
+            rgba(255, 0, 0, 0.15) 86.034%,
+            /* cell 7 */    rgba(255, 192, 203, 0.1) 86.034%,
+            rgba(255, 192, 203, 0.1) 97.762%,
+            /* gutter 8 */  rgba(255, 0, 0, 0.15) 97.762%,
+            rgba(255, 0, 0, 0.15) 100%
+        );
     }
 }
 
@@ -107,7 +197,7 @@
 
     /* Adjust logo for mobile - top align with Cell 1 */
     .site-logo {
-        top: 3.33vh; /* Start of Cell 1 (after top gutter) */
+        top: calc(var(--safe-top) + var(--gutter)); /* Start of Cell 1 (after top gutter) */
         left: var(--gutter);
         width: auto;
         max-width: 60%;
@@ -122,13 +212,15 @@
 
     .mobile-menu-toggle {
         position: fixed;
-        top: 3.33vh; /* Align with start of Cell 1, same as logo */
+        top: calc(var(--safe-top) + var(--precision-gutter)); /* Align with start of Cell 1, same as logo */
         right: var(--gutter);
         z-index: 1001;
         background: transparent;
         border: none;
         color: #fff; /* White with blend mode for visibility */
-        font-size: var(--font-splash-tagline); /* Same height as PLEASURE STATES logo */
+        font-size: var(
+            --font-splash-tagline
+        ); /* Same height as PLEASURE STATES logo */
         font-weight: 400; /* Not bold */
         letter-spacing: 0.02em;
         cursor: pointer;
@@ -156,7 +248,7 @@
         top: 0;
         right: 0;
         width: 100vw;
-        height: 100vh;
+        height: var(--precision-h);
         background-color: #fff; /* White background, not black */
         z-index: 1000;
         display: flex;
@@ -172,7 +264,7 @@
 
     .mobile-menu-close {
         position: absolute;
-        top: 3.33vh; /* Align with start of Cell 1, same as MENU */
+        top: calc(var(--safe-top) + var(--precision-gutter)); /* Align with start of Cell 1, same as MENU */
         right: var(--gutter);
         background: transparent;
         border: none;
@@ -187,14 +279,13 @@
 
     .mobile-menu-social {
         position: absolute;
-        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2));
+        bottom: calc(var(--safe-bottom) + var(--precision-gutter) + var(--precision-cell-height) / 2);
         transform: translateY(50%);
         left: 0;
         right: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5em;
         font-size: var(--font-splash-tagline);
         font-weight: 400;
         letter-spacing: 0.02em;
@@ -202,6 +293,7 @@
     }
 
     .mobile-menu-social-link {
+        flex: 1;
         color: #000;
         text-decoration: none;
         font-size: 17px;
@@ -209,18 +301,33 @@
         line-height: 0.87;
     }
 
+    .mobile-menu-social-link:first-child {
+        text-align: right;
+        padding-right: 0.4em;
+    }
+
+    .mobile-menu-social-link:last-child {
+        text-align: left;
+        padding-left: 0.4em;
+    }
+
     .mobile-menu-social-divider {
         color: #000;
         font-size: 17px;
         font-weight: 700;
         line-height: 0.87;
+        flex-shrink: 0;
     }
 
     .mobile-menu-nav {
         position: absolute;
         /* Visual bottom of "What we believe" aligns with bottom of cell 2.
            Line box top = cell2-bottom - line-height + (line-height - font-size)/2 */
-        top: calc(2 * (3.33vh + (100vh - 8 * 3.33vh) / 7) - var(--font-mobile-menu-line-height) + ((var(--font-mobile-menu-line-height) - var(--font-mobile-menu)) / 2));
+        top: calc(
+            2 * (var(--precision-gutter) + var(--precision-cell-height)) -
+                var(--font-mobile-menu-line-height) +
+                (var(--font-mobile-menu-line-height) - var(--font-mobile-menu)) / 2
+        );
         left: 0;
         right: 0;
         display: flex;
@@ -281,16 +388,18 @@
     /* Mobile logo - using ::before pseudo-element */
     /* Centered in cell 1 - center line should go through vertical middle of logo */
     #splash::before {
-        content: '';
+        content: "";
         position: fixed; /* Use fixed to match tagline positioning */
-        top: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2)); /* EXACT center of cell 1 */
-        left: 3.33vh;
-        right: 3.33vh;
+        top: calc(
+            var(--safe-top) + var(--precision-gutter) + var(--precision-cell-height) / 2
+        ); /* EXACT center of cell 1 */
+        left: calc(var(--safe-left) + var(--precision-gutter));
+        right: calc(var(--safe-right) + var(--precision-gutter));
         transform: translateY(-50%); /* Only vertical centering */
         width: auto; /* Let left/right constrain it */
         height: auto;
         aspect-ratio: 4 / 1;
-        background-image: url('../resources/PS_logotype-01.png');
+        background-image: url("../resources/PS_logotype-01.png");
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
@@ -310,12 +419,18 @@
     .mobile-splash-tagline {
         display: block;
         position: fixed; /* Use fixed so it's always relative to viewport */
-        bottom: calc(3.33vh + ((100vh - (8 * 3.33vh)) / 7 / 2)); /* EXACT center of cell 7 */
-        left: 3.33vh; /* Left gutter - SAME as logo */
-        right: 3.33vh; /* Right gutter - SAME as logo */
+        bottom: calc(
+            var(--safe-bottom) + var(--precision-gutter) + var(--precision-cell-height) / 2
+        ); /* EXACT center of cell 7 */
+        left: calc(var(--safe-left) + var(--precision-gutter));
+        right: calc(var(--safe-right) + var(--precision-gutter));
         transform: translateY(50%); /* Vertical centering on the line */
         text-align: center;
-        font-size: clamp(18px, 5vw, 28px); /* Responsive: scales with viewport width */
+        font-size: clamp(
+            18px,
+            5vw,
+            28px
+        ); /* Responsive: scales with viewport width */
         font-weight: 700;
         line-height: 1.1;
         color: #fff;
@@ -329,11 +444,13 @@
     .mobile-splash-arrow {
         display: block;
         position: fixed;
-        bottom: calc(3.33vh / 2 - (var(--arrow-size-mobile) / 2)); /* Center of gutter minus half arrow height */
-        left: calc(50% - (var(--arrow-size-mobile) / 2)); /* Center minus half arrow width */
+        bottom: var(--precision-gutter); /* Bottom of arrow = bottom of last cell */
+        left: calc(
+            50% - (var(--arrow-size-mobile) / 2)
+        ); /* Center minus half arrow width */
         width: var(--arrow-size-mobile); /* 15px */
         height: var(--arrow-size-mobile); /* 15px */
-        background-image: url('../../resources/down-arrow.png');
+        background-image: url("../../resources/down-arrow.png");
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
@@ -342,7 +459,6 @@
         z-index: 10;
         mix-blend-mode: difference;
     }
-
 
     /* ========================================
        SECTION: WHAT WE BELIEVE
@@ -360,7 +476,7 @@
     /* Text container - full width */
     .philosophy-text-container {
         grid-column: 1;
-        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh);
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
         padding-left: var(--gutter);
         padding-right: var(--gutter);
     }
@@ -417,10 +533,9 @@
     }
 
     .what-we-do-text-box {
-        padding-right: var(--gutter); /* Remove extra nav strip padding on mobile */
-        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh); /* Start at cell 2 */
-        height: 100vh; /* Fallback for older browsers */
-        height: 100svh; /* Use small viewport height - visible screen only */
+        padding-right: var(--gutter);
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter)); /* Start at cell 2 */
+        height: var(--app-h);
     }
 
     .typing-content {
@@ -455,7 +570,10 @@
            Second-to-last cell bottom = 100vh - 2*gutter - cell.
            Block height = 5 lines * (font-size * line-height) */
         position: absolute;
-        top: calc(100vh - 2 * var(--gutter) - var(--mobile-cell-height) - 5 * var(--font-mobile-headline) * var(--font-mobile-headline-line-height));
+        top: calc(
+            var(--app-h) - 2 * var(--gutter) - var(--mobile-cell-height) -
+                5 * var(--font-mobile-headline) * var(--font-mobile-headline-line-height)
+        );
         bottom: auto; /* Override desktop bottom positioning */
         left: var(--gutter);
         right: var(--gutter);
@@ -476,7 +594,7 @@
     #work-with-us-2 .work-with-us-text-container {
         grid-column: 1;
         grid-row: 1 / -1;
-        padding-top: calc(3.33vh + (100vh - 8 * 3.33vh) / 7 + 3.33vh);
+        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
     }
 
     /* Increase paragraph font size on mobile */
@@ -498,7 +616,7 @@
         /* Adjust button positioning for mobile - full width minus gutters */
         left: var(--gutter);
         right: var(--gutter);
-        bottom: calc(var(--gutter) * 2);
+        bottom: calc(var(--gutter) + var(--mobile-cell-height) - var(--button-height)); /* top of button = top of last cell */
         width: auto; /* Let left/right define the width */
         max-width: none; /* Remove max-width restriction */
         transform: none; /* No transform needed */

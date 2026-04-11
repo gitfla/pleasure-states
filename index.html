@@ -34,8 +34,25 @@
     <meta name="twitter:description" content="PLEASURE IS SERIOUS BUSINESS">
     <meta name="twitter:image" content="https://pleasurestates.com/resources/PS_logotype-01.png">
 
+    <!-- Pick random splash variant early (before render) so poster src is set immediately -->
+    <script>
+        (function() {
+            var isMobile = window.innerWidth <= 768;
+            var variants = isMobile ? ['splash-m1','splash-m2','splash-m3'] : ['splash-d1','splash-d2','splash-d3'];
+            window._splashVariant = variants[Math.floor(Math.random() * variants.length)];
+        })();
+    </script>
+
     <!-- Preload mobile logo (CSS background-image, low priority by default) -->
     <link rel="preload" href="resources/PS_logotype-01.png" as="image">
+
+    <!-- Preload all splash poster images so the randomly picked one is already cached -->
+    <link rel="preload" href="resources/splash-d1-poster.jpg" as="image">
+    <link rel="preload" href="resources/splash-d2-poster.jpg" as="image">
+    <link rel="preload" href="resources/splash-d3-poster.jpg" as="image">
+    <link rel="preload" href="resources/splash-m1-poster.jpg" as="image">
+    <link rel="preload" href="resources/splash-m2-poster.jpg" as="image">
+    <link rel="preload" href="resources/splash-m3-poster.jpg" as="image">
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/reset.css">
@@ -101,14 +118,24 @@
             <!-- Video background spanning columns 2-3 -->
             <div class="splash-video-wrapper">
                 <!-- Poster image - visible initially -->
-                <img src="resources/splash-video-poster.jpg"
+                <!-- src set synchronously by inline script below to avoid flash -->
+                <img src=""
                      class="splash-video-poster"
-                     alt="Splash video poster">
+                     alt="">
+                <script>
+                    (function() {
+                        var v = window._splashVariant;
+                        if (v) {
+                            var imgs = document.querySelectorAll('.splash-video-poster');
+                            imgs[imgs.length - 1].src = 'resources/' + v + '-poster.jpg';
+                        }
+                    })();
+                </script>
 
                 <!-- Video - hidden initially, JS will control playback -->
                 <video class="background-video splash-video"
                        autoplay muted loop playsinline preload="auto">
-                    <source src="resources/splash-video.mp4" type="video/mp4">
+                    <source src="resources/splash-d1.mp4" type="video/mp4">
                 </video>
             </div>
 

@@ -137,7 +137,7 @@
         --font-mobile-typing-line-height: 0.87; /* 87% */
         --font-mobile-typing-letter-spacing: -0.02em; /* -2% */
 
-        --font-mobile-headline: 58px;
+        --font-mobile-headline: clamp(44px, 13vw, 58px);
         --font-mobile-headline-line-height: 0.87; /* 87% */
         --font-mobile-headline-letter-spacing: -0.02em; /* -2% */
 

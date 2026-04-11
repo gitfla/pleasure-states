@@ -4,6 +4,10 @@ references/
 # Temporary/backup files
 resources/12.03 - cópia/
 
+# Raw source video folders (large MOV files, already processed to MP4)
+resources/desk_section/
+resources/phone_section/
+
 # Unused/legacy video files
 resources/clip-a-optimized.mp4
 resources/clip-b-optimized.mp4

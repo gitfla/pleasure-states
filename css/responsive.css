@@ -445,15 +445,14 @@
         display: block;
         position: fixed;
         bottom: var(--precision-gutter); /* Bottom of arrow = bottom of last cell */
-        left: calc(
-            50% - (var(--arrow-size-mobile) / 2)
-        ); /* Center minus half arrow width */
+        left: 50%;
+        transform: translateX(-50%);
         width: var(--arrow-size-mobile); /* 15px */
-        height: var(--arrow-size-mobile); /* 15px */
-        background-image: url("../../resources/down-arrow.png");
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
+        height: calc(var(--arrow-size-mobile) * 0.866); /* equilateral triangle height = side * √3/2 */
+        background-color: #fff;
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        background-image: none;
+        mix-blend-mode: difference;
         opacity: 0;
         /* No transition - GSAP handles animation */
         z-index: 10;

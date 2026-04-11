@@ -16,6 +16,25 @@ const SplashSection = {
             return;
         }
 
+        // Randomly pick one of 3 splash video/poster pairs (desktop or mobile ratio)
+        const isMobile = window.innerWidth <= 768;
+        const variants = isMobile ? [
+            { video: 'resources/splash-m1.mp4', poster: 'resources/splash-m1-poster.jpg' },
+            { video: 'resources/splash-m2.mp4', poster: 'resources/splash-m2-poster.jpg' },
+            { video: 'resources/splash-m3.mp4', poster: 'resources/splash-m3-poster.jpg' },
+        ] : [
+            { video: 'resources/splash-d1.mp4', poster: 'resources/splash-d1-poster.jpg' },
+            { video: 'resources/splash-d2.mp4', poster: 'resources/splash-d2-poster.jpg' },
+            { video: 'resources/splash-d3.mp4', poster: 'resources/splash-d3-poster.jpg' },
+        ];
+        const picked = window._splashVariant
+            ? { video: `resources/${window._splashVariant}.mp4`, poster: `resources/${window._splashVariant}-poster.jpg` }
+            : variants[Math.floor(Math.random() * variants.length)];
+        poster.src = picked.poster;
+        const source = video.querySelector('source');
+        if (source) source.src = picked.video;
+        else video.src = picked.video;
+
         // Explicitly start loading the video (ensures buffering for poster crossfade)
         video.load();
 

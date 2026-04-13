@@ -91,8 +91,21 @@
     transition: opacity 0.6s ease, transform 0.3s ease; /* Opacity unified with FADE_PARAGRAPH, transform stays responsive */
 }
 
+@media (min-width: 769px) {
+    .contact-cta {
+        cursor: grab;
+    }
+}
+
 .contact-cta:hover {
     transform: translateY(-2px);
+}
+
+.contact-cta.is-dragging,
+.contact-cta.is-dragging:hover {
+    transform: none;
+    cursor: grabbing;
+    transition: none;
 }
 
 /* Hide button on splash screen */

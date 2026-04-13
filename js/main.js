@@ -88,4 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the experience (triggers splash animation)
     ScrollController.start();
+
+    // Resume videos after returning from another app (mobile suspends media on background)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        document.querySelectorAll('video').forEach(v => {
+            if (v.muted && v.paused) v.play().catch(() => {});
+        });
+    });
 });

@@ -418,46 +418,40 @@ const ScrollController = {
 
         const duration = immediate ? 0 : this.config.transitionDuration;
 
+        // Both sections stationary at top:0.
+        // Current section sits on top and is clipped away, revealing target behind it.
+        // Scroll down: current clipped from bottom upward (boundary line travels bottom→top).
+        // Scroll up: current clipped from top downward (boundary line travels top→bottom).
+
+        gsap.set(targetSectionData.element, { top: '0%', zIndex: 1 });
+        gsap.set(currentSectionData.element, { zIndex: 2, clipPath: 'inset(0% 0% 0% 0%)' });
+
+        const cleanup = () => {
+            gsap.set(currentSectionData.element, { top: '100%', zIndex: '', clipPath: 'none' });
+            gsap.set(targetSectionData.element, { zIndex: '' });
+            const lo = Math.min(targetIndex, previousSection);
+            const hi = Math.max(targetIndex, previousSection);
+            for (let i = lo + 1; i < hi; i++) {
+                gsap.set(this.sections[i].element, { top: '100%' });
+            }
+            this.onTransitionComplete(targetIndex);
+        };
+
         if (direction === 'down') {
-            // Scrolling forward: Next section slides up from bottom to cover current
-
-            // Ensure target section starts at 100% (below viewport)
-            gsap.set(targetSectionData.element, { top: '100%' });
-
-            gsap.to(targetSectionData.element, {
-                top: '0%',     // Slide up to cover current
+            // Clip current from the bottom upward: inset bottom grows 0→100%
+            gsap.to(currentSectionData.element, {
+                clipPath: 'inset(0% 0% 100% 0%)',
                 duration: duration,
                 ease: 'power2.inOut',
-                onComplete: () => this.onTransitionComplete(targetIndex)
+                onComplete: cleanup
             });
         } else {
-            // Scrolling backward: Previous section slides down from top to cover current
-
-            // Ensure target section starts at -100% (above viewport)
-            gsap.set(targetSectionData.element, { top: '-100%' });
-
-            // Temporarily boost z-index so previous section can cover current section
-            const currentZIndex = window.getComputedStyle(currentSectionData.element).zIndex;
-            const tempZIndex = parseInt(currentZIndex) + 1;
-            gsap.set(targetSectionData.element, { zIndex: tempZIndex });
-
-            // Slide previous section down to cover (current stays still)
-            gsap.to(targetSectionData.element, {
-                top: '0%',
+            // Clip current from the top downward: inset top grows 0→100%
+            gsap.to(currentSectionData.element, {
+                clipPath: 'inset(100% 0% 0% 0%)',
                 duration: duration,
                 ease: 'power2.inOut',
-                onComplete: () => {
-                    // Reset z-index after transition
-                    gsap.set(targetSectionData.element, { zIndex: '' });
-
-                    // Move ALL sections between target and current out of the way
-                    // (they're all stacked at top: 0% and have higher z-index than target)
-                    for (let i = targetIndex + 1; i <= previousSection; i++) {
-                        gsap.set(this.sections[i].element, { top: '100%' });
-                    }
-
-                    this.onTransitionComplete(targetIndex);
-                }
+                onComplete: cleanup
             });
         }
     },

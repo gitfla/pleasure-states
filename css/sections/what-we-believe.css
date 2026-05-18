@@ -18,7 +18,7 @@
     font-size: var(--font-believe-body);
     line-height: var(--font-believe-line-height);
     margin-bottom: 0; /* NO base spacing - add explicitly where needed */
-    opacity: 0;
+    opacity: 1;
     color: #000;
 }
 

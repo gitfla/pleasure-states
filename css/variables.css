@@ -75,7 +75,7 @@
         3.13vh,
         35px
     ); /* 35/1117 = 3.13vh - line spacing, vertical */
-    --font-what-we-do: clamp(60px, 6.83vw, 118px); /* 118/1728 = 6.83% */
+    --font-what-we-do: clamp(42px, 4.78vw, 83px); /* 118/1728 = 6.83%, scaled to 70% */
     --font-what-we-do-line-height: 0.87; /* 87% as specified */
     --font-what-we-do-letter-spacing: -2px;
     --font-work-with-us-headline: clamp(60px, 6.83vw, 118px);

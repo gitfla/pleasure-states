@@ -143,125 +143,31 @@ const ScrollController = {
             if (this.currentSection === 2) { // what-we-do is section index 2
                 const scrollZone = this.getScrollZone(e.target, this.mouseX);
 
-                // Mod 8B: Handle left column scroll with gesture detection
-                if (scrollZone === 'left-column') {
-                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
-                        // Typing is active - complete it
-                        WhatWeDoSection.stopTyping();
-                        WhatWeDoSection.showFinalState();
-
-                        // Auto-scroll typing box to bottom with animation
-                        const textBox = document.getElementById('typingTextBox');
-                        const typingContainer = document.getElementById('typingContent');
-                        if (textBox && typingContainer) {
-                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
-                            gsap.to(textBox, {
-                                scrollTop: targetScroll,
-                                duration: 0.5,  // Fast animation (500ms)
-                                ease: 'power2.inOut'
-                            });
-                        }
-
-                        // Mark as interrupted and track gesture
-                        WhatWeDoSection.animationWasInterrupted = true;
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        e.preventDefault();
-                        return;
-                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
-                        // Typing is complete
-
-                        // Check if this is a new gesture
-                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            WhatWeDoSection.animationWasInterrupted = false;
-                        }
-
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        // If still interrupted (same gesture), stay on section
-                        if (WhatWeDoSection.animationWasInterrupted) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // New gesture - allow normal section navigation
-                        e.preventDefault();
-
-                        if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                            return;
-                        }
-                        lastWheelTime = now;
-
-                        const direction = e.deltaY > 0 ? 1 : -1;
-                        this.handleScrollAttempt(direction);
-                        return;
-                    }
-                }
-
                 if (scrollZone === 'typing-box') {
                     const direction = e.deltaY > 0 ? 1 : -1;
 
-                    // Access WhatWeDoSection directly for what-we-do section
                     if (typeof WhatWeDoSection !== 'undefined') {
-                        // Detect if this is a new gesture
-                        const timeSinceLastWheel = now - WhatWeDoSection.lastWheelTime;
-                        const isNewGesture = WhatWeDoSection.isNewGesture();
-
-                        if (isNewGesture) {
+                        if (WhatWeDoSection.isNewGesture()) {
                             WhatWeDoSection.handleGestureStart();
                         }
-
-                        // Update last wheel time for gesture tracking
                         WhatWeDoSection.lastWheelTime = now;
 
-                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-
-                        // During typing: kill momentum once boundary is reached
-                        if (WhatWeDoSection.isTyping) {
-                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
-                                               (direction === -1 && currentBoundary.atTop);
-
-                            if (atBoundary) {
-                                // Mark that this gesture has hit the boundary
-                                if (!WhatWeDoSection.gestureHitBoundary) {
-                                    WhatWeDoSection.gestureHitBoundary = true;
-                                    // Allow this event to go through (reaches boundary naturally)
-                                    return;
-                                } else {
-                                    // Already hit boundary in this gesture - kill remaining momentum
-                                    e.preventDefault();
-                                    return;
-                                }
-                            } else {
-                                // Not at boundary - reset flag (content may have grown, creating new bottom)
-                                WhatWeDoSection.gestureHitBoundary = false;
-                            }
-
-                            // Not at boundary - allow scroll
-                            return;
-                        }
-
-                        // After typing: check if should transition
+                        // Transition out if at scroll boundary
                         if (this.canTransitionFromTypingBox(direction)) {
                             e.preventDefault();
-
-                            // Apply debouncing
-                            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                                return;
-                            }
-
+                            if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
                             lastWheelTime = now;
                             this.handleScrollAttempt(direction);
                             return;
                         }
 
-                        // Check if currently at boundary (just arrived this gesture)
+                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
                         if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
                             e.preventDefault();
                             return;
                         }
 
-                        // Not at boundary - allow scroll
+                        // Not at boundary — let the box scroll
                         return;
                     }
 
@@ -384,32 +290,7 @@ const ScrollController = {
 
                         const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
 
-                        // During typing: kill momentum once boundary is reached
-                        if (WhatWeDoSection.isTyping) {
-                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
-                                               (direction === -1 && currentBoundary.atTop);
-
-                            if (atBoundary) {
-                                // Mark that this gesture has hit the boundary
-                                if (!WhatWeDoSection.gestureHitBoundary) {
-                                    WhatWeDoSection.gestureHitBoundary = true;
-                                    // Allow this event to go through (reaches boundary naturally)
-                                    return;
-                                } else {
-                                    // Already hit boundary in this gesture - kill remaining momentum
-                                    e.preventDefault();
-                                    return;
-                                }
-                            } else {
-                                // Not at boundary - reset flag (content may have grown, creating new bottom)
-                                WhatWeDoSection.gestureHitBoundary = false;
-                            }
-
-                            // Not at boundary - allow scroll
-                            return;
-                        }
-
-                        // After typing: check if should transition
+                        // Check if should transition
                         if (this.canTransitionFromTypingBox(direction)) {
                             // Only trigger if swipe exceeds threshold and hasn't been triggered yet
                             if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {

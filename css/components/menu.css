@@ -3,7 +3,7 @@
     position: fixed;
     top: var(--gutter);
     right: 3.2%; /* Offset by nav strip width to sit in column 3 */
-    z-index: var(--z-menu);
+    z-index: 102; /* Above splash (101) so menu items show during splash animation */
     display: flex;
     flex-direction: column;
     gap: clamp(3px, 0.45vh, 5px); /* 5/1117 = 0.45vh, vertical spacing */
@@ -61,7 +61,7 @@
     height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
     z-index: var(--z-menu);
     opacity: 1;
-    transition: opacity 0.6s ease, top 1.2s ease; /* Unified opacity with FADE_PARAGRAPH */
+    transition: opacity 0.6s ease, top 1.2s ease;
     mix-blend-mode: difference;
     background-color: #fff;
     border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */

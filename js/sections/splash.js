@@ -96,6 +96,20 @@ const SplashSection = {
         // (playAnimation will call it when needed)
         this.imagesLoaded = imagesLoaded;
 
+        // On desktop: position entire menu at bottom, hide it — will animate up on first transition
+        if (!ScrollController.isMobile) {
+            const mainMenu = document.getElementById('mainMenu');
+            const menuIndicator = document.getElementById('menuIndicator');
+            if (mainMenu) {
+                const gutterPx = ScrollController.getGutterPx();
+                // Distance from normal top position to bottom of viewport
+                const travel = window.innerHeight - gutterPx - mainMenu.offsetHeight - gutterPx;
+                gsap.set(mainMenu, { y: travel, opacity: 0, pointerEvents: 'none' });
+            }
+            // Hide indicator separately — shown only once menu reaches final position
+            if (menuIndicator) gsap.set(menuIndicator, { opacity: 0 });
+        }
+
         // Register with scroll controller
         ScrollController.registerSection('splash', {
             onEnter: (hasAnimated) => this.onEnter(hasAnimated),
@@ -422,6 +436,17 @@ const SplashSection = {
                 },
                 `+=${this.ELEMENT_DELAY}`
             );
+        }
+
+        // Entire menu fades in at same time as tagline (desktop only)
+        if (!ScrollController.isMobile) {
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                this.timeline.to(mainMenu,
+                    { opacity: 1, duration: this.ELEMENT_FADE_DURATION, ease: 'power2.out' },
+                    '<'
+                );
+            }
         }
     },
 

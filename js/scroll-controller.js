@@ -430,6 +430,26 @@ const ScrollController = {
         const currentZ = previousSection === 0 ? 101 : 99;
         gsap.set(currentSectionData.element, { zIndex: currentZ, clipPath: `inset(0px 0px 0px 0px)` });
 
+        // On desktop, animate entire menu upward to its natural position.
+        // Scale duration proportionally so it travels at the same apparent speed as the wipe line.
+        if (previousSection === 0 && !this.isMobile) {
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                const currentY = gsap.getProperty(mainMenu, 'y') || 0;
+                const menuDuration = duration * (Math.abs(currentY) / window.innerHeight);
+                gsap.to(mainMenu, {
+                    y: 0,
+                    duration: menuDuration,
+                    ease: 'power2.inOut',
+                    pointerEvents: 'auto',
+                    onComplete: () => {
+                        const menuIndicator = document.getElementById('menuIndicator');
+                        if (menuIndicator) gsap.set(menuIndicator, { opacity: 1 });
+                    }
+                });
+            }
+        }
+
         // On mobile, fade out fixed splash elements that escape clip-path
         if (previousSection === 0 && this.isMobile) {
             const tagline = document.querySelector('.mobile-splash-tagline');
@@ -495,6 +515,12 @@ const ScrollController = {
         // Note: this.currentSection was already updated at the start of goToSection
         this.isTransitioning = false;
 
+        // Re-enable menu pointer-events now that it's in final position
+        if (!this.isMobile) {
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) gsap.set(mainMenu, { pointerEvents: 'auto' });
+        }
+
         const newSectionData = this.sections[newIndex];
 
         // Set reference timestamp for timing logs when entering what-we-believe
@@ -530,6 +556,16 @@ const ScrollController = {
     // No-op: menu/logo/scrollbar/CTA are always visible, covered by splash z-index
     updateMenuVisibility() {},
 
+    // Compute gutter in pixels (CSS variable uses clamp/max, can't parseFloat directly)
+    getGutterPx() {
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:absolute;visibility:hidden;width:var(--gutter)';
+        document.body.appendChild(temp);
+        const val = parseFloat(getComputedStyle(temp).width);
+        document.body.removeChild(temp);
+        return val;
+    },
+
     // Update scroll indicator bar position based on current section
     updateScrollIndicator() {
         const scrollIndicator = document.getElementById('scrollIndicator');
@@ -543,14 +579,7 @@ const ScrollController = {
             return;
         }
 
-        // Compute actual gutter value in pixels (can't use parseFloat on CSS variables with max/clamp)
-        const temp = document.createElement('div');
-        temp.style.position = 'absolute';
-        temp.style.visibility = 'hidden';
-        temp.style.width = 'var(--gutter)';
-        document.body.appendChild(temp);
-        const gutterValue = parseFloat(getComputedStyle(temp).width);
-        document.body.removeChild(temp);
+        const gutterValue = this.getGutterPx();
 
         // Calculate responsive scroll bar height: max(135px, 24.17vh)
         const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);

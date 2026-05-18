@@ -29,11 +29,6 @@ const WorkWithUsSection = {
 
         if (headline) gsap.set(headline, { opacity: 1 });
         gsap.set(paragraphs, { opacity: 1 });
-
-        if (ctaButton) {
-            gsap.set(ctaButton, { opacity: 1, pointerEvents: 'auto' });
-            ScrollController.ctaButtonShown = true;
-        }
     },
 
     initDrag() {

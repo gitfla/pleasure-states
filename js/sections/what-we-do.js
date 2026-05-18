@@ -57,8 +57,6 @@ With a network. With taste. With teeth.`,
     },
 
     onEnter() {
-        const textBox = document.getElementById('typingTextBox');
-        if (textBox) textBox.scrollTop = 0;
         this.gestureStartBoundary = this.checkCurrentBoundary();
         this.lastWheelTime = 0;
     },

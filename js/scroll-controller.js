@@ -4,7 +4,6 @@ const ScrollController = {
     currentSection: 0,
     isTransitioning: false,
     isScrollBlocked: false,
-    ctaButtonShown: false,
     mouseX: 0,  // Track mouse X position for zone-based scrolling
     isMobile: window.innerWidth <= 768,  // Track viewport mode explicitly
     sections: [],
@@ -419,16 +418,50 @@ const ScrollController = {
         const duration = immediate ? 0 : this.config.transitionDuration;
 
         // Both sections stationary at top:0.
-        // Current section sits on top and is clipped away, revealing target behind it.
-        // Scroll down: current clipped from bottom upward (boundary line travels bottom→top).
-        // Scroll up: current clipped from top downward (boundary line travels top→bottom).
+        // Current section sits on top (z:999) and is clipped away, revealing target (z:1) behind it.
+        // Scroll down: clip bottom grows 0→vh (boundary line travels bottom→top).
+        // Scroll up: clip top grows 0→vh (boundary line travels top→bottom).
+
+        // Use the element's own rendered height so inset() clips fully regardless of dvh/chrome
+        const vh = currentSectionData.element.offsetHeight;
 
         gsap.set(targetSectionData.element, { top: '0%', zIndex: 1 });
-        gsap.set(currentSectionData.element, { zIndex: 2, clipPath: 'inset(0% 0% 0% 0%)' });
+        // Splash needs z:1001 to cover fixed menu/logo (z:100/1000). Other sections use z:99 so menu/logo stay visible.
+        const currentZ = previousSection === 0 ? 1001 : 99;
+        gsap.set(currentSectionData.element, { zIndex: currentZ, clipPath: `inset(0px 0px 0px 0px)` });
+
+        // On mobile, fade out fixed splash elements that escape clip-path
+        if (previousSection === 0 && this.isMobile) {
+            const tagline = document.querySelector('.mobile-splash-tagline');
+            const arrow = document.querySelector('.mobile-splash-arrow');
+            if (tagline) gsap.to(tagline, { opacity: 0, duration: duration, ease: 'power2.inOut' });
+            if (arrow) gsap.to(arrow, { opacity: 0, duration: duration, ease: 'power2.inOut' });
+        }
+
+        // CTA button: show at z:0 (behind current section) when transitioning INTO work-with-us-2
+        // so it's revealed naturally by the wipe. After transition, restore to high z-index.
+        const ctaButton = document.getElementById('ctaButton');
+        const enteringWorkWithUs2 = targetSectionData.id === 'work-with-us-2';
+        const ctaAlreadyRevealed = ctaButton && ctaButton.classList.contains('cta-visible');
+        if (ctaButton) {
+            if (enteringWorkWithUs2 && !ctaAlreadyRevealed) {
+                // First time: z:2 so wipe reveals it from behind current section
+                gsap.set(ctaButton, { zIndex: 2 });
+                ctaButton.classList.add('cta-visible');
+            } else if (!ctaAlreadyRevealed) {
+                // Not yet revealed — keep hidden below everything
+                gsap.set(ctaButton, { zIndex: 0 });
+            }
+            // Already revealed — leave z-index untouched, stays visible always
+        }
 
         const cleanup = () => {
-            gsap.set(currentSectionData.element, { top: '100%', zIndex: '', clipPath: 'none' });
+            gsap.set(currentSectionData.element, { top: '100%', zIndex: 0, clipPath: 'none' });
             gsap.set(targetSectionData.element, { zIndex: '' });
+            // Restore CTA z-index after first reveal
+            if (ctaButton && enteringWorkWithUs2 && !ctaAlreadyRevealed) {
+                gsap.set(ctaButton, { zIndex: '' });
+            }
             const lo = Math.min(targetIndex, previousSection);
             const hi = Math.max(targetIndex, previousSection);
             for (let i = lo + 1; i < hi; i++) {
@@ -438,17 +471,17 @@ const ScrollController = {
         };
 
         if (direction === 'down') {
-            // Clip current from the bottom upward: inset bottom grows 0→100%
+            // Clip current from the bottom upward: inset bottom grows 0→vh
             gsap.to(currentSectionData.element, {
-                clipPath: 'inset(0% 0% 100% 0%)',
+                clipPath: `inset(0px 0px ${vh}px 0px)`,
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: cleanup
             });
         } else {
-            // Clip current from the top downward: inset top grows 0→100%
+            // Clip current from the top downward: inset top grows 0→vh
             gsap.to(currentSectionData.element, {
-                clipPath: 'inset(100% 0% 0% 0%)',
+                clipPath: `inset(${vh}px 0px 0px 0px)`,
                 duration: duration,
                 ease: 'power2.inOut',
                 onComplete: cleanup
@@ -494,53 +527,8 @@ const ScrollController = {
         }
     },
 
-    // Show menu and logo from philosophy onwards, hide on splash
-    updateMenuVisibility() {
-        const menu = document.getElementById('mainMenu');
-        const logo = document.getElementById('siteLogo');
-        const scrollIndicator = document.getElementById('scrollIndicator');
-        const ctaButton = document.getElementById('ctaButton');
-
-        if (this.currentSection === 0) {
-            // Splash: hide menu, logo, scroll indicator, and CTA
-            menu.classList.remove('visible');
-            if (logo) logo.classList.remove('visible');
-            if (scrollIndicator) scrollIndicator.classList.remove('visible');
-            if (ctaButton && this.ctaButtonShown) {
-                ctaButton.classList.add('hidden');
-            }
-        } else {
-            // All other sections: show menu, logo, and scroll indicator
-            menu.classList.add('visible');
-            if (logo) {
-                logo.classList.add('visible');
-
-                // Log logo fade start time if we have a timing reference
-                if (this.timingReferenceTimestamp !== null) {
-                    this.logoFadeStartTime = performance.now();
-                    const relativeTime = Math.round(this.logoFadeStartTime - this.timingReferenceTimestamp);
-
-                    // Add transitionend listener to log when logo fade completes
-                    const onLogoTransitionEnd = (e) => {
-                        if (e.propertyName === 'opacity') {
-                            const endTime = performance.now();
-                            this.logoFadeEndTime = endTime;  // Store for gap calculation
-                            const relativeEndTime = Math.round(endTime - this.timingReferenceTimestamp);
-                            const duration = Math.round(endTime - this.logoFadeStartTime);
-                            logo.removeEventListener('transitionend', onLogoTransitionEnd);
-                        }
-                    };
-                    logo.addEventListener('transitionend', onLogoTransitionEnd);
-                }
-            }
-            if (scrollIndicator) scrollIndicator.classList.add('visible');
-            // Show CTA if it's been revealed
-            if (ctaButton && this.ctaButtonShown) {
-                ctaButton.classList.remove('hidden');
-            }
-            // Note: updateScrollIndicator() is now called at the start of goToSection for sync'd animation
-        }
-    },
+    // No-op: menu/logo/scrollbar/CTA are always visible, covered by splash z-index
+    updateMenuVisibility() {},
 
     // Update scroll indicator bar position based on current section
     updateScrollIndicator() {

@@ -41,14 +41,10 @@ const MobileMenuController = {
                 const targetSection = ScrollController.sections.find(s => s.id === searchId);
 
                 if (targetSection) {
-                    // Close menu
+                    // Jump instantly to section, then close menu over it
+                    ScrollController.unlockScroll();
+                    ScrollController.goToSection(targetSection.index, true);
                     this.closeMenu();
-
-                    // Navigate to section
-                    setTimeout(() => {
-                        ScrollController.unlockScroll();
-                        ScrollController.goToSection(targetSection.index);
-                    }, 400); // Wait for menu close animation
                 } else {
                 }
             });

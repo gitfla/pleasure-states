@@ -33,7 +33,7 @@
 
 @media (min-width: 769px) {
     body::before {
-        display: none; /* Debug grid — change to block to show */
+        display: block; /* Debug grid — change to none to hide */
         content: "";
         position: fixed;
         inset: 0;
@@ -236,14 +236,14 @@
         cursor: pointer;
         padding: 0;
         display: block;
-        opacity: 0; /* Hidden by default */
-        pointer-events: none;
+        opacity: 1;
+        pointer-events: auto;
         transition: opacity 0.6s ease;
         line-height: 1; /* Remove extra line height spacing */
         mix-blend-mode: difference; /* Blend like the logo */
     }
 
-    /* Show on what-we-believe and after */
+    /* Show on what-we-believe and after (kept for JS compatibility) */
     .mobile-menu-toggle.visible {
         opacity: 1;
         pointer-events: auto;
@@ -399,7 +399,7 @@
     /* Centered in cell 1 - center line should go through vertical middle of logo */
     #splash::before {
         content: "";
-        position: fixed; /* Use fixed to match tagline positioning */
+        position: absolute;
         top: calc(
             var(--safe-top) + var(--precision-gutter) + var(--precision-cell-height) / 2
         ); /* EXACT center of cell 1 */
@@ -428,7 +428,7 @@
     /* Centered in Cell 7 - center line should go through vertical middle of text */
     .mobile-splash-tagline {
         display: block;
-        position: fixed; /* Use fixed so it's always relative to viewport */
+        position: fixed;
         bottom: calc(
             var(--safe-bottom) + var(--precision-gutter) + var(--precision-cell-height) / 2
         ); /* EXACT center of cell 7 */
@@ -539,12 +539,14 @@
         background-color: transparent; /* Transparent to show video */
         z-index: 2;
         position: relative;
+        overflow: hidden;
     }
 
     .what-we-do-text-box {
         padding-right: var(--gutter);
         padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter)); /* Start at cell 2 */
         height: var(--app-h);
+        overflow-x: hidden;
     }
 
     .typing-content {
@@ -625,6 +627,7 @@
         /* Adjust button positioning for mobile - full width minus gutters */
         left: var(--gutter);
         right: var(--gutter);
+        top: auto;
         bottom: calc(var(--gutter) + var(--mobile-cell-height) - var(--button-height)); /* top of button = top of last cell */
         width: auto; /* Let left/right define the width */
         max-width: none; /* Remove max-width restriction */

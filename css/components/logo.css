@@ -5,7 +5,7 @@
     left: 0;
     width: 32.7%; /* Column 1 width */
     z-index: 1000;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.6s ease; /* Unified with FADE_PARAGRAPH */
     mix-blend-mode: difference;
     pointer-events: none; /* Make logo non-clickable */

@@ -426,8 +426,8 @@ const ScrollController = {
         const vh = currentSectionData.element.offsetHeight;
 
         gsap.set(targetSectionData.element, { top: '0%', zIndex: 1 });
-        // Splash needs z:1001 to cover fixed menu/logo (z:100/1000). Other sections use z:99 so menu/logo stay visible.
-        const currentZ = previousSection === 0 ? 1001 : 99;
+        // Splash needs z:101 to cover fixed menu/logo (z:100). Other sections use z:99 so menu/logo stay visible.
+        const currentZ = previousSection === 0 ? 101 : 99;
         gsap.set(currentSectionData.element, { zIndex: currentZ, clipPath: `inset(0px 0px 0px 0px)` });
 
         // On mobile, fade out fixed splash elements that escape clip-path

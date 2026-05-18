@@ -33,43 +33,53 @@
 
 @media (min-width: 769px) {
     body::before {
-        display: none; /* Debug grid — remove this line to show */
+        display: none; /* Debug grid — change to block to show */
         content: "";
         position: fixed;
         inset: 0;
         z-index: 9999;
         pointer-events: none;
         background:
-            /* COLUMNS: G C G C G+G C G C G+G C G C G nav */
+            /* COLUMNS — matches layout.css percentage bands (32.7% | 32.7% | 31.4% | 3.2%)
+               Band 1: G C G C G  (0–32.7%)
+               Band 2: G C G C G  (32.7%–65.4%)  — shares left G with band 1's right G (double gutter)
+               Band 3: G C G C    (65.4%–96.8%)  — no trailing right gutter
+               Nav:                (96.8%–100%)
+               Each band is 32.7% wide = gutter(1.45%) + cell(14.18%) + gutter(1.45%) + cell(14.18%) + gutter(1.45%) */
             linear-gradient(
                 to right,
-                /* G1 */ rgba(255, 0, 0, 0.15) 0,
-                rgba(255, 0, 0, 0.15) var(--gutter),
-                /* C1 */ rgba(255, 192, 203, 0.12) var(--gutter),
-                rgba(255, 192, 203, 0.12) calc(var(--gutter) + var(--cell-width)),
-                /* G2 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) + var(--cell-width)),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--cell-width)),
-                /* C2 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 2 + var(--cell-width)),
-                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 2 + var(--cell-width) * 2),
-                /* G3+G4 (double) */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--cell-width) * 2),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--cell-width) * 2),
-                /* C3 */ rgba(255, 192, 203, 0.12) calc(var(--gutter) * 4 + var(--cell-width) * 2),
-                rgba(255, 192, 203, 0.12) calc(var(--gutter) * 4 + var(--cell-width) * 3),
-                /* G5 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--cell-width) * 3),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--cell-width) * 3),
-                /* C4 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 5 + var(--cell-width) * 3),
-                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 5 + var(--cell-width) * 4),
-                /* G6+G7 (double) */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--cell-width) * 4),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--cell-width) * 4),
-                /* C5 */ rgba(255, 192, 203, 0.12) calc(var(--gutter) * 7 + var(--cell-width) * 4),
-                rgba(255, 192, 203, 0.12) calc(var(--gutter) * 7 + var(--cell-width) * 5),
-                /* G8 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--cell-width) * 5),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 8 + var(--cell-width) * 5),
-                /* C6 */ rgba(255, 192, 203, 0.06) calc(var(--gutter) * 8 + var(--cell-width) * 5),
-                rgba(255, 192, 203, 0.06) calc(var(--gutter) * 8 + var(--cell-width) * 6),
-                /* Nav strip (no trailing gutter in band 3) */
-                rgba(100, 100, 255, 0.15) calc(var(--gutter) * 8 + var(--cell-width) * 6),
-                rgba(100, 100, 255, 0.15) 100%
+                /* Band 1 */
+                /* G1 */ rgba(255,0,0,0.15) 0%,
+                rgba(255,0,0,0.15) 1.45%,
+                /* C1 */ rgba(255,192,203,0.12) 1.45%,
+                rgba(255,192,203,0.12) 15.63%,
+                /* G2 */ rgba(255,0,0,0.15) 15.63%,
+                rgba(255,0,0,0.15) 17.08%,
+                /* C2 */ rgba(255,192,203,0.06) 17.08%,
+                rgba(255,192,203,0.06) 31.26%,
+                /* G3 (right of band1 = left of band2, double gutter) */
+                rgba(255,0,0,0.15) 31.26%,
+                rgba(255,0,0,0.15) 34.15%,
+                /* Band 2 */
+                /* C3 */ rgba(255,192,203,0.12) 34.15%,
+                rgba(255,192,203,0.12) 48.33%,
+                /* G4 */ rgba(255,0,0,0.15) 48.33%,
+                rgba(255,0,0,0.15) 49.78%,
+                /* C4 */ rgba(255,192,203,0.06) 49.78%,
+                rgba(255,192,203,0.06) 63.96%,
+                /* G5 (right of band2 = left of band3, double gutter) */
+                rgba(255,0,0,0.15) 63.96%,
+                rgba(255,0,0,0.15) 66.85%,
+                /* Band 3 */
+                /* C5 */ rgba(255,192,203,0.12) 66.85%,
+                rgba(255,192,203,0.12) 81.03%,
+                /* G6 */ rgba(255,0,0,0.15) 81.03%,
+                rgba(255,0,0,0.15) 82.48%,
+                /* C6 */ rgba(255,192,203,0.06) 82.48%,
+                rgba(255,192,203,0.06) 96.66%,
+                /* Nav strip (no trailing gutter) */
+                rgba(100,100,255,0.15) 96.66%,
+                rgba(100,100,255,0.15) 100%
             ),
             /* ROWS: G, C, G, C, G... (8 gutters, 7 cells) using --gutter and --cell-height */
             linear-gradient(
@@ -119,7 +129,7 @@
 
 @media (max-width: 768px) {
     body::after {
-        display: none; /* Debug grid — remove this line to show */
+        display: none; /* Debug grid — change to block to show */
         content: "";
         position: fixed;
         top: 0;

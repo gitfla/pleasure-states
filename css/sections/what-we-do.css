@@ -52,4 +52,5 @@
     font-weight: 700;
     text-transform: uppercase;
     text-align: left;
+    margin-top: -0.1em; /* Pull first line up to cancel font leading above cap height */
 }

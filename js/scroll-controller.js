@@ -4,7 +4,6 @@ const ScrollController = {
     currentSection: 0,
     isTransitioning: false,
     isScrollBlocked: false,
-    mouseX: 0,  // Track mouse X position for zone-based scrolling
     isMobile: window.innerWidth <= 768,  // Track viewport mode explicitly
     sections: [],
     sectionElements: [],
@@ -126,208 +125,94 @@ const ScrollController = {
         window.addEventListener('wheel', (e) => {
             const now = Date.now();
 
-            // Block if scroll is locked (splash screen)
-            if (this.isScrollBlocked) {
-                e.preventDefault();
-                return;
-            }
+            if (this.isScrollBlocked) { e.preventDefault(); return; }
+            if (this.isTransitioning) { e.preventDefault(); return; }
 
-            // Block if transition is in progress (prevents rapid scrolling through sections)
-            if (this.isTransitioning) {
-                e.preventDefault();
-                return;
-            }
+            const direction = e.deltaY > 0 ? 1 : -1;
 
-            // Check if we're in what-we-do section
-            if (this.currentSection === 2) { // what-we-do is section index 2
-                const scrollZone = this.getScrollZone(e.target, this.mouseX);
+            // In what-we-do, let the text box scroll and only transition at boundaries
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                if (WhatWeDoSection.isNewGesture()) WhatWeDoSection.handleGestureStart();
+                WhatWeDoSection.lastWheelTime = now;
 
-                if (scrollZone === 'typing-box') {
-                    const direction = e.deltaY > 0 ? 1 : -1;
-
-                    if (typeof WhatWeDoSection !== 'undefined') {
-                        if (WhatWeDoSection.isNewGesture()) {
-                            WhatWeDoSection.handleGestureStart();
-                        }
-                        WhatWeDoSection.lastWheelTime = now;
-
-                        // Transition out if at scroll boundary
-                        if (this.canTransitionFromTypingBox(direction)) {
-                            e.preventDefault();
-                            if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
-                            lastWheelTime = now;
-                            this.handleScrollAttempt(direction);
-                            return;
-                        }
-
-                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // Not at boundary — let the box scroll
-                        return;
-                    }
-
+                if (this.canTransitionFromTypingBox(direction)) {
+                    e.preventDefault();
+                    if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
+                    lastWheelTime = now;
+                    this.handleScrollAttempt(direction);
                     return;
                 }
-            }
 
-            // For all other cases, prevent default and handle section transitions
-            e.preventDefault();
+                const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+                if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                    e.preventDefault();
+                    return;
+                }
 
-            // Debounce: ignore rapid wheel events
-            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
+                // Not at boundary — let the box scroll natively
                 return;
             }
 
+            // All other sections: prevent default and transition
+            e.preventDefault();
+            if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
             lastWheelTime = now;
-
-            const direction = e.deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
             this.handleScrollAttempt(direction);
 
         }, { passive: false });
 
         // Touch events (mobile)
         let touchStartY = 0;
-        let touchStartElement = null;  // Track where touch began for zone detection
         let touchMoved = false;
 
         window.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
-            touchStartElement = e.target;  // Capture touch target for zone detection
             touchMoved = false;
+
+            // Snapshot boundary at true gesture start so a long swipe can't
+            // scroll the text box and transition sections in the same gesture
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                WhatWeDoSection.handleGestureStart();
+            }
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
-            const now = Date.now();
+            if (this.isScrollBlocked) { e.preventDefault(); return; }
+            if (this.isTransitioning) { e.preventDefault(); return; }
 
-            // Block if scroll is locked (splash screen)
-            if (this.isScrollBlocked) {
-                e.preventDefault();
-                return;
-            }
+            const deltaY = touchStartY - e.touches[0].clientY;
+            const direction = deltaY > 0 ? 1 : -1;
 
-            // Block if transition is in progress
-            if (this.isTransitioning) {
-                e.preventDefault();
-                return;
-            }
-
-            const touchEndY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchEndY;
-            const direction = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
-
-            // Check if we're in what-we-do section
-            if (this.currentSection === 2) { // what-we-do is section index 2
-                const touchX = e.touches[0].clientX;
-                const scrollZone = this.getScrollZone(touchStartElement, touchX);
-
-                // Handle left column touch with gesture detection (same as desktop)
-                if (scrollZone === 'left-column') {
-                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
-                        // Typing is active - complete it
-                        WhatWeDoSection.stopTyping();
-                        WhatWeDoSection.showFinalState();
-
-                        // Auto-scroll typing box to bottom with animation
-                        const textBox = document.getElementById('typingTextBox');
-                        const typingContainer = document.getElementById('typingContent');
-                        if (textBox && typingContainer) {
-                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
-                            gsap.to(textBox, {
-                                scrollTop: targetScroll,
-                                duration: 0.5,  // Fast animation (500ms)
-                                ease: 'power2.inOut'
-                            });
-                        }
-
-                        // Mark as interrupted and track gesture
-                        WhatWeDoSection.animationWasInterrupted = true;
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
+            // In what-we-do, let the text box scroll and only transition at boundaries
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                if (this.canTransitionFromTypingBox(direction)) {
+                    if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
                         e.preventDefault();
-                        return;
-                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
-                        // Typing is complete - check if new gesture
-                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            WhatWeDoSection.animationWasInterrupted = false;
-                        }
-
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        // If still interrupted (same gesture), stay on section
-                        if (WhatWeDoSection.animationWasInterrupted) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // New gesture - allow normal section navigation
-                        if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                            e.preventDefault();
-                            touchMoved = true;
-                            this.handleScrollAttempt(direction);
-                        }
-                        return;
+                        touchMoved = true;
+                        this.handleScrollAttempt(direction);
                     }
-                }
-
-                // Handle typing box touch with boundary checking (same as desktop wheel events)
-                if (scrollZone === 'typing-box') {
-                    // Access WhatWeDoSection for gesture tracking
-                    if (typeof WhatWeDoSection !== 'undefined') {
-                        // Detect if this is a new gesture
-                        const isNewGesture = WhatWeDoSection.isNewGesture();
-
-                        if (isNewGesture) {
-                            WhatWeDoSection.handleGestureStart();
-                        }
-
-                        // Update last wheel time for gesture tracking (shared between wheel and touch)
-                        WhatWeDoSection.lastWheelTime = now;
-
-                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-
-                        // Check if should transition
-                        if (this.canTransitionFromTypingBox(direction)) {
-                            // Only trigger if swipe exceeds threshold and hasn't been triggered yet
-                            if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                                e.preventDefault();
-                                touchMoved = true;
-                                this.handleScrollAttempt(direction);
-                            }
-                            return;
-                        }
-
-                        // Check if currently at boundary (just arrived this gesture)
-                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // Not at boundary - allow scroll
-                        return;
-                    }
-
                     return;
                 }
+
+                const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+                if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Not at boundary — let the text box scroll natively
+                return;
             }
 
-            // For all other cases, prevent default and handle section transitions
-            // Only trigger if swipe exceeds threshold and hasn't been triggered yet
+            // All other sections: prevent default and transition on threshold
+            e.preventDefault();
             if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                e.preventDefault();
                 touchMoved = true;
                 this.handleScrollAttempt(direction);
             }
 
         }, { passive: false });
 
-        // Track mouse position for zone-based scrolling
-        window.addEventListener('mousemove', (e) => {
-            this.mouseX = e.clientX;
-        }, { passive: true });
     },
 
     // Position viewport on splash screen
@@ -470,11 +355,15 @@ const ScrollController = {
             this.onTransitionComplete(targetIndex);
         };
 
-        if (direction === 'down') {
+        if (immediate) {
+            // Instant swap — use gsap.set so cleanup runs synchronously
+            gsap.set(currentSectionData.element, { clipPath: direction === 'down' ? `inset(0px 0px ${vh}px 0px)` : `inset(${vh}px 0px 0px 0px)` });
+            cleanup();
+        } else if (direction === 'down') {
             // Clip current from the bottom upward: inset bottom grows 0→vh
             gsap.to(currentSectionData.element, {
                 clipPath: `inset(0px 0px ${vh}px 0px)`,
-                duration: duration,
+                duration,
                 ease: 'power2.inOut',
                 onComplete: cleanup
             });
@@ -482,7 +371,7 @@ const ScrollController = {
             // Clip current from the top downward: inset top grows 0→vh
             gsap.to(currentSectionData.element, {
                 clipPath: `inset(${vh}px 0px 0px 0px)`,
-                duration: duration,
+                duration,
                 ease: 'power2.inOut',
                 onComplete: cleanup
             });
@@ -575,32 +464,6 @@ const ScrollController = {
 
         // Apply position (transition will animate smoothly)
         scrollIndicator.style.top = topPosition + 'px';
-    },
-
-    // Determine which scroll zone the mouse is in (for what-we-do section)
-    getScrollZone(target, mouseX) {
-        const viewportWidth = window.innerWidth;
-
-        // Calculate zone boundaries based on grid layout
-        const leftColumnEnd = viewportWidth * 0.327;  // 32.7%
-        const navStripStart = viewportWidth * 0.968;  // 96.8% (100% - 3.2%)
-
-        // Mod 8B: Check if mouse is in left column (video area)
-        if (mouseX <= leftColumnEnd) {
-            return 'left-column';
-        }
-
-        // Check if mouse is over the typing box element or its children
-        const typingBox = document.querySelector('.what-we-do-text-box');
-        if (typingBox && (typingBox === target || typingBox.contains(target))) {
-            // Mouse is over typing box area
-            if (mouseX > leftColumnEnd && mouseX < navStripStart) {
-                return 'typing-box';
-            }
-        }
-
-        // Default: section transition zones
-        return 'section-transition';
     },
 
     // Check if typing box allows section transition from boundary

@@ -22,6 +22,10 @@
     color: #000;
 }
 
+.philosophy-paragraph:first-child {
+    margin-top: -0.15em; /* Cancel font leading above cap height */
+}
+
 /* Add spacing only where copy has empty lines */
 .philosophy-paragraph[data-index="2"] {
     margin-bottom: var(--font-believe-line-height);

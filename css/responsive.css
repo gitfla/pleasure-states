@@ -33,7 +33,7 @@
 
 @media (min-width: 769px) {
     body::before {
-        display: block; /* Debug grid — change to none to hide */
+        display: none; /* Debug grid — change to block to show */
         content: "";
         position: fixed;
         inset: 0;
@@ -240,6 +240,7 @@
         pointer-events: auto;
         transition: opacity 0.6s ease;
         line-height: 1; /* Remove extra line height spacing */
+        margin-top: -0.1em; /* Cancel font leading above cap height */
         mix-blend-mode: difference; /* Blend like the logo */
     }
 
@@ -260,7 +261,7 @@
         width: 100vw;
         height: var(--precision-h);
         background-color: #fff; /* White background, not black */
-        z-index: 100;
+        z-index: 101;
         display: flex;
         align-items: flex-start;
         justify-content: center;
@@ -285,6 +286,7 @@
         cursor: pointer;
         padding: 0;
         line-height: 1; /* Remove extra line height spacing, same as MENU */
+        margin-top: -0.1em; /* Cancel font leading above cap height */
     }
 
     .mobile-menu-social {

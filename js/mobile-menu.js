@@ -41,7 +41,7 @@ const MobileMenuController = {
                 const targetSection = ScrollController.sections.find(s => s.id === searchId);
 
                 if (targetSection) {
-                    // Jump instantly to section, then close menu over it
+                    // Jump instantly to section, then close menu with slide animation
                     ScrollController.unlockScroll();
                     ScrollController.goToSection(targetSection.index, true);
                     this.closeMenu();

@@ -30,7 +30,7 @@
     /* Grid units */
     --cell-width: clamp(120px, 14.18vw, 245px); /* 245/1728 = 14.18% */
     --cell-height: clamp(80px, 11.73vh, 131px); /* 131/1117 = 11.73% */
-    --gutter: clamp(12px, 1.45vw, 25px); /* 25/1728 = 1.45% */
+    --gutter: max(12px, 1.45vw); /* 25/1728 = 1.45%, uncapped so it scales on wide screens */
     --desktop-cell-height: calc(
         (100vh - 8 * var(--gutter)) / 7
     ); /* Derived from viewport so rows fill exactly 100vh */

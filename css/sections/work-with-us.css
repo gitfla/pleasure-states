@@ -32,6 +32,7 @@
     color: #000;
     opacity: 1;
     text-align: left;
+    margin-top: -0.1em; /* Cancel font leading above cap height */
 }
 
 .work-with-us-text-container {
@@ -54,6 +55,10 @@
     font-size: var(--font-work-with-us-body);
     line-height: var(--font-believe-line-height);
     color: #000;
+}
+
+.contact-line:first-child {
+    margin-top: -0.15em; /* Cancel font leading above cap height */
 }
 
 /* Add spacing where copy has empty lines */

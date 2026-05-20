@@ -59,9 +59,9 @@
     right: calc(3.2% - max(3px, 0.405vw) - var(--gutter)); /* Inside nav strip, left of menu items */
     width: max(3px, 0.405vw);  /* 7/1728 = 0.405% */
     height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
-    z-index: var(--z-menu);
-    opacity: 1;
-    transition: opacity 0.6s ease, top 1.2s ease; /* Unified opacity with FADE_PARAGRAPH */
+    z-index: 102; /* Above splash (101) so it shows during splash animation */
+    opacity: 0; /* Hidden by default — splash.js fades it in */
+    transition: opacity 0.6s ease, top 1.2s ease;
     mix-blend-mode: difference;
     background-color: #fff;
     border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */

@@ -419,6 +419,16 @@ const ScrollController = {
     // No-op: menu/logo/scrollbar/CTA are always visible, covered by splash z-index
     updateMenuVisibility() {},
 
+    // Compute gutter in pixels (CSS variable uses clamp/max, can't parseFloat directly)
+    getGutterPx() {
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:absolute;visibility:hidden;width:var(--gutter)';
+        document.body.appendChild(temp);
+        const val = parseFloat(getComputedStyle(temp).width);
+        document.body.removeChild(temp);
+        return val;
+    },
+
     // Update scroll indicator bar position based on current section
     updateScrollIndicator() {
         const scrollIndicator = document.getElementById('scrollIndicator');

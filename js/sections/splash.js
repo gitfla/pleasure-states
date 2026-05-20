@@ -383,6 +383,22 @@ const SplashSection = {
 
     startTimeline(images, tagline) {
 
+        // Pre-compute scroll indicator positions (same formula as updateScrollIndicator)
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const gutterPx = ScrollController.getGutterPx();
+        const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
+        const topPosition = gutterPx; // what-we-believe position
+        const bottomPosition = window.innerHeight - scrollBarHeight - gutterPx; // work-with-us position
+
+        if (scrollIndicator) {
+            // Disable CSS top transition so GSAP controls it during splash
+            scrollIndicator.style.transition = 'opacity 0.6s ease';
+            gsap.set(scrollIndicator, { top: bottomPosition });
+        }
+
+        const t0 = performance.now();
+        const log = (label) => console.log(`[splash] ${label} @ ${((performance.now() - t0) / 1000).toFixed(2)}s`);
+
         this.timeline = gsap.timeline({
             onComplete: () => {
                 this.onAnimationComplete();
@@ -395,10 +411,24 @@ const SplashSection = {
             {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
-                ease: 'power2.out'
+                ease: 'power2.out',
+                onStart: () => log('PLEASURE start'),
+                onComplete: () => log('PLEASURE end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
+
+        // Scroll indicator fades in at same time as PLEASURE
+        if (scrollIndicator) {
+            this.timeline.to(scrollIndicator,
+                {
+                    opacity: 1,
+                    duration: this.ELEMENT_FADE_DURATION,
+                    ease: 'power2.out',
+                },
+                '<'
+            );
+        }
 
         // "STATES" image appears
         this.timeline.fromTo(images[1],
@@ -406,26 +436,54 @@ const SplashSection = {
             {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
-                ease: 'power2.out'
+                ease: 'power2.out',
+                onStart: () => log('STATES start'),
+                onComplete: () => log('STATES end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
 
+        // Scroll indicator moves from bottom to top, starting with STATES, arriving when tagline ends
+        // Duration = ELEMENT_FADE_DURATION + ELEMENT_DELAY + ELEMENT_FADE_DURATION = 1.8s
+        if (scrollIndicator) {
+            this.timeline.to(scrollIndicator,
+                {
+                    top: topPosition,
+                    duration: this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION,
+                    ease: 'power1.inOut',
+                    onStart: () => log('scrollbar move start'),
+                    onComplete: () => log('scrollbar move end'),
+                },
+                '<'
+            );
+        }
+
         // "PLEASURE IS SERIOUS BUSINESS" appears
+        // Use absolute time to prevent scrollbar tween (parallel, longer) from pushing tagline later.
+        // Absolute time = delay + PLEASURE fade + delay + STATES fade + delay = 3.0s
+        const taglineStart = this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY;
         if (tagline) {
             this.timeline.fromTo(tagline,
                 { opacity: 0 },
                 {
                     opacity: 1,
                     duration: this.ELEMENT_FADE_DURATION,
-                    ease: 'power2.out'
+                    ease: 'power2.out',
+                    onStart: () => log('tagline start'),
+                    onComplete: () => log('tagline end'),
                 },
-                `+=${this.ELEMENT_DELAY}`
+                taglineStart
             );
         }
     },
 
     onAnimationComplete() {
+        // Restore full CSS transition on scroll indicator so post-splash section changes animate
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        if (scrollIndicator) {
+            scrollIndicator.style.transition = '';
+        }
+
         // Splash always auto-advances (not affected by autoAdvanceEnabled flag)
         if (!this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;

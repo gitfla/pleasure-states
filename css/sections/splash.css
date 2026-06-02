@@ -75,9 +75,11 @@
     opacity: 0;
     color: var(--color-text);
     letter-spacing: 0.05em;
-    /* Center between column 3 start (32.7%) and viewport edge (100%) */
-    text-align: center;  /* Center-align text within element */
-    white-space: nowrap;  /* Prevent line wrapping */
+    text-align: left;
+    white-space: nowrap;
+    left: var(--gutter);
+    right: calc(var(--nav-strip) + var(--gutter));
+    font-size: clamp(14px, 1.65vw, 28px); /* Smaller than --font-splash-tagline to fit in column 3 */
     /* Initial position (JS will override with precise alignment) */
     top: 50%;
 }

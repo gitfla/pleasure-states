@@ -383,15 +383,14 @@ const SplashSection = {
 
     startTimeline(images, tagline) {
 
-        // Pre-compute scroll indicator positions (same formula as updateScrollIndicator)
+        // Position scroll indicator at bottom before it fades in with tagline
         const scrollIndicator = document.getElementById('scrollIndicator');
         const gutterPx = ScrollController.getGutterPx();
         const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
-        const topPosition = gutterPx; // what-we-believe position
-        const bottomPosition = window.innerHeight - scrollBarHeight - gutterPx; // work-with-us position
+        const bottomPosition = window.innerHeight - scrollBarHeight - gutterPx;
 
         if (scrollIndicator) {
-            // Disable CSS top transition so GSAP controls it during splash
+            // Disable CSS top transition so position snaps instantly (no animation from 0)
             scrollIndicator.style.transition = 'opacity 0.6s ease';
             gsap.set(scrollIndicator, { top: bottomPosition });
         }
@@ -418,18 +417,6 @@ const SplashSection = {
             `+=${this.ELEMENT_DELAY}`
         );
 
-        // Scroll indicator fades in at same time as PLEASURE
-        if (scrollIndicator) {
-            this.timeline.to(scrollIndicator,
-                {
-                    opacity: 1,
-                    duration: this.ELEMENT_FADE_DURATION,
-                    ease: 'power2.out',
-                },
-                '<'
-            );
-        }
-
         // "STATES" image appears
         this.timeline.fromTo(images[1],
             { opacity: 0 },
@@ -443,23 +430,8 @@ const SplashSection = {
             `+=${this.ELEMENT_DELAY}`
         );
 
-        // Scroll indicator moves from bottom to top, starting with STATES, arriving when tagline ends
-        // Duration = ELEMENT_FADE_DURATION + ELEMENT_DELAY + ELEMENT_FADE_DURATION = 1.8s
-        if (scrollIndicator) {
-            this.timeline.to(scrollIndicator,
-                {
-                    top: topPosition,
-                    duration: this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION,
-                    ease: 'power1.inOut',
-                    onStart: () => log('scrollbar move start'),
-                    onComplete: () => log('scrollbar move end'),
-                },
-                '<'
-            );
-        }
-
         // "PLEASURE IS SERIOUS BUSINESS" appears
-        // Use absolute time to prevent scrollbar tween (parallel, longer) from pushing tagline later.
+        // Use absolute time to prevent any parallel tweens from pushing tagline later.
         // Absolute time = delay + PLEASURE fade + delay + STATES fade + delay = 3.0s
         const taglineStart = this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY;
         if (tagline) {
@@ -471,6 +443,18 @@ const SplashSection = {
                     ease: 'power2.out',
                     onStart: () => log('tagline start'),
                     onComplete: () => log('tagline end'),
+                },
+                taglineStart
+            );
+        }
+
+        // Scroll indicator fades in at same time as tagline, positioned at bottom
+        if (scrollIndicator) {
+            this.timeline.to(scrollIndicator,
+                {
+                    opacity: 1,
+                    duration: this.ELEMENT_FADE_DURATION,
+                    ease: 'power2.out',
                 },
                 taglineStart
             );

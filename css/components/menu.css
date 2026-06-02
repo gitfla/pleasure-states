@@ -61,7 +61,7 @@
     height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
     z-index: 102; /* Above splash (101) so it shows during splash animation */
     opacity: 0; /* Hidden by default — splash.js fades it in */
-    transition: opacity 0.6s ease, top 1.2s ease;
+    transition: opacity 0.6s ease, top 1.2s cubic-bezier(0.45, 0, 0.55, 1); /* cubic-bezier matches GSAP power2.inOut */
     mix-blend-mode: difference;
     background-color: #fff;
     border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */

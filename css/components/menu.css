@@ -7,8 +7,8 @@
     display: flex;
     flex-direction: column;
     gap: clamp(3px, 0.45vh, 5px); /* 5/1117 = 0.45vh, vertical spacing */
-    opacity: 0;  /* Hidden by default */
-    pointer-events: none;  /* Can't click when hidden */
+    opacity: 1;
+    pointer-events: auto;
     transition: opacity 0.6s ease; /* Unified with FADE_PARAGRAPH */
 }
 
@@ -27,10 +27,6 @@
     background-color: #fff;
     border-radius: max(4px, 0.463vw); /* 8/1728 = 0.463% */
     transition: top 1.2s ease; /* Match section transition duration */
-    opacity: 0;
-}
-
-.main-menu.visible .menu-indicator {
     opacity: 1;
 }
 
@@ -63,9 +59,9 @@
     right: calc(3.2% - max(3px, 0.405vw) - var(--gutter)); /* Inside nav strip, left of menu items */
     width: max(3px, 0.405vw);  /* 7/1728 = 0.405% */
     height: max(135px, 24.17vh); /* 270/1117 = 24.17% */
-    z-index: var(--z-menu);
-    opacity: 0;
-    transition: opacity 0.6s ease, top 1.2s ease; /* Unified opacity with FADE_PARAGRAPH */
+    z-index: 102; /* Above splash (101) so it shows during splash animation */
+    opacity: 0; /* Hidden by default — splash.js fades it in */
+    transition: opacity 0.6s ease, top 1.2s cubic-bezier(0.45, 0, 0.55, 1); /* cubic-bezier matches GSAP power2.inOut */
     mix-blend-mode: difference;
     background-color: #fff;
     border-radius: max(1.5px, 0.203vw); /* 3.5/1728 = 0.203% */

@@ -34,19 +34,8 @@ function initMobileVideoAutoplay() {
 
 }
 
-// Logo visibility handler - updated to work with scroll controller
+// Logo visibility handler - logo is always visible; just updates mobile menu
 function updateLogoVisibility(sectionIndex) {
-    const logo = document.getElementById('siteLogo');
-    if (!logo) return;
-
-    // Show logo on all sections except splash (index 0)
-    if (sectionIndex > 0) {
-        logo.classList.add('visible');
-    } else {
-        logo.classList.remove('visible');
-    }
-
-    // Also update mobile menu visibility
     if (typeof MobileMenuController !== 'undefined' && MobileMenuController.updateMenuVisibility) {
         MobileMenuController.updateMenuVisibility();
     }

@@ -4,8 +4,6 @@ const ScrollController = {
     currentSection: 0,
     isTransitioning: false,
     isScrollBlocked: false,
-    ctaButtonShown: false,
-    mouseX: 0,  // Track mouse X position for zone-based scrolling
     isMobile: window.innerWidth <= 768,  // Track viewport mode explicitly
     sections: [],
     sectionElements: [],
@@ -127,327 +125,94 @@ const ScrollController = {
         window.addEventListener('wheel', (e) => {
             const now = Date.now();
 
-            // Block if scroll is locked (splash screen)
-            if (this.isScrollBlocked) {
-                e.preventDefault();
-                return;
-            }
+            if (this.isScrollBlocked) { e.preventDefault(); return; }
+            if (this.isTransitioning) { e.preventDefault(); return; }
 
-            // Block if transition is in progress (prevents rapid scrolling through sections)
-            if (this.isTransitioning) {
-                e.preventDefault();
-                return;
-            }
+            const direction = e.deltaY > 0 ? 1 : -1;
 
-            // Check if we're in what-we-do section
-            if (this.currentSection === 2) { // what-we-do is section index 2
-                const scrollZone = this.getScrollZone(e.target, this.mouseX);
+            // In what-we-do, let the text box scroll and only transition at boundaries
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                if (WhatWeDoSection.isNewGesture()) WhatWeDoSection.handleGestureStart();
+                WhatWeDoSection.lastWheelTime = now;
 
-                // Mod 8B: Handle left column scroll with gesture detection
-                if (scrollZone === 'left-column') {
-                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
-                        // Typing is active - complete it
-                        WhatWeDoSection.stopTyping();
-                        WhatWeDoSection.showFinalState();
-
-                        // Auto-scroll typing box to bottom with animation
-                        const textBox = document.getElementById('typingTextBox');
-                        const typingContainer = document.getElementById('typingContent');
-                        if (textBox && typingContainer) {
-                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
-                            gsap.to(textBox, {
-                                scrollTop: targetScroll,
-                                duration: 0.5,  // Fast animation (500ms)
-                                ease: 'power2.inOut'
-                            });
-                        }
-
-                        // Mark as interrupted and track gesture
-                        WhatWeDoSection.animationWasInterrupted = true;
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        e.preventDefault();
-                        return;
-                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
-                        // Typing is complete
-
-                        // Check if this is a new gesture
-                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            WhatWeDoSection.animationWasInterrupted = false;
-                        }
-
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        // If still interrupted (same gesture), stay on section
-                        if (WhatWeDoSection.animationWasInterrupted) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // New gesture - allow normal section navigation
-                        e.preventDefault();
-
-                        if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                            return;
-                        }
-                        lastWheelTime = now;
-
-                        const direction = e.deltaY > 0 ? 1 : -1;
-                        this.handleScrollAttempt(direction);
-                        return;
-                    }
-                }
-
-                if (scrollZone === 'typing-box') {
-                    const direction = e.deltaY > 0 ? 1 : -1;
-
-                    // Access WhatWeDoSection directly for what-we-do section
-                    if (typeof WhatWeDoSection !== 'undefined') {
-                        // Detect if this is a new gesture
-                        const timeSinceLastWheel = now - WhatWeDoSection.lastWheelTime;
-                        const isNewGesture = WhatWeDoSection.isNewGesture();
-
-                        if (isNewGesture) {
-                            WhatWeDoSection.handleGestureStart();
-                        }
-
-                        // Update last wheel time for gesture tracking
-                        WhatWeDoSection.lastWheelTime = now;
-
-                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-
-                        // During typing: kill momentum once boundary is reached
-                        if (WhatWeDoSection.isTyping) {
-                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
-                                               (direction === -1 && currentBoundary.atTop);
-
-                            if (atBoundary) {
-                                // Mark that this gesture has hit the boundary
-                                if (!WhatWeDoSection.gestureHitBoundary) {
-                                    WhatWeDoSection.gestureHitBoundary = true;
-                                    // Allow this event to go through (reaches boundary naturally)
-                                    return;
-                                } else {
-                                    // Already hit boundary in this gesture - kill remaining momentum
-                                    e.preventDefault();
-                                    return;
-                                }
-                            } else {
-                                // Not at boundary - reset flag (content may have grown, creating new bottom)
-                                WhatWeDoSection.gestureHitBoundary = false;
-                            }
-
-                            // Not at boundary - allow scroll
-                            return;
-                        }
-
-                        // After typing: check if should transition
-                        if (this.canTransitionFromTypingBox(direction)) {
-                            e.preventDefault();
-
-                            // Apply debouncing
-                            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
-                                return;
-                            }
-
-                            lastWheelTime = now;
-                            this.handleScrollAttempt(direction);
-                            return;
-                        }
-
-                        // Check if currently at boundary (just arrived this gesture)
-                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // Not at boundary - allow scroll
-                        return;
-                    }
-
+                if (this.canTransitionFromTypingBox(direction)) {
+                    e.preventDefault();
+                    if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
+                    lastWheelTime = now;
+                    this.handleScrollAttempt(direction);
                     return;
                 }
-            }
 
-            // For all other cases, prevent default and handle section transitions
-            e.preventDefault();
+                const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+                if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                    e.preventDefault();
+                    return;
+                }
 
-            // Debounce: ignore rapid wheel events
-            if (now - lastWheelTime < this.config.wheelDebounceDelay) {
+                // Not at boundary — let the box scroll natively
                 return;
             }
 
+            // All other sections: prevent default and transition
+            e.preventDefault();
+            if (now - lastWheelTime < this.config.wheelDebounceDelay) return;
             lastWheelTime = now;
-
-            const direction = e.deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
             this.handleScrollAttempt(direction);
 
         }, { passive: false });
 
         // Touch events (mobile)
         let touchStartY = 0;
-        let touchStartElement = null;  // Track where touch began for zone detection
         let touchMoved = false;
 
         window.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
-            touchStartElement = e.target;  // Capture touch target for zone detection
             touchMoved = false;
+
+            // Snapshot boundary at true gesture start so a long swipe can't
+            // scroll the text box and transition sections in the same gesture
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                WhatWeDoSection.handleGestureStart();
+            }
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
-            const now = Date.now();
+            if (this.isScrollBlocked) { e.preventDefault(); return; }
+            if (this.isTransitioning) { e.preventDefault(); return; }
 
-            // Block if scroll is locked (splash screen)
-            if (this.isScrollBlocked) {
-                e.preventDefault();
-                return;
-            }
+            const deltaY = touchStartY - e.touches[0].clientY;
+            const direction = deltaY > 0 ? 1 : -1;
 
-            // Block if transition is in progress
-            if (this.isTransitioning) {
-                e.preventDefault();
-                return;
-            }
-
-            const touchEndY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchEndY;
-            const direction = deltaY > 0 ? 1 : -1; // 1 = down, -1 = up
-
-            // Check if we're in what-we-do section
-            if (this.currentSection === 2) { // what-we-do is section index 2
-                const touchX = e.touches[0].clientX;
-                const scrollZone = this.getScrollZone(touchStartElement, touchX);
-
-                // Handle left column touch with gesture detection (same as desktop)
-                if (scrollZone === 'left-column') {
-                    if (typeof WhatWeDoSection !== 'undefined' && WhatWeDoSection.isTyping) {
-                        // Typing is active - complete it
-                        WhatWeDoSection.stopTyping();
-                        WhatWeDoSection.showFinalState();
-
-                        // Auto-scroll typing box to bottom with animation
-                        const textBox = document.getElementById('typingTextBox');
-                        const typingContainer = document.getElementById('typingContent');
-                        if (textBox && typingContainer) {
-                            const targetScroll = typingContainer.scrollHeight - textBox.clientHeight;
-                            gsap.to(textBox, {
-                                scrollTop: targetScroll,
-                                duration: 0.5,  // Fast animation (500ms)
-                                ease: 'power2.inOut'
-                            });
-                        }
-
-                        // Mark as interrupted and track gesture
-                        WhatWeDoSection.animationWasInterrupted = true;
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
+            // In what-we-do, let the text box scroll and only transition at boundaries
+            if (this.currentSection === 2 && typeof WhatWeDoSection !== 'undefined') {
+                if (this.canTransitionFromTypingBox(direction)) {
+                    if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
                         e.preventDefault();
-                        return;
-                    } else if (typeof WhatWeDoSection !== 'undefined' && !WhatWeDoSection.isTyping) {
-                        // Typing is complete - check if new gesture
-                        if (WhatWeDoSection.isNewLeftColumnGesture()) {
-                            WhatWeDoSection.animationWasInterrupted = false;
-                        }
-
-                        WhatWeDoSection.lastLeftColumnScrollTime = now;
-
-                        // If still interrupted (same gesture), stay on section
-                        if (WhatWeDoSection.animationWasInterrupted) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // New gesture - allow normal section navigation
-                        if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                            e.preventDefault();
-                            touchMoved = true;
-                            this.handleScrollAttempt(direction);
-                        }
-                        return;
+                        touchMoved = true;
+                        this.handleScrollAttempt(direction);
                     }
-                }
-
-                // Handle typing box touch with boundary checking (same as desktop wheel events)
-                if (scrollZone === 'typing-box') {
-                    // Access WhatWeDoSection for gesture tracking
-                    if (typeof WhatWeDoSection !== 'undefined') {
-                        // Detect if this is a new gesture
-                        const isNewGesture = WhatWeDoSection.isNewGesture();
-
-                        if (isNewGesture) {
-                            WhatWeDoSection.handleGestureStart();
-                        }
-
-                        // Update last wheel time for gesture tracking (shared between wheel and touch)
-                        WhatWeDoSection.lastWheelTime = now;
-
-                        const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
-
-                        // During typing: kill momentum once boundary is reached
-                        if (WhatWeDoSection.isTyping) {
-                            const atBoundary = (direction === 1 && currentBoundary.atBottom) ||
-                                               (direction === -1 && currentBoundary.atTop);
-
-                            if (atBoundary) {
-                                // Mark that this gesture has hit the boundary
-                                if (!WhatWeDoSection.gestureHitBoundary) {
-                                    WhatWeDoSection.gestureHitBoundary = true;
-                                    // Allow this event to go through (reaches boundary naturally)
-                                    return;
-                                } else {
-                                    // Already hit boundary in this gesture - kill remaining momentum
-                                    e.preventDefault();
-                                    return;
-                                }
-                            } else {
-                                // Not at boundary - reset flag (content may have grown, creating new bottom)
-                                WhatWeDoSection.gestureHitBoundary = false;
-                            }
-
-                            // Not at boundary - allow scroll
-                            return;
-                        }
-
-                        // After typing: check if should transition
-                        if (this.canTransitionFromTypingBox(direction)) {
-                            // Only trigger if swipe exceeds threshold and hasn't been triggered yet
-                            if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                                e.preventDefault();
-                                touchMoved = true;
-                                this.handleScrollAttempt(direction);
-                            }
-                            return;
-                        }
-
-                        // Check if currently at boundary (just arrived this gesture)
-                        if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        // Not at boundary - allow scroll
-                        return;
-                    }
-
                     return;
                 }
+
+                const currentBoundary = WhatWeDoSection.checkCurrentBoundary();
+                if ((direction === 1 && currentBoundary.atBottom) || (direction === -1 && currentBoundary.atTop)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Not at boundary — let the text box scroll natively
+                return;
             }
 
-            // For all other cases, prevent default and handle section transitions
-            // Only trigger if swipe exceeds threshold and hasn't been triggered yet
+            // All other sections: prevent default and transition on threshold
+            e.preventDefault();
             if (Math.abs(deltaY) > this.config.snapThreshold && !touchMoved) {
-                e.preventDefault();
                 touchMoved = true;
                 this.handleScrollAttempt(direction);
             }
 
         }, { passive: false });
 
-        // Track mouse position for zone-based scrolling
-        window.addEventListener('mousemove', (e) => {
-            this.mouseX = e.clientX;
-        }, { passive: true });
     },
 
     // Position viewport on splash screen
@@ -537,46 +302,78 @@ const ScrollController = {
 
         const duration = immediate ? 0 : this.config.transitionDuration;
 
-        if (direction === 'down') {
-            // Scrolling forward: Next section slides up from bottom to cover current
+        // Both sections stationary at top:0.
+        // Current section sits on top (z:999) and is clipped away, revealing target (z:1) behind it.
+        // Scroll down: clip bottom grows 0→vh (boundary line travels bottom→top).
+        // Scroll up: clip top grows 0→vh (boundary line travels top→bottom).
 
-            // Ensure target section starts at 100% (below viewport)
-            gsap.set(targetSectionData.element, { top: '100%' });
+        // Use the element's own rendered height so inset() clips fully regardless of dvh/chrome
+        const vh = currentSectionData.element.offsetHeight;
 
-            gsap.to(targetSectionData.element, {
-                top: '0%',     // Slide up to cover current
-                duration: duration,
+        gsap.set(targetSectionData.element, { top: '0%', zIndex: 1 });
+        // Splash needs z:101 to cover fixed menu/logo (z:100). Other sections use z:99 so menu/logo stay visible.
+        const currentZ = previousSection === 0 ? 101 : 99;
+        gsap.set(currentSectionData.element, { zIndex: currentZ, clipPath: `inset(0px 0px 0px 0px)` });
+
+        // On mobile, fade out fixed splash elements that escape clip-path
+        if (previousSection === 0 && this.isMobile) {
+            const tagline = document.querySelector('.mobile-splash-tagline');
+            const arrow = document.querySelector('.mobile-splash-arrow');
+            if (tagline) gsap.to(tagline, { opacity: 0, duration: duration, ease: 'power2.inOut' });
+            if (arrow) gsap.to(arrow, { opacity: 0, duration: duration, ease: 'power2.inOut' });
+        }
+
+        // CTA button: show at z:0 (behind current section) when transitioning INTO work-with-us-2
+        // so it's revealed naturally by the wipe. After transition, restore to high z-index.
+        const ctaButton = document.getElementById('ctaButton');
+        const enteringWorkWithUs2 = targetSectionData.id === 'work-with-us-2';
+        const ctaAlreadyRevealed = ctaButton && ctaButton.classList.contains('cta-visible');
+        if (ctaButton) {
+            if (enteringWorkWithUs2 && !ctaAlreadyRevealed) {
+                // First time: z:2 so wipe reveals it from behind current section
+                gsap.set(ctaButton, { zIndex: 2 });
+                ctaButton.classList.add('cta-visible');
+            } else if (!ctaAlreadyRevealed) {
+                // Not yet revealed — keep hidden below everything
+                gsap.set(ctaButton, { zIndex: 0 });
+            }
+            // Already revealed — leave z-index untouched, stays visible always
+        }
+
+        const cleanup = () => {
+            gsap.set(currentSectionData.element, { top: '100%', zIndex: 0, clipPath: 'none' });
+            gsap.set(targetSectionData.element, { zIndex: '' });
+            // Restore CTA z-index after first reveal
+            if (ctaButton && enteringWorkWithUs2 && !ctaAlreadyRevealed) {
+                gsap.set(ctaButton, { zIndex: '' });
+            }
+            const lo = Math.min(targetIndex, previousSection);
+            const hi = Math.max(targetIndex, previousSection);
+            for (let i = lo + 1; i < hi; i++) {
+                gsap.set(this.sections[i].element, { top: '100%' });
+            }
+            this.onTransitionComplete(targetIndex);
+        };
+
+        if (immediate) {
+            // Instant swap — use gsap.set so cleanup runs synchronously
+            gsap.set(currentSectionData.element, { clipPath: direction === 'down' ? `inset(0px 0px ${vh}px 0px)` : `inset(${vh}px 0px 0px 0px)` });
+            cleanup();
+        } else if (direction === 'down') {
+            // Clip current from the bottom upward: inset bottom grows 0→vh
+            gsap.to(currentSectionData.element, {
+                clipPath: `inset(0px 0px ${vh}px 0px)`,
+                duration,
                 ease: 'power2.inOut',
-                onComplete: () => this.onTransitionComplete(targetIndex)
+                onComplete: cleanup
             });
         } else {
-            // Scrolling backward: Previous section slides down from top to cover current
-
-            // Ensure target section starts at -100% (above viewport)
-            gsap.set(targetSectionData.element, { top: '-100%' });
-
-            // Temporarily boost z-index so previous section can cover current section
-            const currentZIndex = window.getComputedStyle(currentSectionData.element).zIndex;
-            const tempZIndex = parseInt(currentZIndex) + 1;
-            gsap.set(targetSectionData.element, { zIndex: tempZIndex });
-
-            // Slide previous section down to cover (current stays still)
-            gsap.to(targetSectionData.element, {
-                top: '0%',
-                duration: duration,
+            // Clip current from the top downward: inset top grows 0→vh
+            gsap.to(currentSectionData.element, {
+                clipPath: `inset(${vh}px 0px 0px 0px)`,
+                duration,
                 ease: 'power2.inOut',
-                onComplete: () => {
-                    // Reset z-index after transition
-                    gsap.set(targetSectionData.element, { zIndex: '' });
-
-                    // Move ALL sections between target and current out of the way
-                    // (they're all stacked at top: 0% and have higher z-index than target)
-                    for (let i = targetIndex + 1; i <= previousSection; i++) {
-                        gsap.set(this.sections[i].element, { top: '100%' });
-                    }
-
-                    this.onTransitionComplete(targetIndex);
-                }
+                onComplete: cleanup
             });
         }
     },
@@ -619,52 +416,17 @@ const ScrollController = {
         }
     },
 
-    // Show menu and logo from philosophy onwards, hide on splash
-    updateMenuVisibility() {
-        const menu = document.getElementById('mainMenu');
-        const logo = document.getElementById('siteLogo');
-        const scrollIndicator = document.getElementById('scrollIndicator');
-        const ctaButton = document.getElementById('ctaButton');
+    // No-op: menu/logo/scrollbar/CTA are always visible, covered by splash z-index
+    updateMenuVisibility() {},
 
-        if (this.currentSection === 0) {
-            // Splash: hide menu, logo, scroll indicator, and CTA
-            menu.classList.remove('visible');
-            if (logo) logo.classList.remove('visible');
-            if (scrollIndicator) scrollIndicator.classList.remove('visible');
-            if (ctaButton && this.ctaButtonShown) {
-                ctaButton.classList.add('hidden');
-            }
-        } else {
-            // All other sections: show menu, logo, and scroll indicator
-            menu.classList.add('visible');
-            if (logo) {
-                logo.classList.add('visible');
-
-                // Log logo fade start time if we have a timing reference
-                if (this.timingReferenceTimestamp !== null) {
-                    this.logoFadeStartTime = performance.now();
-                    const relativeTime = Math.round(this.logoFadeStartTime - this.timingReferenceTimestamp);
-
-                    // Add transitionend listener to log when logo fade completes
-                    const onLogoTransitionEnd = (e) => {
-                        if (e.propertyName === 'opacity') {
-                            const endTime = performance.now();
-                            this.logoFadeEndTime = endTime;  // Store for gap calculation
-                            const relativeEndTime = Math.round(endTime - this.timingReferenceTimestamp);
-                            const duration = Math.round(endTime - this.logoFadeStartTime);
-                            logo.removeEventListener('transitionend', onLogoTransitionEnd);
-                        }
-                    };
-                    logo.addEventListener('transitionend', onLogoTransitionEnd);
-                }
-            }
-            if (scrollIndicator) scrollIndicator.classList.add('visible');
-            // Show CTA if it's been revealed
-            if (ctaButton && this.ctaButtonShown) {
-                ctaButton.classList.remove('hidden');
-            }
-            // Note: updateScrollIndicator() is now called at the start of goToSection for sync'd animation
-        }
+    // Compute gutter in pixels (CSS variable uses clamp/max, can't parseFloat directly)
+    getGutterPx() {
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:absolute;visibility:hidden;width:var(--gutter)';
+        document.body.appendChild(temp);
+        const val = parseFloat(getComputedStyle(temp).width);
+        document.body.removeChild(temp);
+        return val;
     },
 
     // Update scroll indicator bar position based on current section
@@ -712,32 +474,6 @@ const ScrollController = {
 
         // Apply position (transition will animate smoothly)
         scrollIndicator.style.top = topPosition + 'px';
-    },
-
-    // Determine which scroll zone the mouse is in (for what-we-do section)
-    getScrollZone(target, mouseX) {
-        const viewportWidth = window.innerWidth;
-
-        // Calculate zone boundaries based on grid layout
-        const leftColumnEnd = viewportWidth * 0.327;  // 32.7%
-        const navStripStart = viewportWidth * 0.968;  // 96.8% (100% - 3.2%)
-
-        // Mod 8B: Check if mouse is in left column (video area)
-        if (mouseX <= leftColumnEnd) {
-            return 'left-column';
-        }
-
-        // Check if mouse is over the typing box element or its children
-        const typingBox = document.querySelector('.what-we-do-text-box');
-        if (typingBox && (typingBox === target || typingBox.contains(target))) {
-            // Mouse is over typing box area
-            if (mouseX > leftColumnEnd && mouseX < navStripStart) {
-                return 'typing-box';
-            }
-        }
-
-        // Default: section transition zones
-        return 'section-transition';
     },
 
     // Check if typing box allows section transition from boundary

@@ -30,8 +30,9 @@
     letter-spacing: -6px;
     font-weight: 700;
     color: #000;
-    opacity: 0;
+    opacity: 1;
     text-align: left;
+    margin-top: -0.1em; /* Cancel font leading above cap height */
 }
 
 .work-with-us-text-container {
@@ -49,11 +50,15 @@
 }
 
 .contact-line {
-    opacity: 0;
+    opacity: 1;
     margin-bottom: 0; /* NO base spacing - add explicitly where needed */
     font-size: var(--font-work-with-us-body);
     line-height: var(--font-believe-line-height);
     color: #000;
+}
+
+.contact-line:first-child {
+    margin-top: -0.15em; /* Cancel font leading above cap height */
 }
 
 /* Add spacing where copy has empty lines */
@@ -67,7 +72,7 @@
 .contact-cta {
     position: fixed;
     right: calc(31.4vw + var(--nav-strip) - var(--gutter) - var(--button-width));
-    bottom: calc(2 * var(--gutter) + var(--desktop-cell-height));  /* Bottom of button aligns with bottom of second-to-last cell */
+    top: calc(7 * var(--gutter) + 6 * var(--desktop-cell-height));  /* Top of button aligns with top of last cell */
     z-index: var(--z-menu);
 
     display: flex;
@@ -85,31 +90,70 @@
     /* Apply blend mode for color inversion across all sections */
     mix-blend-mode: difference;
 
-    /* Start hidden */
+    overflow: hidden;
+
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s ease, transform 0.3s ease; /* Opacity unified with FADE_PARAGRAPH, transform stays responsive */
-}
-
-@media (min-width: 769px) {
-    .contact-cta {
-        cursor: grab;
-    }
-}
-
-.contact-cta:hover {
-    transform: translateY(-2px);
-}
-
-.contact-cta.is-dragging,
-.contact-cta.is-dragging:hover {
-    transform: none;
-    cursor: grabbing;
     transition: none;
 }
 
-/* Hide button on splash screen */
-.contact-cta.hidden {
-    opacity: 0;
-    pointer-events: none;
+.contact-cta.cta-visible {
+    opacity: 1;
+    pointer-events: auto;
 }
+
+.cta-default,
+.cta-hover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    font-weight: 700;
+}
+
+.cta-default {
+    font-size: var(--font-button);
+    transition: opacity 0.55s ease;
+}
+
+.cta-hover {
+    font-size: clamp(13px, 1.55vw, 27px);
+    line-height: 0.87;
+    transition: opacity 0.55s ease;
+}
+
+.cta-default { opacity: 1; }
+.cta-hover   { opacity: 0; }
+
+.contact-cta:hover .cta-default { opacity: 0; }
+.contact-cta:hover .cta-hover {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.cta-hover a {
+    transition: transform 0.2s ease;
+    display: inline-block;
+    padding: 0 0.7em;
+}
+
+.cta-hover a:hover {
+    transform: translateY(-1px);
+}
+
+.cta-sep {
+    display: inline-block;
+    width: 1.5px;
+    height: 0.72em; /* approx cap-height */
+    background-color: currentColor;
+    border-radius: 999px;
+    opacity: 1;
+    pointer-events: none;
+    align-self: center;
+    flex-shrink: 0;
+}
+

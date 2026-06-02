@@ -18,8 +18,12 @@
     font-size: var(--font-believe-body);
     line-height: var(--font-believe-line-height);
     margin-bottom: 0; /* NO base spacing - add explicitly where needed */
-    opacity: 0;
+    opacity: 1;
     color: #000;
+}
+
+.philosophy-paragraph:first-child {
+    margin-top: -0.15em; /* Cancel font leading above cap height */
 }
 
 /* Add spacing only where copy has empty lines */
@@ -31,7 +35,7 @@
     margin-bottom: var(--font-believe-line-height);
 }
 
-.philosophy-paragraph[data-index="5"] {
+.philosophy-paragraph[data-index="6"] {
     margin-bottom: var(--font-believe-line-height);
 }
 

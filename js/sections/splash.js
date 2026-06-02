@@ -383,6 +383,21 @@ const SplashSection = {
 
     startTimeline(images, tagline) {
 
+        // Position scroll indicator at bottom before it fades in with tagline
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const gutterPx = ScrollController.getGutterPx();
+        const scrollBarHeight = Math.max(135, window.innerHeight * 0.2417);
+        const bottomPosition = window.innerHeight - scrollBarHeight - gutterPx;
+
+        if (scrollIndicator) {
+            // Disable CSS top transition so position snaps instantly (no animation from 0)
+            scrollIndicator.style.transition = 'opacity 0.6s ease';
+            gsap.set(scrollIndicator, { top: bottomPosition });
+        }
+
+        const t0 = performance.now();
+        const log = (label) => console.log(`[splash] ${label} @ ${((performance.now() - t0) / 1000).toFixed(2)}s`);
+
         this.timeline = gsap.timeline({
             onComplete: () => {
                 this.onAnimationComplete();
@@ -395,7 +410,9 @@ const SplashSection = {
             {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
-                ease: 'power2.out'
+                ease: 'power2.out',
+                onStart: () => log('PLEASURE start'),
+                onComplete: () => log('PLEASURE end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
@@ -406,26 +423,51 @@ const SplashSection = {
             {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
-                ease: 'power2.out'
+                ease: 'power2.out',
+                onStart: () => log('STATES start'),
+                onComplete: () => log('STATES end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
 
         // "PLEASURE IS SERIOUS BUSINESS" appears
+        // Use absolute time to prevent any parallel tweens from pushing tagline later.
+        // Absolute time = delay + PLEASURE fade + delay + STATES fade + delay = 3.0s
+        const taglineStart = this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY + this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY;
         if (tagline) {
             this.timeline.fromTo(tagline,
                 { opacity: 0 },
                 {
                     opacity: 1,
                     duration: this.ELEMENT_FADE_DURATION,
-                    ease: 'power2.out'
+                    ease: 'power2.out',
+                    onStart: () => log('tagline start'),
+                    onComplete: () => log('tagline end'),
                 },
-                `+=${this.ELEMENT_DELAY}`
+                taglineStart
+            );
+        }
+
+        // Scroll indicator fades in at same time as tagline, positioned at bottom
+        if (scrollIndicator) {
+            this.timeline.to(scrollIndicator,
+                {
+                    opacity: 1,
+                    duration: this.ELEMENT_FADE_DURATION,
+                    ease: 'power2.out',
+                },
+                taglineStart
             );
         }
     },
 
     onAnimationComplete() {
+        // Restore full CSS transition on scroll indicator so post-splash section changes animate
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        if (scrollIndicator) {
+            scrollIndicator.style.transition = '';
+        }
+
         // Splash always auto-advances (not affected by autoAdvanceEnabled flag)
         if (!this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;
@@ -470,5 +512,6 @@ const SplashSection = {
         if (this.resizeHandler) {
             window.removeEventListener('resize', this.resizeHandler);
         }
+
     }
 };

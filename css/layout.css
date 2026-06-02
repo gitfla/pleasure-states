@@ -1,8 +1,14 @@
 /* Global Layout */
+html {
+    overscroll-behavior: none; /* Prevent pull-to-refresh on Android Chrome */
+}
+
 body {
     font-family: var(--font-family-primary);
     background-color: var(--color-bg);
     color: var(--color-text);
+    overscroll-behavior: none;
+    touch-action: pan-x pan-y; /* Let browser handle panning but not pull-to-refresh */
 }
 
 /* Sections: Fixed positioning, full viewport */
@@ -17,7 +23,7 @@ body {
 
 /* Z-index stacking: higher index = covers previous sections */
 #splash {
-    z-index: 10;
+    z-index: 101;
 }
 
 #what-we-believe {

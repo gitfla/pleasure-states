@@ -48,73 +48,96 @@
                Each band is 32.7% wide = gutter(1.45%) + cell(14.18%) + gutter(1.45%) + cell(14.18%) + gutter(1.45%) */
             linear-gradient(
                 to right,
-                /* Band 1 */
-                /* G1 */ rgba(255,0,0,0.15) 0%,
-                rgba(255,0,0,0.15) 1.45%,
-                /* C1 */ rgba(255,192,203,0.12) 1.45%,
-                rgba(255,192,203,0.12) 15.63%,
-                /* G2 */ rgba(255,0,0,0.15) 15.63%,
-                rgba(255,0,0,0.15) 17.08%,
-                /* C2 */ rgba(255,192,203,0.06) 17.08%,
-                rgba(255,192,203,0.06) 31.26%,
+                /* Band 1 */ /* G1 */ rgba(255, 0, 0, 0.15) 0%,
+                rgba(255, 0, 0, 0.15) 1.45%,
+                /* C1 */ rgba(255, 192, 203, 0.12) 1.45%,
+                rgba(255, 192, 203, 0.12) 15.63%,
+                /* G2 */ rgba(255, 0, 0, 0.15) 15.63%,
+                rgba(255, 0, 0, 0.15) 17.08%,
+                /* C2 */ rgba(255, 192, 203, 0.06) 17.08%,
+                rgba(255, 192, 203, 0.06) 31.26%,
                 /* G3 (right of band1 = left of band2, double gutter) */
-                rgba(255,0,0,0.15) 31.26%,
-                rgba(255,0,0,0.15) 34.15%,
-                /* Band 2 */
-                /* C3 */ rgba(255,192,203,0.12) 34.15%,
-                rgba(255,192,203,0.12) 48.33%,
-                /* G4 */ rgba(255,0,0,0.15) 48.33%,
-                rgba(255,0,0,0.15) 49.78%,
-                /* C4 */ rgba(255,192,203,0.06) 49.78%,
-                rgba(255,192,203,0.06) 63.96%,
+                    rgba(255, 0, 0, 0.15) 31.26%,
+                rgba(255, 0, 0, 0.15) 34.15%,
+                /* Band 2 */ /* C3 */ rgba(255, 192, 203, 0.12) 34.15%,
+                rgba(255, 192, 203, 0.12) 48.33%,
+                /* G4 */ rgba(255, 0, 0, 0.15) 48.33%,
+                rgba(255, 0, 0, 0.15) 49.78%,
+                /* C4 */ rgba(255, 192, 203, 0.06) 49.78%,
+                rgba(255, 192, 203, 0.06) 63.96%,
                 /* G5 (right of band2 = left of band3, double gutter) */
-                rgba(255,0,0,0.15) 63.96%,
-                rgba(255,0,0,0.15) 66.85%,
-                /* Band 3 */
-                /* C5 */ rgba(255,192,203,0.12) 66.85%,
-                rgba(255,192,203,0.12) 81.03%,
-                /* G6 */ rgba(255,0,0,0.15) 81.03%,
-                rgba(255,0,0,0.15) 82.48%,
-                /* C6 */ rgba(255,192,203,0.06) 82.48%,
-                rgba(255,192,203,0.06) 96.66%,
-                /* Nav strip (no trailing gutter) */
-                rgba(100,100,255,0.15) 96.66%,
-                rgba(100,100,255,0.15) 100%
+                    rgba(255, 0, 0, 0.15) 63.96%,
+                rgba(255, 0, 0, 0.15) 66.85%,
+                /* Band 3 */ /* C5 */ rgba(255, 192, 203, 0.12) 66.85%,
+                rgba(255, 192, 203, 0.12) 81.03%,
+                /* G6 */ rgba(255, 0, 0, 0.15) 81.03%,
+                rgba(255, 0, 0, 0.15) 82.48%,
+                /* C6 */ rgba(255, 192, 203, 0.06) 82.48%,
+                rgba(255, 192, 203, 0.06) 96.66%,
+                /* Nav strip (no trailing gutter) */ rgba(100, 100, 255, 0.15)
+                    96.66%,
+                rgba(100, 100, 255, 0.15) 100%
             ),
             /* ROWS: G, C, G, C, G... (8 gutters, 7 cells) using --gutter and --cell-height */
-            linear-gradient(
-                to bottom,
-                /* G1 */ rgba(255, 0, 0, 0.15) 0,
-                rgba(255, 0, 0, 0.15) var(--gutter),
-                /* C1 */ rgba(255, 192, 203, 0.08) var(--gutter),
-                rgba(255, 192, 203, 0.08) calc(var(--gutter) + var(--desktop-cell-height)),
-                /* G2 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) + var(--desktop-cell-height)),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--desktop-cell-height)),
-                /* C2 */ transparent calc(var(--gutter) * 2 + var(--desktop-cell-height)),
-                transparent calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
-                /* G3 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
-                /* C3 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
-                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
-                /* G4 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
-                /* C4 */ transparent calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
-                transparent calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
-                /* G5 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
-                /* C5 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
-                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
-                /* G6 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
-                /* C6 */ transparent calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
-                transparent calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
-                /* G7 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
-                rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
-                /* C7 */ rgba(255, 192, 203, 0.08) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
-                rgba(255, 192, 203, 0.08) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
-                /* G8 */ rgba(255, 0, 0, 0.15) calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
-                rgba(255, 0, 0, 0.15) 100%
-            );
+                linear-gradient(
+                    to bottom,
+                    /* G1 */ rgba(255, 0, 0, 0.15) 0,
+                    rgba(255, 0, 0, 0.15) var(--gutter),
+                    /* C1 */ rgba(255, 192, 203, 0.08) var(--gutter),
+                    rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) + var(--desktop-cell-height)),
+                    /* G2 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) + var(--desktop-cell-height)),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 2 + var(--desktop-cell-height)),
+                    /* C2 */ transparent
+                        calc(var(--gutter) * 2 + var(--desktop-cell-height)),
+                    transparent
+                        calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
+                    /* G3 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 2 + var(--desktop-cell-height) * 2),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
+                    /* C3 */ rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 3 + var(--desktop-cell-height) * 2),
+                    rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
+                    /* G4 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 3 + var(--desktop-cell-height) * 3),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
+                    /* C4 */ transparent
+                        calc(var(--gutter) * 4 + var(--desktop-cell-height) * 3),
+                    transparent
+                        calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
+                    /* G5 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 4 + var(--desktop-cell-height) * 4),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
+                    /* C5 */ rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 5 + var(--desktop-cell-height) * 4),
+                    rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
+                    /* G6 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 5 + var(--desktop-cell-height) * 5),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
+                    /* C6 */ transparent
+                        calc(var(--gutter) * 6 + var(--desktop-cell-height) * 5),
+                    transparent
+                        calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
+                    /* G7 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 6 + var(--desktop-cell-height) * 6),
+                    rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
+                    /* C7 */ rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 7 + var(--desktop-cell-height) * 6),
+                    rgba(255, 192, 203, 0.08)
+                        calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
+                    /* G8 */ rgba(255, 0, 0, 0.15)
+                        calc(var(--gutter) * 7 + var(--desktop-cell-height) * 7),
+                    rgba(255, 0, 0, 0.15) 100%
+                );
     }
 }
 
@@ -154,39 +177,39 @@
                 rgba(255, 0, 0, 0.15) 100%
             ),
             /* ROWS: G=2.238%, C=11.728% — 8×2.238 + 7×11.728 = 17.904 + 82.096 = 100% */
-            linear-gradient(
-            to bottom,
-            /* gutter 1 */  rgba(255, 0, 0, 0.15) 0%,
-            rgba(255, 0, 0, 0.15) 2.238%,
-            /* cell 1 */    rgba(255, 192, 203, 0.1) 2.238%,
-            rgba(255, 192, 203, 0.1) 13.966%,
-            /* gutter 2 */  rgba(255, 0, 0, 0.15) 13.966%,
-            rgba(255, 0, 0, 0.15) 16.204%,
-            /* cell 2 */    rgba(255, 192, 203, 0.1) 16.204%,
-            rgba(255, 192, 203, 0.1) 27.932%,
-            /* gutter 3 */  rgba(255, 0, 0, 0.15) 27.932%,
-            rgba(255, 0, 0, 0.15) 30.17%,
-            /* cell 3 */    rgba(255, 192, 203, 0.1) 30.17%,
-            rgba(255, 192, 203, 0.1) 41.898%,
-            /* gutter 4 */  rgba(255, 0, 0, 0.15) 41.898%,
-            rgba(255, 0, 0, 0.15) 44.136%,
-            /* cell 4 */    rgba(255, 192, 203, 0.1) 44.136%,
-            rgba(255, 192, 203, 0.1) 55.864%,
-            /* gutter 5 */  rgba(255, 0, 0, 0.15) 55.864%,
-            rgba(255, 0, 0, 0.15) 58.102%,
-            /* cell 5 */    rgba(255, 192, 203, 0.1) 58.102%,
-            rgba(255, 192, 203, 0.1) 69.83%,
-            /* gutter 6 */  rgba(255, 0, 0, 0.15) 69.83%,
-            rgba(255, 0, 0, 0.15) 72.068%,
-            /* cell 6 */    rgba(255, 192, 203, 0.1) 72.068%,
-            rgba(255, 192, 203, 0.1) 83.796%,
-            /* gutter 7 */  rgba(255, 0, 0, 0.15) 83.796%,
-            rgba(255, 0, 0, 0.15) 86.034%,
-            /* cell 7 */    rgba(255, 192, 203, 0.1) 86.034%,
-            rgba(255, 192, 203, 0.1) 97.762%,
-            /* gutter 8 */  rgba(255, 0, 0, 0.15) 97.762%,
-            rgba(255, 0, 0, 0.15) 100%
-        );
+                linear-gradient(
+                    to bottom,
+                    /* gutter 1 */ rgba(255, 0, 0, 0.15) 0%,
+                    rgba(255, 0, 0, 0.15) 2.238%,
+                    /* cell 1 */ rgba(255, 192, 203, 0.1) 2.238%,
+                    rgba(255, 192, 203, 0.1) 13.966%,
+                    /* gutter 2 */ rgba(255, 0, 0, 0.15) 13.966%,
+                    rgba(255, 0, 0, 0.15) 16.204%,
+                    /* cell 2 */ rgba(255, 192, 203, 0.1) 16.204%,
+                    rgba(255, 192, 203, 0.1) 27.932%,
+                    /* gutter 3 */ rgba(255, 0, 0, 0.15) 27.932%,
+                    rgba(255, 0, 0, 0.15) 30.17%,
+                    /* cell 3 */ rgba(255, 192, 203, 0.1) 30.17%,
+                    rgba(255, 192, 203, 0.1) 41.898%,
+                    /* gutter 4 */ rgba(255, 0, 0, 0.15) 41.898%,
+                    rgba(255, 0, 0, 0.15) 44.136%,
+                    /* cell 4 */ rgba(255, 192, 203, 0.1) 44.136%,
+                    rgba(255, 192, 203, 0.1) 55.864%,
+                    /* gutter 5 */ rgba(255, 0, 0, 0.15) 55.864%,
+                    rgba(255, 0, 0, 0.15) 58.102%,
+                    /* cell 5 */ rgba(255, 192, 203, 0.1) 58.102%,
+                    rgba(255, 192, 203, 0.1) 69.83%,
+                    /* gutter 6 */ rgba(255, 0, 0, 0.15) 69.83%,
+                    rgba(255, 0, 0, 0.15) 72.068%,
+                    /* cell 6 */ rgba(255, 192, 203, 0.1) 72.068%,
+                    rgba(255, 192, 203, 0.1) 83.796%,
+                    /* gutter 7 */ rgba(255, 0, 0, 0.15) 83.796%,
+                    rgba(255, 0, 0, 0.15) 86.034%,
+                    /* cell 7 */ rgba(255, 192, 203, 0.1) 86.034%,
+                    rgba(255, 192, 203, 0.1) 97.762%,
+                    /* gutter 8 */ rgba(255, 0, 0, 0.15) 97.762%,
+                    rgba(255, 0, 0, 0.15) 100%
+                );
     }
 }
 
@@ -207,7 +230,9 @@
 
     /* Adjust logo for mobile - top align with Cell 1 */
     .site-logo {
-        top: calc(var(--safe-top) + var(--gutter)); /* Start of Cell 1 (after top gutter) */
+        top: calc(
+            var(--safe-top) + var(--gutter)
+        ); /* Start of Cell 1 (after top gutter) */
         left: var(--gutter);
         width: auto;
         max-width: 60%;
@@ -222,7 +247,9 @@
 
     .mobile-menu-toggle {
         position: fixed;
-        top: calc(var(--safe-top) + var(--precision-gutter)); /* Align with start of Cell 1, same as logo */
+        top: calc(
+            var(--safe-top) + var(--precision-gutter)
+        ); /* Align with start of Cell 1, same as logo */
         right: var(--gutter);
         z-index: 101;
         background: transparent;
@@ -275,7 +302,9 @@
 
     .mobile-menu-close {
         position: absolute;
-        top: calc(var(--safe-top) + var(--precision-gutter)); /* Align with start of Cell 1, same as MENU */
+        top: calc(
+            var(--safe-top) + var(--precision-gutter)
+        ); /* Align with start of Cell 1, same as MENU */
         right: var(--gutter);
         background: transparent;
         border: none;
@@ -291,7 +320,10 @@
 
     .mobile-menu-social {
         position: absolute;
-        bottom: calc(var(--safe-bottom) + var(--precision-gutter) + var(--precision-cell-height) / 2);
+        bottom: calc(
+            var(--safe-bottom) + var(--precision-gutter) +
+                var(--precision-cell-height) / 2
+        );
         transform: translateY(50%);
         left: 0;
         right: 0;
@@ -338,7 +370,11 @@
         top: calc(
             2 * (var(--precision-gutter) + var(--precision-cell-height)) -
                 var(--font-mobile-menu-line-height) +
-                (var(--font-mobile-menu-line-height) - var(--font-mobile-menu)) / 2
+                (
+                    var(--font-mobile-menu-line-height) -
+                        var(--font-mobile-menu)
+                ) /
+                2
         );
         left: 0;
         right: 0;
@@ -403,7 +439,8 @@
         content: "";
         position: absolute;
         top: calc(
-            var(--safe-top) + var(--precision-gutter) + var(--precision-cell-height) / 2
+            var(--safe-top) + var(--precision-gutter) +
+                var(--precision-cell-height) / 2
         ); /* EXACT center of cell 1 */
         left: calc(var(--safe-left) + var(--precision-gutter));
         right: calc(var(--safe-right) + var(--precision-gutter));
@@ -432,7 +469,8 @@
         display: block;
         position: fixed;
         bottom: calc(
-            var(--safe-bottom) + var(--precision-gutter) + var(--precision-cell-height) / 2
+            var(--safe-bottom) + var(--precision-gutter) +
+                var(--precision-cell-height) / 2
         ); /* EXACT center of cell 7 */
         left: calc(var(--safe-left) + var(--precision-gutter));
         right: calc(var(--safe-right) + var(--precision-gutter));
@@ -456,11 +494,15 @@
     .mobile-splash-arrow {
         display: block;
         position: fixed;
-        bottom: var(--precision-gutter); /* Bottom of arrow = bottom of last cell */
+        bottom: var(
+            --precision-gutter
+        ); /* Bottom of arrow = bottom of last cell */
         left: 50%;
         transform: translateX(-50%);
         width: var(--arrow-size-mobile); /* 15px */
-        height: calc(var(--arrow-size-mobile) * 0.866); /* equilateral triangle height = side * √3/2 */
+        height: calc(
+            var(--arrow-size-mobile) * 0.866
+        ); /* equilateral triangle height = side * √3/2 */
         background-color: #fff;
         clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
         background-image: none;
@@ -487,7 +529,9 @@
     /* Text container - full width */
     .philosophy-text-container {
         grid-column: 1;
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+        padding-top: calc(
+            var(--gutter) + var(--mobile-cell-height) + var(--gutter)
+        );
         padding-left: var(--gutter);
         padding-right: var(--gutter);
     }
@@ -546,7 +590,9 @@
 
     .what-we-do-text-box {
         padding-right: var(--gutter);
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter)); /* Start at cell 2 */
+        padding-top: calc(
+            var(--gutter) + var(--mobile-cell-height) + var(--gutter)
+        ); /* Start at cell 2 */
         height: var(--app-h);
         overflow-x: hidden;
     }
@@ -584,8 +630,9 @@
            Block height = 5 lines * (font-size * line-height) */
         position: absolute;
         top: calc(
-            var(--app-h) - 2 * var(--gutter) - var(--mobile-cell-height) -
-                5 * var(--font-mobile-headline) * var(--font-mobile-headline-line-height)
+            var(--app-h) - 2 * var(--gutter) - var(--mobile-cell-height) - 5 *
+                var(--font-mobile-headline) *
+                var(--font-mobile-headline-line-height)
         );
         bottom: auto; /* Override desktop bottom positioning */
         left: var(--gutter);
@@ -607,7 +654,9 @@
     #work-with-us-2 .work-with-us-text-container {
         grid-column: 1;
         grid-row: 1 / -1;
-        padding-top: calc(var(--gutter) + var(--mobile-cell-height) + var(--gutter));
+        padding-top: calc(
+            var(--gutter) + var(--mobile-cell-height) + var(--gutter)
+        );
     }
 
     /* Increase paragraph font size on mobile */
@@ -630,13 +679,23 @@
         left: var(--gutter);
         right: var(--gutter);
         top: auto;
-        bottom: calc(var(--gutter) + var(--mobile-cell-height) - var(--button-height)); /* top of button = top of last cell */
+        bottom: calc(
+            var(--gutter) + var(--mobile-cell-height) - var(--button-height)
+        ); /* top of button = top of last cell */
         width: auto; /* Let left/right define the width */
         max-width: none; /* Remove max-width restriction */
-        transform: none; /* No transform needed */
+        transform: none;
+        /* Restore original mobile dimensions */
+        height: clamp(52px, 6.18vh, 69px);
     }
 
-    .contact-cta:hover {
-        transform: translateY(-2px);
+    .cta-default {
+        font-size: 19px;
+    }
+    .cta-hover {
+        display: none;
+    }
+    .contact-cta:hover .cta-default {
+        opacity: 1;
     }
 }

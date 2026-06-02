@@ -14,7 +14,29 @@ const WorkWithUsSection = {
             onScrollAttempt: () => true
         });
 
-        this.initDrag();
+        this.initCtaButton();
+    },
+
+    initCtaButton() {
+        const btn = document.getElementById('ctaButton');
+        if (!btn) return;
+        // On mobile (no hover state), tapping the div opens email.
+        // On desktop, inner <a> tags handle their own navigation.
+        btn.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return;
+            // On desktop, clicking the button background (outside the links) does nothing.
+            // On mobile, the hover layer is hidden so any tap opens email.
+            const hoverLayer = btn.querySelector('.cta-hover');
+            if (hoverLayer && getComputedStyle(hoverLayer).display === 'none') {
+                window.location.href = 'mailto:hello@pleasurestates.com';
+            }
+        });
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = 'mailto:hello@pleasurestates.com';
+            }
+        });
     },
 
     onEnter1() {
@@ -25,81 +47,8 @@ const WorkWithUsSection = {
     onEnter2() {
         const headline = document.querySelector('#work-with-us-2 .work-with-us-headline');
         const paragraphs = document.querySelectorAll('#work-with-us-2 .contact-line');
-        const ctaButton = document.getElementById('ctaButton');
 
         if (headline) gsap.set(headline, { opacity: 1 });
         gsap.set(paragraphs, { opacity: 1 });
-    },
-
-    initDrag() {
-        if (!window.matchMedia('(min-width: 769px)').matches) return;
-
-        const btn = document.getElementById('ctaButton');
-        if (!btn) return;
-
-        let startX, startY, originLeft, originTop, dragging = false, moved = false;
-
-        btn.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0) return;
-
-            // Convert CSS right/bottom to left/top on first drag
-            if (btn.style.left === '') {
-                const rect = btn.getBoundingClientRect();
-                btn.style.left = rect.left + 'px';
-                btn.style.top = rect.top + 'px';
-                btn.style.right = 'auto';
-                btn.style.bottom = 'auto';
-            }
-
-            originLeft = parseFloat(btn.style.left);
-            originTop = parseFloat(btn.style.top);
-            startX = e.clientX;
-            startY = e.clientY;
-            dragging = true;
-            moved = false;
-
-            btn.setPointerCapture(e.pointerId);
-            e.preventDefault();
-        });
-
-        btn.addEventListener('pointermove', (e) => {
-            if (!dragging) return;
-
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-
-            if (!moved && Math.abs(dx) + Math.abs(dy) > 4) {
-                moved = true;
-                btn.classList.add('is-dragging');
-            }
-
-            if (moved) {
-                const vw = window.innerWidth;
-                const vh = window.innerHeight;
-                const w = btn.offsetWidth;
-                const h = btn.offsetHeight;
-
-                const newLeft = Math.min(Math.max(originLeft + dx, 0), vw - w);
-                const newTop = Math.min(Math.max(originTop + dy, 0), vh - h);
-
-                btn.style.left = newLeft + 'px';
-                btn.style.top = newTop + 'px';
-            }
-        });
-
-        const onRelease = (e) => {
-            if (!dragging) return;
-            dragging = false;
-            btn.classList.remove('is-dragging');
-
-            if (moved) {
-                btn.addEventListener('click', (ce) => ce.preventDefault(), { once: true });
-            }
-        };
-
-        btn.addEventListener('pointerup', onRelease);
-        btn.addEventListener('pointercancel', onRelease);
-        window.addEventListener('pointerup', onRelease);
-        document.addEventListener('pointerleave', onRelease);
     }
 };

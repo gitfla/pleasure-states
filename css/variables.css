@@ -80,7 +80,7 @@
     --font-what-we-do-letter-spacing: -2px;
     --font-work-with-us-headline: clamp(60px, 6.83vw, 118px);
     --font-work-with-us-body: clamp(15px, 1.68vw, 29px);
-    --font-button: clamp(16px, 1.79vw, 31px);
+    --font-button: clamp(15px, 1.79vw, 31px);
     --font-menu: clamp(13px, 1.04vw, 18px); /* 18/1728 = 1.04% */
     --font-menu-spacing: clamp(3px, 0.29vw, 5px); /* 5/1728 = 0.29% */
 
@@ -88,11 +88,7 @@
        BUTTONS
        ======================================== */
     --button-width: var(--inner-width-2col); /* 515px reference */
-    --button-height: clamp(
-        52px,
-        6.18vh,
-        69px
-    ); /* 69/1117 = 6.18vh - vertical */
+    --button-height: clamp(40px, 3.96vw, 69px); /* inner-width-2col * 0.133 ≈ 29.8vw * 0.133 = 3.96vw — maintains 7.5:1 ratio with width */
     --button-radius: clamp(14px, 1.56vw, 27px); /* 27/1728 = 1.56% */
 
     /* ========================================

@@ -156,13 +156,22 @@
         <div class="scroll-indicator" id="scrollIndicator"></div>
 
         <!-- CTA Button (positioned in work-with-us, then becomes fixed) -->
-        <a
-            href="mailto:hello@pleasurestates.com"
+        <div
             class="contact-cta"
             id="ctaButton"
+            role="link"
+            tabindex="0"
+            aria-label="Follow the feeling — contact us"
         >
-            FOLLOW THE FEELING
-        </a>
+            <span class="cta-default" aria-hidden="true">FOLLOW THE FEELING</span>
+            <span class="cta-hover">
+                <a href="mailto:hello@pleasurestates.com">Email</a>
+                <span class="cta-sep" aria-hidden="true"></span>
+                <a href="https://www.instagram.com/pleasurestates" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <span class="cta-sep" aria-hidden="true"></span>
+                <a href="https://www.linkedin.com/company/pleasurestates/" target="_blank" rel="noopener noreferrer">Linkedin</a>
+            </span>
+        </div>
 
         <!-- Section 1: Splash Screen -->
         <section

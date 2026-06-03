@@ -226,7 +226,6 @@ const ScrollController = {
         // Trigger splash animation
         if (this.sections[0] && this.sections[0].onEnter) {
             this.sections[0].onEnter();
-        } else {
         }
     },
 
@@ -391,11 +390,6 @@ const ScrollController = {
             this.timingReferenceTimestamp = performance.now();
         }
 
-        // DEBUG: Log all section positions
-        this.sections.forEach((s, i) => {
-            const top = s.element.style.top;
-        });
-
         // Update scroll blocking state
         this.isScrollBlocked = newSectionData.isScrollBlocking;
 
@@ -412,7 +406,6 @@ const ScrollController = {
             newSectionData.onEnter(newSectionData.hasAnimated);
             // Mark as animated after first visit
             newSectionData.hasAnimated = true;
-        } else {
         }
     },
 

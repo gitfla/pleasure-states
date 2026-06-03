@@ -357,7 +357,6 @@ const SplashSection = {
                 },
                 `+=${this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY}` // Logo fade duration + delay
             );
-        } else {
         }
 
         // Show arrow (same time as tagline)
@@ -376,7 +375,6 @@ const SplashSection = {
                 },
                 '<' // Same time as tagline
             );
-        } else {
         }
 
     },
@@ -395,24 +393,19 @@ const SplashSection = {
             gsap.set(scrollIndicator, { top: bottomPosition });
         }
 
-        const t0 = performance.now();
-        const log = (label) => console.log(`[splash] ${label} @ ${((performance.now() - t0) / 1000).toFixed(2)}s`);
-
         this.timeline = gsap.timeline({
             onComplete: () => {
                 this.onAnimationComplete();
             }
         });
 
-        // "PLEASURE" image appears (with same delay as others)
+        // "PLEASURE" image appears
         this.timeline.fromTo(images[0],
             { opacity: 0 },
             {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
                 ease: 'power2.out',
-                onStart: () => log('PLEASURE start'),
-                onComplete: () => log('PLEASURE end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
@@ -424,8 +417,6 @@ const SplashSection = {
                 opacity: 1,
                 duration: this.ELEMENT_FADE_DURATION,
                 ease: 'power2.out',
-                onStart: () => log('STATES start'),
-                onComplete: () => log('STATES end'),
             },
             `+=${this.ELEMENT_DELAY}`
         );
@@ -441,8 +432,6 @@ const SplashSection = {
                     opacity: 1,
                     duration: this.ELEMENT_FADE_DURATION,
                     ease: 'power2.out',
-                    onStart: () => log('tagline start'),
-                    onComplete: () => log('tagline end'),
                 },
                 taglineStart
             );

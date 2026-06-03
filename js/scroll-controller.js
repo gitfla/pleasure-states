@@ -383,6 +383,7 @@ const ScrollController = {
         // Note: this.currentSection was already updated at the start of goToSection
         this.isTransitioning = false;
 
+
         const newSectionData = this.sections[newIndex];
 
         // Set reference timestamp for timing logs when entering what-we-believe

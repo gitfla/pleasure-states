@@ -6,7 +6,8 @@ const SplashSection = {
     // ANIMATION TIMING CONSTANTS (reference base constants for consistency)
     ELEMENT_FADE_DURATION: TimingConstants.FADE_PARAGRAPH,  // 0.6s - Fade-in duration for images and tagline
     ELEMENT_DELAY: TimingConstants.DELAY_SHORT,             // 0.6s - Delay between element appearances
-    FINAL_DELAY_MS: TimingConstants.DELAY_LONG * 1000,     // 2500ms - Delay after animation before auto-advance
+    FINAL_DELAY_MS: TimingConstants.DELAY_LONG * 1000,     // 2500ms - Delay after animation before auto-advance (desktop)
+    FINAL_DELAY_MS_MOBILE: TimingConstants.DELAY_SHORT * 2 * 1000, // 1200ms - Delay after animation before auto-advance (mobile)
 
     initVideo() {
         const video = document.querySelector('.splash-video');
@@ -268,75 +269,18 @@ const SplashSection = {
         const mobileTagline = document.querySelector('.mobile-splash-tagline');
         const mobileArrow = document.querySelector('.mobile-splash-arrow');
 
-        // Get viewport and computed values
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-
-        // Calculate gutter in pixels (3.33vh)
-        const gutterPx = viewportHeight * 0.0333; // 3.33vh
-
-        // Calculate cell height
-        const cellHeightPx = (viewportHeight - (8 * gutterPx)) / 7;
-
-        // Calculate expected positions
-        const logoExpectedTop = gutterPx + (cellHeightPx / 2);
-        const taglineExpectedBottom = gutterPx + (cellHeightPx / 2);
-
-        // Get actual positions and dimensions
-        if (splashSection) {
-            const beforeStyle = window.getComputedStyle(splashSection, '::before');
-        }
-
-        if (mobileTagline) {
-            const taglineRect = mobileTagline.getBoundingClientRect();
-            const taglineStyle = window.getComputedStyle(mobileTagline);
-
-            // Calculate expected position
-            const cellHeight = (viewportHeight - (8 * gutterPx)) / 7;
-            const expectedBottom = gutterPx + (cellHeight / 2);
-            const expectedTop = viewportHeight - expectedBottom;
-
-        }
-
-        if (mobileArrow) {
-            const arrowRect = mobileArrow.getBoundingClientRect();
-            const arrowStyle = window.getComputedStyle(mobileArrow);
-        }
-
         this.timeline = gsap.timeline({
-            onStart: () => {
-            },
-            onUpdate: () => {
-                // Log progress every 10%
-                const progress = this.timeline.progress();
-                if (progress > 0 && progress % 0.1 < 0.01) {
-                }
-            },
             onComplete: () => {
                 this.onAnimationComplete();
             }
         });
 
         // Show logo (::before pseudo-element via class)
-        // Start after initial delay
         this.timeline.call(() => {
-            const beforeOpacity = window.getComputedStyle(splashSection, '::before').opacity;
-
             splashSection.classList.add('logo-visible');
-
-            // Check every 100ms for 1 second to see opacity transition
-            let checks = 0;
-            const checkInterval = setInterval(() => {
-                checks++;
-                const currentOpacity = window.getComputedStyle(splashSection, '::before').opacity;
-
-                if (checks >= 10) {
-                    clearInterval(checkInterval);
-                }
-            }, 100);
         }, null, `+=${this.ELEMENT_DELAY}`);
 
-        // Show tagline - wait for logo fade duration (0.6s from CSS) + delay
+        // Show tagline (bottom text) after logo fade + delay
         if (mobileTagline) {
             this.timeline.fromTo(mobileTagline,
                 { opacity: 0 },
@@ -344,22 +288,12 @@ const SplashSection = {
                     opacity: 1,
                     duration: this.ELEMENT_FADE_DURATION,
                     ease: 'power2.out',
-                    onStart: () => {
-                    },
-                    onUpdate: function() {
-                        // Log opacity during animation (throttled)
-                        if (this.progress() % 0.25 < 0.1) {
-                        }
-                    },
-                    onComplete: () => {
-                        const finalOpacity = window.getComputedStyle(mobileTagline).opacity;
-                    }
                 },
-                `+=${this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY}` // Logo fade duration + delay
+                `+=${this.ELEMENT_FADE_DURATION + this.ELEMENT_DELAY}`
             );
         }
 
-        // Show arrow (same time as tagline)
+        // Show arrow after bottom text finishes + delay
         if (mobileArrow) {
             this.timeline.fromTo(mobileArrow,
                 { opacity: 0 },
@@ -367,13 +301,8 @@ const SplashSection = {
                     opacity: 1,
                     duration: this.ELEMENT_FADE_DURATION,
                     ease: 'power2.out',
-                    onStart: () => {
-                    },
-                    onComplete: () => {
-                        const finalOpacity = window.getComputedStyle(mobileArrow).opacity;
-                    }
                 },
-                '<' // Same time as tagline
+                `+=${this.ELEMENT_DELAY}`
             );
         }
 
@@ -460,10 +389,11 @@ const SplashSection = {
         // Splash always auto-advances (not affected by autoAdvanceEnabled flag)
         if (!this.hasAutoAdvanced) {
             this.hasAutoAdvanced = true;
+            const delay = ScrollController.isMobile ? this.FINAL_DELAY_MS_MOBILE : this.FINAL_DELAY_MS;
             setTimeout(() => {
                 ScrollController.unlockScroll();
                 ScrollController.advanceToNext();
-            }, this.FINAL_DELAY_MS);
+            }, delay);
         }
     },
 

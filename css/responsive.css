@@ -591,12 +591,14 @@
     }
 
     .what-we-do-text-box {
+        padding-left: var(--gutter);
         padding-right: var(--gutter);
         padding-top: calc(
             var(--gutter) + var(--mobile-cell-height) + var(--gutter)
         ); /* Start at cell 2 */
         height: var(--app-h);
         overflow-x: hidden;
+        background: transparent;
     }
 
     .typing-content {

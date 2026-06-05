@@ -4,13 +4,13 @@ const WorkWithUsSection = {
     init() {
         ScrollController.registerSection('work-with-us-1', {
             onEnter: () => this.onEnter1(),
-            onLeave: () => {},
+
             onScrollAttempt: () => true
         });
 
         ScrollController.registerSection('work-with-us-2', {
             onEnter: () => this.onEnter2(),
-            onLeave: () => {},
+
             onScrollAttempt: () => true
         });
 

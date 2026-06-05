@@ -23,5 +23,4 @@
     width: 100%;
     height: auto;
     display: block;
-    /* filter: invert(1); */ /* Removed - Fixed_WORMARK.png should work without inversion */
 }

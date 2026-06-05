@@ -45,7 +45,6 @@ const MobileMenuController = {
                     ScrollController.unlockScroll();
                     ScrollController.goToSection(targetSection.index, true);
                     this.closeMenu();
-                } else {
                 }
             });
         });

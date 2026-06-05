@@ -18,7 +18,6 @@ const MenuController = {
                     // Unlock scroll if splash screen is blocking
                     ScrollController.unlockScroll();
                     ScrollController.goToSection(targetSection.index);
-                } else {
                 }
             });
         });

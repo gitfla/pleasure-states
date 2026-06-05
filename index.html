@@ -95,33 +95,8 @@
         <link rel="stylesheet" href="css/responsive.css" />
     </head>
     <body>
-        <!-- Logo -->
-        <a href="#splash" class="site-logo" id="siteLogo">
-            <img src="resources/Fixed_WORMARK.png" alt="Pleasure States" />
-        </a>
-
-        <!-- Navigation Menu (Desktop) -->
-        <nav class="main-menu" id="mainMenu">
-            <div class="menu-indicator" id="menuIndicator"></div>
-            <button class="menu-item" data-target="what-we-believe">
-                What we believe
-            </button>
-            <button class="menu-item" data-target="what-we-do">
-                What we do
-            </button>
-            <button class="menu-item" data-target="work-with-us">
-                Work with us
-            </button>
-        </nav>
-
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">MENU</button>
-
         <!-- Mobile Menu Overlay -->
         <div class="mobile-menu-overlay" id="mobileMenuOverlay">
-            <button class="mobile-menu-close" id="mobileMenuClose">
-                CLOSE
-            </button>
             <nav class="mobile-menu-nav">
                 <button class="mobile-menu-item" data-target="what-we-believe">
                     What we believe
@@ -151,6 +126,29 @@
                 >
             </div>
         </div>
+
+        <!-- Mobile Header: logo + toggle/close in a shared flex container for vertical alignment -->
+        <div class="mobile-header">
+            <a href="#splash" class="site-logo" id="siteLogo">
+                <img src="resources/Fixed_WORMARK.png" alt="Pleasure States" />
+            </a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">MENU</button>
+            <button class="mobile-menu-close" id="mobileMenuClose">CLOSE</button>
+        </div>
+
+        <!-- Navigation Menu (Desktop) -->
+        <nav class="main-menu" id="mainMenu">
+            <div class="menu-indicator" id="menuIndicator"></div>
+            <button class="menu-item" data-target="what-we-believe">
+                What we believe
+            </button>
+            <button class="menu-item" data-target="what-we-do">
+                What we do
+            </button>
+            <button class="menu-item" data-target="work-with-us">
+                Work with us
+            </button>
+        </nav>
 
         <!-- Scroll Indicator -->
         <div class="scroll-indicator" id="scrollIndicator"></div>

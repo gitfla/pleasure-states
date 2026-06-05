@@ -31,11 +31,15 @@
     margin-bottom: var(--font-believe-line-height);
 }
 
+.philosophy-paragraph[data-index="3"] {
+    margin-bottom: var(--font-believe-line-height);
+}
+
 .philosophy-paragraph[data-index="4"] {
     margin-bottom: var(--font-believe-line-height);
 }
 
-.philosophy-paragraph[data-index="6"] {
+.philosophy-paragraph[data-index="5"] {
     margin-bottom: var(--font-believe-line-height);
 }
 

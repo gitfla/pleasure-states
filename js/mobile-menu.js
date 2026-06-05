@@ -78,41 +78,36 @@ const MobileMenuController = {
     openMenu() {
         const menuOverlay = document.getElementById('mobileMenuOverlay');
         const menuToggle = document.getElementById('mobileMenuToggle');
-        const siteLogo = document.getElementById('siteLogo');
+        const menuClose = document.getElementById('mobileMenuClose');
 
         if (menuOverlay) {
             menuOverlay.classList.add('active');
         }
 
-        // Switch logo from blend mode to normal + invert so it reads black on white overlay
-        if (siteLogo) {
-            siteLogo.style.mixBlendMode = 'normal';
-            siteLogo.style.filter = 'invert(1)';
-        }
-
-        // Optionally hide the toggle while menu is open
         if (menuToggle) {
             menuToggle.style.opacity = '0';
             menuToggle.style.pointerEvents = 'none';
+        }
+        if (menuClose) {
+            menuClose.style.opacity = '1';
+            menuClose.style.pointerEvents = 'auto';
         }
     },
 
     closeMenu() {
         const menuOverlay = document.getElementById('mobileMenuOverlay');
         const menuToggle = document.getElementById('mobileMenuToggle');
-        const siteLogo = document.getElementById('siteLogo');
+        const menuClose = document.getElementById('mobileMenuClose');
 
         if (menuOverlay) {
             menuOverlay.classList.remove('active');
         }
 
-        // Restore logo blend mode
-        if (siteLogo) {
-            siteLogo.style.mixBlendMode = '';
-            siteLogo.style.filter = '';
+        // Swap CLOSE→MENU immediately (before overlay slides out)
+        if (menuClose) {
+            menuClose.style.opacity = '0';
+            menuClose.style.pointerEvents = 'none';
         }
-
-        // Show toggle again
         if (menuToggle) {
             menuToggle.style.opacity = '1';
             menuToggle.style.pointerEvents = 'auto';

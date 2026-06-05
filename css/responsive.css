@@ -6,7 +6,9 @@
     .mobile-menu-toggle,
     .mobile-menu-overlay,
     .mobile-splash-tagline,
-    .mobile-splash-arrow {
+    .mobile-splash-arrow,
+    .mobile-header,
+    .site-logo-mobile {
         display: none;
     }
 
@@ -228,17 +230,38 @@
         display: none;
     }
 
-    /* Adjust logo for mobile - top align with Cell 1 */
-    .site-logo {
-        top: calc(
-            var(--safe-top) + var(--gutter)
-        ); /* Start of Cell 1 (after top gutter) */
+    /* Mobile header: shared flex container for logo + toggle */
+    .mobile-header {
+        position: fixed;
+        top: calc(var(--safe-top) + var(--gutter)); /* Start of Cell 1 */
         left: var(--gutter);
+        right: var(--gutter);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 101;
+        pointer-events: none;
+        mix-blend-mode: difference; /* Blend against page content */
+    }
+
+    /* Hide desktop logo on mobile */
+    .site-logo {
+        display: none;
+    }
+
+    /* Mobile logo inside flex header */
+    .site-logo-mobile {
+        display: block;
         width: auto;
-        max-width: 60%;
+        max-width: 75%;
         padding: 0;
-        align-items: flex-start; /* Top align */
-        z-index: 101; /* Above mobile menu overlay */
+        pointer-events: auto;
+    }
+
+    .site-logo-mobile img {
+        width: 100%;
+        height: auto;
+        display: block;
     }
 
     /* ========================================
@@ -246,29 +269,21 @@
        ======================================== */
 
     .mobile-menu-toggle {
-        position: fixed;
-        top: calc(
-            var(--safe-top) + var(--precision-gutter)
-        ); /* Align with start of Cell 1, same as logo */
-        right: var(--gutter);
-        z-index: 101;
+        position: absolute;
+        right: 0; /* One gutter from screen edge (header already inset by --gutter) */
         background: transparent;
         border: none;
-        color: #fff; /* White with blend mode for visibility */
-        font-size: var(
-            --font-splash-tagline
-        ); /* Same height as PLEASURE STATES logo */
-        font-weight: 400; /* Not bold */
+        color: #fff;
+        font-size: var(--font-splash-tagline);
+        font-weight: 400;
         letter-spacing: 0.02em;
         cursor: pointer;
         padding: 0;
         display: block;
         opacity: 1;
         pointer-events: auto;
-        transition: opacity 0.6s ease;
-        line-height: 1; /* Remove extra line height spacing */
-        margin-top: -0.1em; /* Cancel font leading above cap height */
-        mix-blend-mode: difference; /* Blend like the logo */
+        line-height: 1;
+        mix-blend-mode: difference;
     }
 
     /* Show on what-we-believe and after (kept for JS compatibility) */
@@ -302,31 +317,26 @@
 
     .mobile-menu-close {
         position: absolute;
-        top: calc(
-            var(--safe-top) + var(--precision-gutter)
-        ); /* Align with start of Cell 1, same as MENU */
-        right: var(--gutter);
+        right: 0; /* Same position as MENU toggle */
         background: transparent;
         border: none;
-        color: #000; /* Black text on white background */
-        font-size: var(--font-splash-tagline); /* Same as MENU */
-        font-weight: 400; /* Not bold */
+        color: #fff;
+        font-size: var(--font-splash-tagline);
+        font-weight: 400;
         letter-spacing: 0.02em;
         cursor: pointer;
         padding: 0;
-        line-height: 1; /* Remove extra line height spacing, same as MENU */
-        margin-top: -0.1em; /* Cancel font leading above cap height */
+        line-height: 1;
+        pointer-events: none;
+        opacity: 0; /* Hidden by default, shown via JS when menu opens */
     }
 
     .mobile-menu-social {
         position: absolute;
-        bottom: calc(
-            var(--safe-bottom) + var(--precision-gutter) +
-                var(--precision-cell-height) / 2
-        );
-        transform: translateY(50%);
-        left: 0;
-        right: 0;
+        bottom: calc(var(--gutter) + var(--mobile-cell-height) - var(--button-height)); /* Match CTA top edge */
+        left: var(--gutter);
+        right: var(--gutter);
+        height: clamp(52px, 6.18vh, 69px); /* Match CTA height */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -337,7 +347,6 @@
     }
 
     .mobile-menu-social-link {
-        flex: 1;
         color: #000;
         text-decoration: none;
         font-size: 17px;
@@ -345,22 +354,15 @@
         line-height: 0.87;
     }
 
-    .mobile-menu-social-link:first-child {
-        text-align: right;
-        padding-right: 0.4em;
-    }
-
-    .mobile-menu-social-link:last-child {
-        text-align: left;
-        padding-left: 0.4em;
-    }
-
     .mobile-menu-social-divider {
-        color: #000;
-        font-size: 17px;
-        font-weight: 700;
-        line-height: 0.87;
+        display: inline-block;
+        width: 1.5px;
+        height: 0.72em;
+        background-color: #000;
+        border-radius: 999px;
+        vertical-align: middle;
         flex-shrink: 0;
+        margin: 0 0.7em;
     }
 
     .mobile-menu-nav {

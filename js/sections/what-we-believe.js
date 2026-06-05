@@ -13,7 +13,7 @@ const WhatWeBelieveSection = {
         const paragraphs = document.querySelectorAll('.philosophy-paragraph');
 
         // Restore last paragraph text if it was previously split into word spans
-        const lastParagraph = paragraphs[6];
+        const lastParagraph = paragraphs[5];
         if (lastParagraph && lastParagraph.dataset.originalText) {
             lastParagraph.textContent = lastParagraph.dataset.originalText;
         }

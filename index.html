@@ -95,10 +95,57 @@
         <link rel="stylesheet" href="css/responsive.css" />
     </head>
     <body>
-        <!-- Logo -->
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+            <nav class="mobile-menu-nav">
+                <button class="mobile-menu-item" data-target="what-we-believe">
+                    What we believe
+                </button>
+                <button class="mobile-menu-item" data-target="what-we-do">
+                    What we do
+                </button>
+                <button class="mobile-menu-item" data-target="work-with-us">
+                    Work with us
+                </button>
+            </nav>
+            <div class="mobile-menu-social">
+                <a
+                    href="mailto:hello@pleasurestates.com"
+                    class="mobile-menu-social-link"
+                    >Email</a
+                >
+                <span class="mobile-menu-social-divider"></span>
+                <a
+                    href="https://www.instagram.com/pleasurestates"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mobile-menu-social-link"
+                    >Instagram</a
+                >
+                <span class="mobile-menu-social-divider"></span>
+                <a
+                    href="https://www.linkedin.com/company/pleasurestates/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mobile-menu-social-link"
+                    >Linkedin</a
+                >
+            </div>
+        </div>
+
+        <!-- Logo (desktop) -->
         <a href="#splash" class="site-logo" id="siteLogo">
             <img src="resources/Fixed_WORMARK.png" alt="Pleasure States" />
         </a>
+
+        <!-- Mobile Header: logo + toggle/close in a shared flex container for vertical alignment -->
+        <div class="mobile-header">
+            <a href="#splash" class="site-logo-mobile" id="siteLogoMobile">
+                <img src="resources/Fixed_WORMARK.png" alt="Pleasure States" />
+            </a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">MENU</button>
+            <button class="mobile-menu-close" id="mobileMenuClose">CLOSE</button>
+        </div>
 
         <!-- Navigation Menu (Desktop) -->
         <nav class="main-menu" id="mainMenu">
@@ -114,44 +161,6 @@
             </button>
         </nav>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">MENU</button>
-
-        <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">
-            <button class="mobile-menu-close" id="mobileMenuClose">
-                CLOSE
-            </button>
-            <nav class="mobile-menu-nav">
-                <button class="mobile-menu-item" data-target="what-we-believe">
-                    What we believe
-                </button>
-                <button class="mobile-menu-item" data-target="what-we-do">
-                    What we do
-                </button>
-                <button class="mobile-menu-item" data-target="work-with-us">
-                    Work with us
-                </button>
-            </nav>
-            <div class="mobile-menu-social">
-                <a
-                    href="https://www.instagram.com/pleasurestates"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="mobile-menu-social-link"
-                    >Instagram</a
-                >
-                <span class="mobile-menu-social-divider">|</span>
-                <a
-                    href="https://www.linkedin.com/company/pleasurestates/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="mobile-menu-social-link"
-                    >Linkedin</a
-                >
-            </div>
-        </div>
-
         <!-- Scroll Indicator -->
         <div class="scroll-indicator" id="scrollIndicator"></div>
 
@@ -163,13 +172,25 @@
             tabindex="0"
             aria-label="Follow the feeling — contact us"
         >
-            <span class="cta-default" aria-hidden="true">FOLLOW THE FEELING</span>
+            <span class="cta-default" aria-hidden="true"
+                >FOLLOW THE FEELING</span
+            >
             <span class="cta-hover">
                 <a href="mailto:hello@pleasurestates.com">Email</a>
                 <span class="cta-sep" aria-hidden="true"></span>
-                <a href="https://www.instagram.com/pleasurestates" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a
+                    href="https://www.instagram.com/pleasurestates"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Instagram</a
+                >
                 <span class="cta-sep" aria-hidden="true"></span>
-                <a href="https://www.linkedin.com/company/pleasurestates/" target="_blank" rel="noopener noreferrer">Linkedin</a>
+                <a
+                    href="https://www.linkedin.com/company/pleasurestates/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Linkedin</a
+                >
             </span>
         </div>
 
@@ -270,18 +291,18 @@
                         It's how people know they're alive.
                     </p>
                     <p class="philosophy-paragraph" data-index="3">
-                        There are more states of it than we ever explore.
+                        There are more states of it than we ever explore. Few go
+                        looking.
                     </p>
                     <p class="philosophy-paragraph" data-index="4">
-                        Few go looking.
+                        Our creative strategy practice is guided by instinct,
+                        truth, and the permission to feel it all.
                     </p>
                     <p class="philosophy-paragraph" data-index="5">
-                        Our creative strategy practice is guided by instinct, truth, and the permission to feel it all.
+                        In the ideas we shape, the experiences we imagine and
+                        the relationships we keep.
                     </p>
                     <p class="philosophy-paragraph" data-index="6">
-                        In the ideas we shape, the experiences we imagine and the relationships we keep.
-                    </p>
-                    <p class="philosophy-paragraph" data-index="7">
                         Otherwise, what's the point?
                     </p>
                 </div>

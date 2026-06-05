@@ -35,7 +35,7 @@
 
 @media (min-width: 769px) {
     body::before {
-        display: block; /* Debug grid — change to block to show */
+        display: none; /* Debug grid — change to block to show */
         content: "";
         position: fixed;
         inset: 0;
@@ -154,7 +154,7 @@
 
 @media (max-width: 768px) {
     body::after {
-        display: block; /* Debug grid — change to block to show */
+        display: none; /* Debug grid — change to block to show */
         content: "";
         position: fixed;
         top: 0;

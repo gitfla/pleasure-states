@@ -30,13 +30,17 @@
     opacity: 1;
 }
 
+.menu-item:first-of-type {
+    margin-top: -0.1em; /* Cancel font leading above cap height */
+}
+
 .menu-item {
     color: var(--color-text);
     font-size: var(--font-menu);
     font-weight: 700;
     letter-spacing: 0.02em;
     padding: 0;
-    padding-left: calc(var(--gutter) * 2);
+    margin-left: calc(var(--gutter) * 2);
     transition: color 0.3s ease;
     text-align: right;
     background-color: transparent;

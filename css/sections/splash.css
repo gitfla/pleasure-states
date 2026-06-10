@@ -95,6 +95,7 @@
     object-position: center center;
     z-index: 0;
     opacity: 1;
+    display: block;
     /* No transition - just stay visible, video will fade on top */
 }
 

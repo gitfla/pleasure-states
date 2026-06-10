@@ -340,7 +340,7 @@ const ScrollController = {
         }
 
         const cleanup = () => {
-            gsap.set(currentSectionData.element, { top: '100%', zIndex: 0, clipPath: 'none' });
+            gsap.set(currentSectionData.element, { top: 'var(--app-h)', zIndex: 0, clipPath: 'none' });
             gsap.set(targetSectionData.element, { zIndex: '' });
             // Restore CTA z-index after first reveal
             if (ctaButton && enteringWorkWithUs2 && !ctaAlreadyRevealed) {
@@ -349,7 +349,7 @@ const ScrollController = {
             const lo = Math.min(targetIndex, previousSection);
             const hi = Math.max(targetIndex, previousSection);
             for (let i = lo + 1; i < hi; i++) {
-                gsap.set(this.sections[i].element, { top: '100%' });
+                gsap.set(this.sections[i].element, { top: 'var(--app-h)' });
             }
             this.onTransitionComplete(targetIndex);
         };

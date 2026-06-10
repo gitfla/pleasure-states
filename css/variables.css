@@ -18,6 +18,10 @@
 }
 
 :root {
+    --app-h: 100vh; /* Mobile overrides to 100dvh below */
+}
+
+:root {
     /* ========================================
        MODULAR GRID SYSTEM
        Reference: 1728×1117px, 6×7 grid
